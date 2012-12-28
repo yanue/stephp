@@ -1,0 +1,242 @@
+@CHARSET "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+		outline:none;
+}
+
+body {
+	font: 12px/18 Arial;
+	line-height: 180%;
+	color: #666;
+	text-shadow: 0 0 3px rgba(200, 230, 240, 0.3);
+	line-height: 180%;
+	background: #f9f9f9;
+
+}
+
+a {
+	color: #06f;
+	text-decoration: none;
+}
+
+ul {
+	list-style-type: none;
+}
+
+a:hover {
+	color: #666;
+    text-decoration: underline;
+	outline: none;
+}
+
+.clear {
+	clear: both;
+}
+
+img {
+	border: none;
+}
+h1,h2,h3,h4,h5,h6{font-family:"Microsoft Yahei";}
+
+#header {
+	border: 1px solid #e6e6e6;
+	border-top: none;
+	height: 60px;
+	box-shadow: 1px 1px 5px rgba(200, 160, 160, 0.3);
+	position: relative;
+	background: #FFF url(../images/head.png) -20px top no-repeat;
+}
+
+#header #logo {
+	height: 58px;
+	width: 106px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background: url(../images/logo.png) 8px center no-repeat;
+}
+
+#header #logo a {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+#header #nav {
+	padding: 35px 5px 0 208px;
+	overflow: hidden;
+}
+
+#header #nav span {
+	float: right;
+}
+
+#main {
+	border: 1px solid #e6e6e6;
+	position: relative;
+}
+/*侧边栏*/
+#main #sidebar {
+	float: left;
+	width: 200px;
+    background:#fff;
+	position: absolute;
+	left: 0px;
+	top: 5px;
+    box-shadow: 1px 1px 5px rgba(200, 160, 160, 0.3) ;
+	z-index: 2;
+	min-height: 690px;
+    border: 1px solid #e6e6e6;
+    overflow: hidden;
+}
+
+#main #sidebar #user {
+	height: 60px;
+	margin: 5px 5px;
+    border: 1px solid #e0e0e0;
+	padding: 5px 0;
+	background: #FFF url(../images/user.png) 5px center no-repeat;
+}
+
+#main #sidebar #user p {
+	margin: 0 0 0 60px;
+	line-height: 20px;
+	overflow: hidden;
+}
+/*menu*/
+
+#sidebar #leftIndex{
+    width: 36px;
+    float: left;
+    margin: 0 0 0 5px;
+    border: 1px solid #E0E0E0;
+    border-bottom: none;
+
+}
+#sidebar #leftIndex a{
+    display: block;
+    padding: 10px;
+    font-family: "Microsoft YaHei";
+    color: #555;
+    line-height: 120%;
+}
+
+#sidebar #leftIndex a:hover{
+    text-decoration: none;
+}
+
+#sidebar #leftIndex li{
+    position: relative;
+    font-size: 14px;
+    border-left: 0;
+    border-bottom: 1px solid #E0E0E0;
+    border-top: 1px solid white;
+    cursor: pointer;
+}
+
+
+
+#sidebar #leftIndex .selected{
+    background: white;
+    border-left: 3px solid #81C036;
+    border-top: 0 none;
+    font-weight: bold;
+    box-shadow: -1px 2px 3px #F0EFEF inset;
+}
+
+#sidebar #leftIndex .selected a{
+    color: #000;
+}
+
+#main #sidebar #menu {
+    float: left;
+    width: 156px;
+    margin: -8px 0 0 1px;
+    overflow: hidden;
+    font-family: 'Microsoft YaHei';
+}
+
+#main #sidebar #menu .menuTitle {
+	margin: 8px 5px;
+	padding: 0 0 0 16px;
+	line-height: 30px;
+	font-size: 14px;
+	cursor: pointer;
+	border: 1px solid #e0e0e0;
+    background: url("../images/nav.png") repeat-x 0 -20px;
+}
+
+#main #sidebar #menu .menuTitle:hover {
+    background-position: 0 -68px;
+	text-decoration: none;
+    border: 1px solid #ccc;
+}
+
+#main #sidebar #menu .selected {
+    background-position: 0 -110px;
+    box-shadow: -1px 2px 3px #F0EFEF inset;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    color: #000;
+
+}
+
+#main #sidebar #menu .menuList {
+	margin: 0 5px;
+	padding: 5px;
+	border: 1px solid #e0e0e0;
+    background: #fff;
+}
+
+#main #sidebar #menu .menuList a {
+	display: block;
+	height: 100%;
+	line-height: 200%;
+	padding: 0 0 0 20px;
+	margin: 0 0 0 0px;
+    color: #666;
+    background: url("../images/nav_l.png") no-repeat 6px center;
+}
+
+#main #sidebar #menu .menuList a:hover{
+    background-color: #f6f6f6;
+}
+
+#main #sidebar #menu .menuList .current{
+    background-color: #f3f3f3;
+}
+
+/*内容区域*/
+#main #showpage {
+	border: 1px solid #e6e6e6;
+	box-shadow: 1px 1px 5px rgba(200, 160, 160, 0.3);
+	background: #fff;
+	margin: 5px 0 0 208px;
+	line-height: 30px;
+	padding: 0 0 0 8px;
+	z-index: 1;
+}
+
+#main #content {
+	border: 1px solid #e6e6e6;
+	box-shadow: 1px 1px 5px rgba(200, 160, 160, 0.3);
+	background: #fff;
+	padding: 5px;
+	margin: 6px 0 6px 208px;
+	min-height: 632px;
+	z-index: 1;
+}
+
+#footer {
+	border: 1px solid #e6e6e6;
+	box-shadow: 1px 1px 5px rgba(200, 160, 160, 0.3);
+	background: #fff;
+	line-height: 36px;
+	padding: 0 8px;
+}
+
+#footer span {
+	float: right;
+}

@@ -1,0 +1,29 @@
+/*弹出层的STYLE*/
+#msgbg{ position: absolute; top: 0; left: 0;z-index:9999; width: 100%; height: 100%;background:#ccc;opacity: 0.5;filter:alpha(opacity=50);zoom:1; display:none;}
+#msgDiv {
+z-index:10000;
+border-radius:5px;
+width:360px;
+background: #fff;
+text-align: left;
+font-size: 12px;
+left:50%;/*FF IE7*/
+top: 50%;/*FF IE7*/
+margin-left:-200px!important;/*FF IE7 该值为本身宽的一半 */
+margin-top:-60px!important;/*FF IE7 该值为本身高的一半*/
+margin-top:0px;
+position:fixed!important;/*FF IE7*/
+position:absolute;/*IE6*/
+_top:expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop + (document.documentElement.clientHeight-this.offsetHeight)/2 :/*IE6*/ document.body.scrollTop + (document.body.clientHeight - this.clientHeight)/2);/*IE5 IE5.5*/
+display:none;
+}
+#msgDiv #msgTitle{font-family:"微软雅黑";border-radius:5px;background:#c00;margin:3px;display:block;padding:5px 15px;line-height:25px;color:#fff;font-weight:bold;}
+#msgDiv #msgTitle span{float:right;}
+#msgDiv #msgTitle span:hover{color:#f00;cursor:pointer;}
+#msgDiv #msgContent{padding:8px;}
+#msgDiv #confirm{padding:5px 0;margin:5px 8px;display:block;border-top:1px solid #f0f0f0;}
+#msgDiv #confirm .msgbutton{font-size:12px;background: #EEEEEE;border: 1px solid #D8DCDF;color: #004276;font-weight: bold;display:inline-block;padding:2px 6px;border-radius:3px;cursor:pointer;}
+#msgDiv #confirm .msgbutton:hover{border: 1px solid #cdd5da; background: #f6f6f6 50% 50% repeat-x; font-weight: bold; color: #336699; outline: none;}
+#msgDiv a{text-decoration:none;color:#f00;}
+#msgDiv a:hover{color:#f60;}
+/*The END*/
