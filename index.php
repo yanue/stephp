@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: yansueh
- * Date: 12-12-15
- * Time: 上午11:50
- */
-require_once 'library/Bootstrap.php';
+error_reporting(0);
+define('ROOT_PATH', dirname(__FILE__).'/');
+require_once ROOT_PATH.'library/Bootstrap.php';
 $app = new Bootstrap();
 $app->init();
