@@ -1,148 +1,235 @@
 <?php
+define('VERSION', '1.0.1');
+
+if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 class Bootstrap {
+    public static $_fullUrl         = null;
+    public static $_moduleName      = 'default';
+    public static $_appPath         = null;
+    public static $_moduleCurPath   = null;
+    public static $_controllerName 	= 'index';  // 控制器
+    public static $_actionName 		= 'index';  // 方法
+    public static $_requestString   = array(); # ?后面的部分 a=b&c=d
+    public static $_requestParams   = array();
+    public static $_requestPath     = array(); # action 后面的目录结构
+    public static $_urlSuffix       = '.html'; # path部分后面
+    public static $_isRouterMatched = false; # 是否经过路由并验证通过
 
-    private	$_url				= null;
-    private $_controller 		= null;
-
-    private $_controllerPath 	= 'controllers/';
-    private $_modelPath 		= 'models/';
     private $_libPath 			= 'library/';
     private $_errorFile 		= 'ErrorController.php';
-    private $_defaultFile 		= 'IndexController.php';
 
+    public function __construct(){
+        $GLOBALS['_startTime']=microtime(true);
+        $GLOBALS['_startMemory']=memory_get_usage();
+    }
 
     /**
-     * Starts the Bootstrap
+     * 初始化应用
      *
-     * @return boolean
      */
-    public function init()
-    {
-		require_once 'config.php';
-        // Sets the protected $_url
-        $this->_getUrl();
+    public function init() {
         $this->__autoLoad();
-        // Load the default controller if no URL is set
-        // eg: Visit http://localhost it loads Default Controller
-        if (empty($this->_url[0])) {
-            $this->_loadDefaultController();
-            return false;
+        if($timeZone = $this->_getIni('phpSettings.date.timezone')){
+            date_default_timezone_set($timeZone);
+        }
+        if($display_errors = $this->_getIni('phpSettings.display_errors')){
+            ini_set('display_errors',$display_errors);
+        }
+        // 设定错误和异常处理
+        if($this->_getIni('phpSettings.debug')){
+            register_shutdown_function(array('Debug','fatalError'));
+            set_error_handler(array('Debug','appError'));
+            set_exception_handler(array('Debug','appException'));
         }
 
-        $this->_loadExistingController();
-        $this->_callControllerMethod();
-    }
-
-    /**
-     * Fetches the $_GET from 'url'
-     */
-    private function _getUrl()
-    {
-        $url = isset($_GET['url']) ? $_GET['url'] : null;
-        $url = rtrim($url, '/');
-        $url = filter_var($url, FILTER_SANITIZE_URL);
-        $this->_url = explode('/', $url);
-    }
-
-    /**
-     * This loads if there is no GET parameter passed
-     */
-    private function _loadDefaultController()
-    {
-        require $this->_controllerPath . $this->_defaultFile;
-        $this->_controller = new IndexController();
-        $this->_controller->index();
-    }
-
-    /**
-     * Load an existing controller if there IS a GET parameter passed
-     *
-     * @return boolean|string
-     */
-    private function _loadExistingController()
-    {
-        require_once 'config.php';
-        $file = $this->_controllerPath . $this->_url[0] . 'Controller.php';
-
-        if (file_exists($file)) {
-            require_once $file;
-            $controller = $this->_url[0].'Controller';
-            $this->_controller = new $controller;
-            $this->_controller->loadModel($this->_url[0], $this->_modelPath);
-        } else {
-            $this->_error();
-            return false;
-        }
-    }
-
-    /**
-     * If a method is passed in the GET url parameter
-     *
-     *  http://localhost/controller/method/(param)/(param)/(param)
-     *  url[0] = Controller
-     *  url[1] = Method
-     *  url[2] = Param
-     *  url[3] = Param
-     *  url[4] = Param
-     */
-    private function _callControllerMethod()
-    {
-        $length = count($this->_url);
-
-        // Make sure the method we are calling exists
-        if ($length > 1) {
-            if (!method_exists($this->_controller, $this->_url[1])) {
-                $this->_error();
-                return false;
+        self::$_appPath = ROOT_PATH.($this->_getIni('application.path') ? $this->_getIni('application.path') : 'app').'/';
+        $routerFile = self::$_appPath.'AppRouter.php';
+        # 路由设置
+        if(file_exists($routerFile)){
+            require_once $routerFile;
+            if(method_exists('AppRouter','__construct')){
+                new AppRouter();
             }
         }
 
-        // Determine what to load
-        switch ($length) {
-            case 5:
-                //Controller->Method(Param1, Param2, Param3)
-                $this->_controller->{$this->_url[1]}($this->_url[2], $this->_url[3],$this->_url[4]);
-                break;
+        $this->urlParse();
+        $this->_execute();
+    }
 
-            case 4:
-                //Controller->Method(Param1, Param2)
-                $this->_controller->{$this->_url[1]}($this->_url[2], $this->_url[3]);
-                break;
+    /**
+     * url解析并分配mvc
+     *
+     *
+     */
+    private function urlParse(){
+        if(self::$_isRouterMatched == true) return false;#经过路由就不需要下面的处理了
+        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        $path = ltrim(Request::getPath(),'/');
+        # 判断url后缀是否存在
+        self::$_urlSuffix = $settings['application.default.suffix'] ? $settings['application.default.suffix'] : self::$_urlSuffix;
+        # 截取后缀
+        if(strlen($path)>strlen(self::$_urlSuffix)){
+            $path = (false === strripos($path,self::$_urlSuffix,strlen(self::$_urlSuffix))) ? $path : substr($path,0,strlen($path)-strlen(self::$_urlSuffix));
+        }
+        # 解析module,controller,action去他参数
+        $pathArr = explode('/', $path);
+        # 取出控制
+        $pathArr = array_values(array_diff($pathArr, array(null)));
+        $this->parseMvc($pathArr);
+    }
 
-            case 3:
-                //Controller->Method(Param1, Param2)
-                $this->_controller->{$this->_url[1]}($this->_url[2]);
-                break;
+    /**
+     * 解析mvc结构
+     */
+    private function parseMvc($pathArr){
+        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        # 通过'?'后面参数初步设置mvc
+        $module = Request::get('module') ? Request::get('module') : $this->_getIni('application.default.module');
+        $controller = Request::get('controller') ? Request::get('controller') : $this->_getIni('application.default.controller');
+        $action = Request::get('action') ? Request::get('action') : $this->_getIni('application.default.action');
 
-            case 2:
-                //Controller->Method(Param1, Param2)
-                $this->_controller->{$this->_url[1]}();
-                break;
+        # 截取mvc部分后面的path请求key=>val
+        $paramPath = array();
+        # 获取action后面的目录结构参数起始位置:第一个是不是module决定是否删除第3个元素,剩下作为path部分的除mvc外的请求参数
+        $unset_pathArr_pos2 = false;
+        # 第一个参数与默认的module名相同
+        if(isset($pathArr[0]) && $settings['application.default.module'] == $pathArr[0]){
+            $module = isset($pathArr[0]) && $pathArr[0]!='' ? $pathArr[0] : $module ;
+            $controller = isset($pathArr[1]) && $pathArr[1]!='' ? $pathArr[1] : $controller ;
+            $action = isset($pathArr[2]) && $pathArr[2]!='' ? $pathArr[2] : $action ;
+            if(($len = count($pathArr)) > 2){
+                $unset_pathArr_pos2 = true;
+                for($i=0;$i<ceil(($len-3)/2);$i++){
+                    $paramPath[$pathArr[$i*2+3]] = isset($pathArr[$i*2+4]) ? $pathArr[$i*2+4] : '';
+                }
+            }
+        }else{
+            # 第一个参数与默认的module名不相同,则判断以它为module是否存在,
+            if(isset($pathArr[0]) && file_exists(self::$_appPath.$pathArr[0])){
+                # 模块文件夹存在
+                $module = isset($pathArr[0]) && $pathArr[0]!='' ? $pathArr[0] : $module ;
+                $controller = isset($pathArr[1]) && $pathArr[1]!='' ? $pathArr[1] : $controller ;
+                $action = isset($pathArr[2]) && $pathArr[2]!='' ? $pathArr[2] : $action ;
+                if(($len = count($pathArr)) >2 ){
+                    $unset_pathArr_pos2 = true;
+                    for($i=0;$i<ceil(($len-3)/2);$i++){
+                        $paramPath[$pathArr[$i*2+3]] = isset($pathArr[$i*2+4]) ? $pathArr[$i*2+4] : '';
+                    }
+                }
+            }else{
+                # 模块不存在,调用默认模块
+                $controller = isset($pathArr[0]) && $pathArr[0]!='' ? $pathArr[0] : $controller ;
+                $action = isset($pathArr[1]) && $pathArr[1]!='' ? $pathArr[1] : $action ;
+                if(($len = count($pathArr)) >2 ){
+                    for($i=0;$i<ceil(($len-2)/2);$i++){
+                        if($pathArr[$i*2+2] && !is_numeric($pathArr[$i*2+2])){
+                            $paramPath[$pathArr[$i*2+2]] = isset($pathArr[$i*2+3]) ? $pathArr[$i*2+3] : '';
+                        }
+                    }
+                }
+            }
+        }
+        $paramMvc = array(
+            'module'        =>$module,
+            'controller'    =>$controller,
+            'action'        =>$action
+        );
+        # 静态变量赋值
+        self::$_moduleName      = $module;
+        self::$_controllerName  = $controller;
+        self::$_actionName      = $action;
+        self::$_moduleCurPath   = self::$_appPath.self::$_moduleName.'/';
 
-            default:
-                $this->_controller->index();
-                break;
+        unset($pathArr[0]);
+        unset($pathArr[1]);
+        if($unset_pathArr_pos2) unset($pathArr[2]);
+        $requestPath = array_values($pathArr);
+
+
+        # 解析'?'后query部分a=b&c=d
+        $paramQuery = array();
+        $queryString = isset($urlParam['query']) ? $urlParam['query'] : '' ;
+        parse_str($queryString,$paramQuery);
+        # 合并所有请求
+        $requestParams = array_merge($paramMvc,$paramQuery,$paramPath);
+
+        self::$_requestString   = $queryString;
+        self::$_requestPath     = $requestPath;
+        self::$_requestParams   = $requestParams;
+    }
+
+    /**
+     * 根据url引入控制器并调用方法
+     *
+     * @return null
+     */
+    private function _execute(){
+        $controller = ucfirst(self::$_controllerName) . 'Controller';
+        $action = self::$_actionName.'Action';
+        $file = self::$_moduleCurPath . 'controllers/' . $controller . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            if (! method_exists($controller, $action)) {
+                $this->_error();
+            }else{
+                $controllerObj = new $controller();
+                $controllerObj->{$action}();
+            }
+        } else {
+            $this->_error();
         }
     }
 
     /**
-     * Display an error page if nothing exists
-     *
-     * @return boolean
+     * 获取ini配置文件的参数
      */
-    private function _error() {
-        require_once $this->_controllerPath . $this->_errorFile;
-        $this->_controller = new ErrorController();
-        $this->_controller->index();
-        return false;
+    private function _getIni($key){
+        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        return isset($settings[$key]) ? $settings[$key] : '' ;
+    }
+    
+    /**
+     * 错误提示
+     *
+     * @return null
+     */
+    private function _error($msg='') {
+        $file = self::$_moduleCurPath . $this->_errorFile;
+        if(file_exists($file)){
+            require_once $file;
+            $controllerObj = new ErrorController();
+            $controllerObj->indexAction();
+        }else{
+            echo '错误:访问地址不存在!'.$msg;
+            Debug::trace();
+        }
     }
 
-    // auto load base class
-    public function __autoLoad (){
-        require_once $this->_libPath.'Controller.php';
-        require_once $this->_libPath.'Model.php';
-        require_once $this->_libPath.'View.php';
+    /**
+     * 加载基本核心类文件
+     *
+     * @return null
+     */
+    private  function __autoLoad (){
+        require_once ROOT_PATH.$this->_libPath.'db/Db.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Model.php';
+        require_once ROOT_PATH.$this->_libPath.'core/View.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Controller.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Uri.php';
+        require_once ROOT_PATH.$this->_libPath.'util/Debug.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Router.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Loader.php';
+        require_once ROOT_PATH.$this->_libPath.'func/Func.php';
+        require_once ROOT_PATH.$this->_libPath.'core/Request.php';
+        require_once ROOT_PATH.$this->_libPath.'util/MsgCode.php';
+        require_once ROOT_PATH.$this->_libPath.'util/Hash.php';
+        require_once ROOT_PATH.$this->_libPath.'util/Session.php';
+        require_once ROOT_PATH.$this->_libPath.'util/Cookie.php';
+        require_once ROOT_PATH.$this->_libPath.'util/Csrf.php';
     }
 
+    public function __destruct(){
+//        Debug::memAndTime();
+    }
 }
