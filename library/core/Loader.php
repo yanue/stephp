@@ -1,152 +1,83 @@
 <?php
-/*
- * Loader.php
- *------------------------------------------------------------------------------
- * @copyright : yanue.net
- *------------------------------------------------------------------------------
- * @author : yanue
- * @date : 13-6-18
- *------------------------------------------------------------------------------
- */
+class Loader {
 
-class Loader
-{
+    private static $_modelPath = '';
+    private static $_libPath = '';
+    private static $_isSetLib = false;
+    private static $_isSetModel = false;
+    public static $loader;
 
-    /**
-     * Controller Directory Path
-     *
-     * @var Array
-     * @access protected
-     */
-    protected $_controllerDirectoryPath = array();
-
-    /**
-     * Model Directory Path
-     *
-     * @var Array
-     * @access protected
-     */
-    protected $_modelDirectoryPath = array();
-
-    /**
-     * Library Directory Path
-     *
-     * @var Array
-     * @access protected
-     */
-    protected $_libraryDirectoryPath = array();
-
-
-    /**
-     * Constructor
-     * Constant contain my full path to Model, View, Controllers and Lobrary-
-     * Direcories.
-     *
-     * @Constant MPATH,VPATH,CPATH,LPATH
-     */
-
-    public function __construct()
+    public static function init()
     {
-
-        $this->libraryDirectoryPath     = ROOT_PATH.'library/util';
-
-        spl_autoload_register(array($this,'load_library'));
+        if (self::$loader == NULL)
+            self::$loader = new self();
+        return self::$loader;
     }
 
-    /**
-     *-----------------------------------------------------
-     * Load Library
-     *-----------------------------------------------------
-     * Method for load library.
-     * This method return class object.
-     *
-     * @library String
-     * @param String
-     * @access public
+    public function __construct() {
+        self::$_libPath = $this->setIncludePathStr(array('./library/core','./library/db','./library/func','./library/util'));
+        spl_autoload_register(array($this,'library'));
+        spl_autoload_register(array($this,'model'));
+    }
+
+    /*
+     * 自动加载library下面的类
      */
-    public function load_library($library, $param = null)
+    public function library($class)
     {
-        print_r($library);
-        if (is_string($library)) {
-            return $this->initialize_class($library);
+        if(!self::$_isSetLib){
+            self::$_isSetLib=true;
+            // 设置所有library下的子目录
+            $include_paths = get_include_path().PATH_SEPARATOR.self::$_libPath;
+            set_include_path($include_paths);
         }
-        if (is_array($library)) {
-            foreach ($library as $key) {
-                return $this->initialize_class($library);
+        $file = $class.'.php';
+        require_once $file;
+    }
+
+    // TODO
+    public function model($class)
+    {
+        if(!self::$_isSetModel){
+            self::$_isSetModel=true;
+            $include_paths = set_include_path(get_include_path().PATH_SEPARATOR.self::$_modelPath);
+            set_include_path($include_paths);
+        }
+        $file = $class.'.php';
+        echo 'asd';
+        require_once $file;
+    }
+
+    public function setModelPath($path){
+        self::$_modelPath = $path;
+        spl_autoload_register(array($this,'model'));
+        echo 'asd';
+    }
+    
+    public function helper($class)
+    {
+        $class = preg_replace('/_helper$/ui','',$class);
+        set_include_path(get_include_path().PATH_SEPARATOR.'/helper/');
+        spl_autoload_extensions('.helper.php');
+        spl_autoload($class);
+    }
+
+    /*
+     * 组合多个目录
+     *
+     * 参考 set_include_path
+     */
+    private function setIncludePathStr($paths){
+        $path_str = '';
+        if(is_array($paths)){
+            foreach ($paths as $path) {
+                $path_str .= $path.PATH_SEPARATOR;
             }
+        }else{
+            $path_str = $paths;
         }
+        return $path_str;
     }
-
-    /**
-     *-----------------------------------------------------
-     * Initialize Class
-     *-----------------------------------------------------
-     * Method for initialise class
-     * This method return new object.
-     * This method can initialize more class using (array)
-     *
-     * @library String|Array
-     * @param String
-     * @access public
-     */
-    public function initialize_class($library)
-    {
-        try {
-            if (is_array($library)) {
-                foreach($library as $class) {
-                    $arrayObject =  new $class;
-                }
-                return $this;
-            }
-            if (is_string($library)) {
-                print_r($library);
-
-                spl_autoload($library);
-            }else {
-                throw new Exception('Class name must be string.');
-            }
-            if (null == $library) {
-                throw new Exception('You must enter the name of the class.');
-            }
-        } catch(Exception $exception) {
-            echo $exception;
-        }
-    }
-
-    /**
-     * Autoload Controller class
-     *
-     * @param  string $class
-     * @return object
-     */
-
-    public function load_controller($controller)
-    {
-        if ($controller) {
-            set_include_path($this->controllerDirectoryPath);
-            spl_autoload_extensions('.php');
-            spl_autoload_register();
-        }
-    }
-
-
-    /**
-     * Autoload Model class
-     *
-     * @param  string $class
-     * @return object
-     */
-
-    public function load_models($model)
-    {
-        if ($model) {
-            set_include_path($this->modelDirectoryPath);
-            spl_autoload_extensions('.php');
-            spl_autoload_register();
-        }
-    }
-
-
-
-
 }
+
+?>

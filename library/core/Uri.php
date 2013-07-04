@@ -1,16 +1,19 @@
 <?php
+/**
+ * uri各种参数获取综合类
+ * 
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.0 - 2013-07-04
+ */
+
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-/*==============================================================================
- * uri操作处理
- *------------------------------------------------------------------------------
- * @copyright : yanue.net
- *------------------------------------------------------------------------------
- * @author : yanue
- * @date : 13-6-6
- *==============================================================================*/
+class Uri extends Dispatcher{
 
-class Uri {
+    public function __construct(){
+        parent::__construct();
+    }
 
     /* *
      * -----------------------------------------------------------------------------------------------------------------
@@ -25,7 +28,7 @@ class Uri {
      * -----------------------------------------------------------------------------------------------------------------
      * */
     public function getParam($key){
-        $params = Bootstrap::$_requestParams;
+        $params = parent::$_requestParams;
         return isset($params[$key]) ? $params[$key] : false ;
     }
 
@@ -44,7 +47,7 @@ class Uri {
      * -----------------------------------------------------------------------------------------------------------------
      * */
     public function getUri($n){
-        $params = Bootstrap::$_requestPath;
+        $params = parent::$_requestPath;
         return isset($params[$n-1]) ? $params[$n-1] : false ;
     }
 
@@ -58,7 +61,7 @@ class Uri {
      * -----------------------------------------------------------------------------------------------------------------
      * */
     public function getUrl(){
-        return Bootstrap::$_fullUrl;
+        return Request::getFullUrl();
     }
 
     /* *
@@ -71,7 +74,7 @@ class Uri {
      * -----------------------------------------------------------------------------------------------------------------
      * */
     public function getLastParam(){
-        $params = Bootstrap::$_requestPath;
+        $params = parent::$_requestPath;
         $len = count($params);
         return $len%2==1 ? $params[$len-1] : null;
     }
@@ -88,8 +91,9 @@ class Uri {
      * -----------------------------------------------------------------------------------------------------------------
      * */
     public function getQuery($key){
-        $params = Bootstrap::$_requestString;
-        return isset($params[$key]) ? $params[$key] : '' ;
+        $params = Request::getQuery();
+        parse_str($params,$paramQuery);
+        return isset($paramQuery[$key]) ? $paramQuery[$key] : '' ;
     }
 
     /* *
@@ -103,8 +107,8 @@ class Uri {
      * @return string 新构造url
      * -----------------------------------------------------------------------------------------------------------------
      * */
-    public function url($add_arr=array(),$rm_arr=array(),$getQueryString=false){
-        $params = Bootstrap::$_requestPath;
+    public function setUrl($add_arr=array(),$rm_arr=array(),$getQueryString=false){
+        $params = parent::$_requestPath;
         $paramPath = array();
         $lastParam = $this->getLastParam();
         if(($len = count($params)) > 0){
@@ -119,16 +123,16 @@ class Uri {
         # 移除匹配参数
         $params = array_diff_key($params,array_flip((array)$rm_arr));
 
-        $mvcUri = Bootstrap::$_moduleName.'/'.Bootstrap::$_controllerName.'/'.Bootstrap::$_actionName;
+        $mvcUri = parent::$_moduleName.'/'.parent::$_controllerName.'/'.parent::$_actionName;
 
         foreach ($params as $k=>$v) {
             $mvcUri .= '/'.$k.'/'.$v;
         }
 
         # 添加最后一个path参数和后缀
-        $uriPath = $mvcUri.$lastParam.Bootstrap::$_urlSuffix;
+        $uriPath = $mvcUri.$lastParam.parent::$_urlSuffix;
         # 返回后面的query参数
-        $request_uri = $getQueryString==true && Bootstrap::$_requestString ? $uriPath.'?'.Bootstrap::$_requestString : $uriPath;
+        $request_uri = $getQueryString==true && parent::$_requestString ? $uriPath.'?'.parent::$_requestString : $uriPath;
         return Request::baseUrl($request_uri);
     }
 }

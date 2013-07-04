@@ -1,12 +1,13 @@
 <?php
+
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 /**
- * session库
- * @example     Session::getInstance()->get("key")
- * @copyright	http://www.yanue.net
+ * session 处理库
+ * @example     Session::instance()->get("key")
+ * @copyright	http://yanue.net/
  * @author 		yanue <yanue@outlook.com>
- * @version		1.0 - 2012-07-02
+ * @version		1.0.1 - 2013-07-02
  */
 
 //使用 COOKIE 保存 SESSION ID 的方法
@@ -26,18 +27,29 @@ class Session
         session_cache_expire($this->session_cache_expire);
         if( session_id() == '' )
         {
-            session_set_cookie_params(time()+3600, '/', '/', NULL, NULL);
             $this->sessionState = session_start();
+            session_set_cookie_params(time()+3600, '/', '/', NULL, NULL);
         }
         return $this->sessionState;
     }
 
+    /*
+     * 设置session过期时间
+     *
+     * @param $time 时间长度(秒)
+     */
+    public function setExpire($time){
+        if($time){
+            session_cache_expire($time);
+        }
+    }
+
 
     /**
-     *    实例化对象
+     * 实例化对象
      *
-     *    @return  object
-     **/
+     * @return  object
+     */
 
     public static function instance(){
         static $obj;
@@ -47,7 +59,8 @@ class Session
 
 
     /**
-     * set 变量
+     * set 设置变量
+     *
      * @param string $name
      * @param string|int|array $value
      * @return void
@@ -58,7 +71,8 @@ class Session
     }
 
     /**
-     * 获取变量
+     * get 获取变量
+     *
      * @param string  $name
      * @return sring|int|array
      */
@@ -70,7 +84,7 @@ class Session
 
     /**
      * 获取全部session
-     * @param string  $name
+     *
      * @return array
      */
 
@@ -80,8 +94,7 @@ class Session
     }
 
     /**
-     * Returns true if there no session with this name or it's empty, or 0,
-     * or a few other things. Check http://php.net/empty for a full list.
+     * 判断session是否为空
      *
      * @param string $name
      * @return bool
@@ -93,6 +106,7 @@ class Session
 
     /**
      * 判断key 是否存在
+     *
      * @param string $name
      * @return boolean
      */
@@ -102,7 +116,8 @@ class Session
     }
 
     /**
-     * 删除
+     * 删除session
+     *
      * @param string $name
      */
     public function del( $name )
@@ -112,10 +127,10 @@ class Session
 
 
     /**
-     *    清楚session
+     * 清楚session
      *
-     *    @return    boolean
-     **/
+     * @return boolean
+     */
 
     public function destroy()
     {

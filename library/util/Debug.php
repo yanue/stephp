@@ -150,4 +150,8 @@ class Debug {
         echo  '<p class="trance">[第'.$errline.'行] '.$errfile.' <code>'.$errTypeName .'['.$errno.']</code> : '.$errMsg.'</p>';
     }
 
+    public static function show($tip='错误:',$msg){
+        self::css();
+        echo  '<p class="trance" style="border:1px solid #e0e0e0;padding:5px;"><code>'.$tip.'</code><span>'.$msg.'</span></p>';
+    }
 }

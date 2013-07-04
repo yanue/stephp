@@ -79,7 +79,8 @@ class Request {
     }
 
     public static function getQuery(){
-        return $_SERVER["QUERY_STRING"];
+        if(!self::$_fullUrl) self::requestUri();
+        return self::$_requestQuery;
     }
 
     public static function getPath(){
@@ -120,5 +121,6 @@ class Request {
         # 去除uri中当前脚本目录'/'
         $uriParam = parse_url(self::$_requestUri);
         self::$_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '/';
+        self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '/';
     }
 }
