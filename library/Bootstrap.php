@@ -10,7 +10,7 @@
 
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-define('VERSION', '1.1.2');
+define('VERSION', '1.1.3');
 
 class Bootstrap {
 
