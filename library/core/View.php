@@ -1,12 +1,21 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-
+/**
+ * 视图处理类
+ *
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.2 - 13-7-5
+ */
 class View
 {
     protected $_content = '';
     protected $_layout = 'layout';
+
     public function __construct (){
+        $disp = new Dispatcher();
+
     }
 
     // render

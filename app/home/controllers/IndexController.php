@@ -21,6 +21,6 @@ class IndexController extends Controller{
 //        echo $this->uri->getUrl();
 //        echo '<br />';
 //        echo $this->uri->getUri(1);
-        new UserModel();
+//        new UserModel();
     }
 }

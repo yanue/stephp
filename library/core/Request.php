@@ -1,17 +1,6 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-/*
- * Request.php
- *------------------------------------------------------------------------------
- * @copyright : yanue.net
- *------------------------------------------------------------------------------
- * @author : yanue
- * @date : 13-6-18
- *------------------------------------------------------------------------------
- */
-
-
 /**
  * Request represents an HTTP request.
  *
@@ -23,9 +12,8 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
  *   * getUri
  *   * getUriForPath
  *
- * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
+ * @author yanue <yanue@outlook.comt>
+ * @copyright	http://yanue.net/
  */
 class Request {
     private static $_requestUri 	= null;

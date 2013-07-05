@@ -1,6 +1,12 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
-
+/**
+ * 控制器处理类
+ *
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.2 - 13-7-5
+ */
 class Controller
 {
     public $uri = NULL;
@@ -8,7 +14,6 @@ class Controller
     public $session = null;
 
     /*
-     * 将
      *
      */
     public function __construct () {

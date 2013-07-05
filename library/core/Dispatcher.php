@@ -3,6 +3,7 @@
  * 分发类，负责解析url分配mvc名称及请求数组
  * 
  * @author yanue <yanue@outlook.com>
+ * @copyright http://yanue.net/
  * @version 1.0.0 2013-07-04
  */
 class Dispatcher
@@ -18,11 +19,10 @@ class Dispatcher
     private static $_isRouterMatched = false; # 是否经过路由并验证通过
 
 	public function __construct(){
-        self::$_appPath = ROOT_PATH.($this->_getIni('application.path') ? $this->_getIni('application.path') : 'app').'/';
-        $this->urlParse();
-        $this->requestParam();
+        self::$_appPath = ROOT_PATH.(Loader::getConfig('application.path') ? Loader::getConfig('application.path') : 'app').'/';
+        $this->urlParse();// url解析mvc
+        $this->requestParam(); // 合并请求进行组合
 	}
-
 
     /*
      * 获取控制器名
@@ -64,16 +64,16 @@ class Dispatcher
     /**
      * url解析
      *
-     * @return mixed
+     * @return bool
      */
-    protected function urlParse(){
+    private function urlParse(){
         if(self::$_isRouterMatched == true) return false;#经过路由就不需要下面的处理了
 
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
         $path = ltrim(Request::getPath(),'/');
 
         # 判断url后缀是否存在
-        self::$_urlSuffix = $settings['application.default.suffix'] ? $settings['application.default.suffix'] : self::$_urlSuffix;
+        $_url_suffix = Loader::getConfig('application.default.suffix');
+        self::$_urlSuffix =  $_url_suffix ? $_url_suffix : self::$_urlSuffix;
 
         # 截取后缀
         if(strlen($path)>strlen(self::$_urlSuffix)){
@@ -87,25 +87,22 @@ class Dispatcher
         $_requestPath = array_values(array_diff($_requestPath, array(null)));
 
         $this->parseMvc($_requestPath);
-        return $_requestPath;
+        return true;
     }
     
     /**
      * 解析mvc结构
      *
-     *
      */
-    protected function parseMvc($_requestPath){
-
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+    private function parseMvc($_requestPath){
 
         # 通过'?'后面参数初步设置mvc
-        $module     = Request::get('module') ? Request::get('module') : $this->_getIni('application.default.module');
-        $controller = Request::get('controller') ? Request::get('controller') : $this->_getIni('application.default.controller');
-        $action     = Request::get('action') ? Request::get('action') : $this->_getIni('application.default.action');
+        $module     = Request::get('module') ? Request::get('module') : Loader::getConfig('application.default.module');
+        $controller = Request::get('controller') ? Request::get('controller') : Loader::getConfig('application.default.controller');
+        $action     = Request::get('action') ? Request::get('action') : Loader::getConfig('application.default.action');
 
         # 第一个参数与默认的module名相同
-        if(isset($_requestPath[0]) && $settings['application.default.module'] == $_requestPath[0]){
+        if(isset($_requestPath[0]) && Loader::getConfig('application.default.module') == $_requestPath[0]){
             $module     = isset($_requestPath[0]) && $_requestPath[0]!='' ? $_requestPath[0] : $module ;
             $controller = isset($_requestPath[1]) && $_requestPath[1]!='' ? $_requestPath[1] : $controller ;
             $action     = isset($_requestPath[2]) && $_requestPath[2]!='' ? $_requestPath[2] : $action ;
@@ -123,6 +120,7 @@ class Dispatcher
             }
         }
 
+        # mvc
         $paramMvc = array(
             'module'        => $module,
             'controller'    => $controller,
@@ -131,6 +129,7 @@ class Dispatcher
 
         # 去除 mvc 结构后面的目录结构数组
         $requestPath = array_values(array_diff($_requestPath,array_values($paramMvc)));
+
         # 静态变量赋值
         self::$_moduleName      = $module;
         self::$_controllerName  = $controller;
@@ -168,14 +167,6 @@ class Dispatcher
 
         # 合并所有请求,'?'后面的参数如果有与path部分相同的将被覆盖
         self::$_requestParams = $requestParams = array_merge($paramQuery,$paramMvc,$paramPath);
-    }
-
-    /**
-     * 获取ini配置文件的参数
-     */
-    private function _getIni($key){
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
-        return isset($settings[$key]) ? $settings[$key] : '' ;
     }
 }
 ?>

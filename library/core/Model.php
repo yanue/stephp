@@ -1,6 +1,14 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
+/*
+ * 数据处理模型类
+ *
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.1 - 13-7-5
+ */
+
 class Model extends Db
 {
     public function __construct($DB_TYPE='', $DB_HOST='',$DB_PORT='', $DB_NAME='', $DB_USER='', $DB_PASS=''){

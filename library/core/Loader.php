@@ -1,83 +1,78 @@
 <?php
+if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+
+/**
+ *
+ * 类库自动加载器 -  Loader.php
+ * --外接口
+ *  -addIncludePath() 追加目录到include_path
+ *  -getConfig() 获取(单个)系统配置信息
+ *
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.1 - 13-7-4
+ */
+
 class Loader {
 
-    private static $_modelPath = '';
-    private static $_libPath = '';
-    private static $_isSetLib = false;
-    private static $_isSetModel = false;
-    public static $loader;
-
-    public static function init()
-    {
-        if (self::$loader == NULL)
-            self::$loader = new self();
-        return self::$loader;
+    /*
+     * 初始化
+     *
+     */
+    public function __construct() {
+        $include_paths = array('./library/core','./library/db','./library/func','./library/util');
+        $this->setIncludePath($include_paths);
+        spl_autoload_register(array($this,'loadClass'));
     }
 
-    public function __construct() {
-        self::$_libPath = $this->setIncludePathStr(array('./library/core','./library/db','./library/func','./library/util'));
-        spl_autoload_register(array($this,'library'));
-        spl_autoload_register(array($this,'model'));
+    /*
+     * 追加目录到include_path
+     *
+     */
+    public function addIncludePath($path){
+        echo $path;
+        $this->setIncludePath($path);
+    }
+
+    /*
+     * 获取(单个)系统配置信息
+     *
+     * @param string $key 具体需要获取的键名
+     * @return mixed
+     */
+    public static function getConfig($key=''){
+        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        if (!$key ){ return $settings; }
+        return isset($settings[$key]) ? $settings[$key] : '' ;
     }
 
     /*
      * 自动加载library下面的类
+     *
      */
-    public function library($class)
-    {
-        if(!self::$_isSetLib){
-            self::$_isSetLib=true;
-            // 设置所有library下的子目录
-            $include_paths = get_include_path().PATH_SEPARATOR.self::$_libPath;
-            set_include_path($include_paths);
-        }
+    private function loadClass($class){
+        # 文件名就是类名
         $file = $class.'.php';
-        require_once $file;
-    }
-
-    // TODO
-    public function model($class)
-    {
-        if(!self::$_isSetModel){
-            self::$_isSetModel=true;
-            $include_paths = set_include_path(get_include_path().PATH_SEPARATOR.self::$_modelPath);
-            set_include_path($include_paths);
-        }
-        $file = $class.'.php';
-        echo 'asd';
-        require_once $file;
-    }
-
-    public function setModelPath($path){
-        self::$_modelPath = $path;
-        spl_autoload_register(array($this,'model'));
-        echo 'asd';
-    }
-    
-    public function helper($class)
-    {
-        $class = preg_replace('/_helper$/ui','',$class);
-        set_include_path(get_include_path().PATH_SEPARATOR.'/helper/');
-        spl_autoload_extensions('.helper.php');
-        spl_autoload($class);
+        include_once $file;
     }
 
     /*
-     * 组合多个目录
+     * 设置新目录并合并添加到include_path
      *
-     * 参考 set_include_path
+     * @return bool
      */
-    private function setIncludePathStr($paths){
-        $path_str = '';
-        if(is_array($paths)){
-            foreach ($paths as $path) {
-                $path_str .= $path.PATH_SEPARATOR;
-            }
-        }else{
-            $path_str = $paths;
-        }
-        return $path_str;
+    private function setIncludePath($paths){
+        if( !$paths ){ return false; }
+        # 原始路径
+        $old_paths = get_include_path();
+        $old_paths_arr =  explode(PATH_SEPARATOR,$old_paths);
+        # 要添加的路径
+        $new_paths = is_array($paths) ? $paths : array($paths);
+        # 合并,保持唯一,生成字串
+        $now_paths = array_unique(array_merge($old_paths_arr , $new_paths));
+        $include_paths = implode(PATH_SEPARATOR,$now_paths);
+        # 设置到include_path
+        set_include_path($include_paths);
+        return true;
     }
 }
-
-?>

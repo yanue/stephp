@@ -1,16 +1,16 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+/*
+ * cookie 处理类
+ *
+ * @copyright	http://yanue.net/
+ * @author 		yanue <yanue@outlook.com>
+ * @version		1.0.0 - 13-7-2
+ */
+
 
 class Cookie
 {
-    const Session = null;
-    const OneDay = 86400;
-    const SevenDays = 604800;
-    const ThirtyDays = 2592000;
-    const SixMonths = 15811200;
-    const OneYear = 31536000;
-    const Lifetime = -1; // 2030-01-01 00:00:00
-
     /**
      * Returns true if there is a cookie with this name.
      *

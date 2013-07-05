@@ -3,12 +3,10 @@
  * Created by JetBrains PhpStorm.
  * User: yanue
  * Date: 13-6-30
- * Time: PM11:35
+ * Time: PM8:15
  * To change this template use File | Settings | File Templates.
  */
 
-class UserModel {
-    function __construct(){
-        echo '<br >------------------UserModel-------------------<br >';
-    }
+class IndexController extends Controller{
+	
 }
