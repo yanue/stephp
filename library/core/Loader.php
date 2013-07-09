@@ -30,7 +30,6 @@ class Loader {
      *
      */
     public function addIncludePath($path){
-        echo $path;
         $this->setIncludePath($path);
     }
 

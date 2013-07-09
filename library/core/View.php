@@ -6,66 +6,142 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
  *
  * @copyright	http://yanue.net/
  * @author 		yanue <yanue@outlook.com>
- * @version		1.0.2 - 13-7-5
+ * @version		1.0.6 - 13-7-9
  */
 class View
 {
-    protected $_content = '';
-    protected $_layout = 'layout';
 
+    /*
+     * layout布局
+     *
+     */
+    private $_layout = '';
+
+    /*
+     * layout下当前action内容模板
+     *
+     */
+    private $_content = '';
+
+    /*
+     * uri全局处理
+     *
+     */
+    private $uri = null;
+
+    /*
+     * 初始化
+     */
     public function __construct (){
-        $disp = new Dispatcher();
-
+        $this->uri = & $this->initUri();
     }
 
-    // render
+    /*
+     * 实例化uri类
+     *
+     * @return object
+     */
+    private function initUri(){
+        return new Uri();
+    }
+
+    /*
+     *
+     */
+    public function uri(){
+        return $this->uri;
+    }
+    
+    /*
+     * render  -- to include template
+     *
+     * @param string $name : 当前模块视图下相对路径模块名称.
+     * @return void.
+     */
     public function render($name){
-        $file =  Bootstrap::$_moduleCurPath.'views/'.$name.'.php';
+        $file = $this->uri->getModulePath().'views/'.$name.'.php';
         if(file_exists($file)){
             include_once $file;
         }
     }
 
-    public function baseUrl($uri=''){
-        return Request::baseUrl($uri);
-    }
-
-    public function setContent($filename=''){
-       if($filename){
-           $this->_content = $filename;
-       }else{
-           $this->_content = Bootstrap::$_controllerName.'/'.Bootstrap::$_actionName ;
-       }
-    }
-
-    // set layout
-    public function setLayout($layout='layout',$file='')
+    /*
+     * set layout
+     *
+     * @param string $layout : 需要使用的布局模块名称
+     * @param string $content : 当前action在layout内引用的内容模板
+     * @return void;
+     */
+    public function setLayout($layout='layout',$content='')
     {
-        $this->setContent($file);
-        $this->render($layout);
+        $this->_layout = $layout;
+        if($content){
+            $this->_content = $content;
+        }
     }
 
-    // for layout content
+    /*
+     * set layout content
+     *
+     * @param string $content : 当前action在layout内引用的内容模板
+     * @return void
+     */
+    public function setContent($content='')
+    {
+        if($content){
+            $this->_content = $content;
+        }
+    }
+
+    /*
+     * 禁用layout
+     *
+     */
+    public function disableLayout(){
+        $this->_layout = null;
+    }
+    
+    /*
+     * set layout
+     *
+     */
+    public function getLayout()
+    {
+        return $this->_layout;
+    }
+
+    /*
+     * include layout content
+     *
+     * 说明 : 加载layout布局下的当前action的内容模板,于layout模板内使用
+     */
     public function content(){
         if($this->_content){
-            $file = Bootstrap::$_moduleCurPath.'views/'.$this->_content.'.php';
-            if(file_exists($file)){
-                include_once $file;
-            }
+            include_once $this->uri->getModulePath().'views/'.$this->_content.'.php';
+        }else{
+            include_once $this->uri->getModulePath().'views/'.$this->uri->getController().'/'.$this->uri->getAction().'.php';
         }
     }
 
-    // create pic url
-    public function photoUrl($img_content,$w=200,$h=200){
-        return IMAGE_SERVER.$w.'/'.$h.'/'.$img_content;
-    }
-
-
-    public function loadFile($filename){
-        $file = ROOT_PATH. $filename.'.php';
-        if(file_exists($file)){
-            include_once $file;
+    /*
+     * 模板显示功能
+     *
+     */
+    private function display(){
+        // 页面缓存
+        ob_start();
+        ob_implicit_flush(0);
+        // 模板阵列变量分解成为独立变量
+        // 直接载入PHP模板
+        if($this->_layout){
+            include_once $this->uri->getModulePath().'views/'.$this->_layout.'.php';
         }
     }
 
+    /*
+     * 载入模块
+     */
+    public function __destruct(){
+        $this->display();
+    }
 }

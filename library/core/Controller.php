@@ -5,24 +5,42 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
  *
  * @copyright	http://yanue.net/
  * @author 		yanue <yanue@outlook.com>
- * @version		1.0.2 - 13-7-5
+ * @version		1.0.3 - 13-7-9
  */
 class Controller
 {
-    public $uri = NULL;
+    /*
+     * 视图
+     *
+     */
     public $view = NULL;
+
+    /*
+     * url全局处理
+     *
+     */
+    public $uri = NULL;
+
+    /*
+     * session处理
+     *
+     */
     public $session = null;
 
     /*
+     * 初始化控制器
      *
      */
     public function __construct () {
-        $this->uri = new Uri();
-        $this->session = new Session();
         $this->view = new View();
+        $this->uri = & $this->view->uri();
+        $this->session = new Session();
     }
 
-    // load file
+    /*
+     * load file
+     *
+     */
     public function loadFile($name) {
         $path = ROOT_PATH.$name;
         if (file_exists($path)) {
@@ -32,20 +50,25 @@ class Controller
         return false;
     }
 
-	// load configs file
+	/*
+	 * load configs file
+	 *
+	 */
 	public function loadConfig ($file){
-        $file = ROOT_PATH.'configs/'.$file.'.php';
+        $file = $this->uri->getModulePath().'configs/'.$file.'.php';
 		if(file_exists($file)){
 			include_once $file;
 		}
 	}
 
-    // load plugins
+    /*
+     * load plugins
+     *
+     */
     public function loadPlugin($name) {
         $path = ROOT_PATH.'plugins/'.$name.'.class.php';
         if (file_exists($path)) {
             require_once $path;
         }
     }
-
 }

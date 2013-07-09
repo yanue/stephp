@@ -4,50 +4,45 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 /**
  * Request represents an HTTP request.
  *
- * The methods dealing with URL accept / return a raw path (% encoded):
- *   * getBasePath
- *   * getBaseUrl
- *   * getPathInfo
- *   * getRequestUri
- *   * getUri
- *   * getUriForPath
- *
  * @author yanue <yanue@outlook.comt>
  * @copyright	http://yanue.net/
  */
 class Request {
-    private static $_requestUri 	= null;
-    private static $_fullUrl        = null;
-    private static $_requestQuery  = null;
-    private static $_requestPath  = null;
 
+    /*
+     * uri部分
+     */
+    private $_requestUri 	= null;
+
+    /*
+     * 完整url
+     */
+    private $_fullUrl        = null;
+
+    /*
+     * uri中?后query部分
+     */
+    private $_requestQuery  = null;
+
+    /*
+     * uri中path部分
+     */
+    private $_requestPath  = null;
+
+    /*
+     * 初始化并解析
+     */
     public function __construct(){
-        self::requestUri();
-        self::uriParse();
-    }
-
-    public static function get($key){
-        return isset($_GET[$key]) ? $_GET[$key] : null ;
-    }
-
-    public static function post($key){
-        return isset($_POST[$key]) ? $_POST[$key] : null ;
-    }
-
-    public static function request($key){
-        return isset($_REQUEST[$key]) ? $_REQUEST[$key] : null ;
+        # 解析url
+        $this->parseUrl();
     }
 
     /* *
-     * -----------------------------------------------------------------------------------------------------------------
      * 获取基本地址: baseUrl
-     * -----------------------------------------------------------------------------------------------------------------
      * 说明: 返回不包含mvc结构,可以通过uri参数传入设置
      *
      * @param string $uri 包含mvc结构的uri参数
-     *
      * @return string
-     * -----------------------------------------------------------------------------------------------------------------
      * */
     public static function baseUrl($uri=''){
         $baseUrl = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
@@ -56,27 +51,49 @@ class Request {
         return $baseUrl.'/'.$uri;
     }
 
-    public static function getUri(){
-        if(!self::$_fullUrl) self::requestUri();
-        return self::$_requestUri;
+    /*
+     * 获取uri部分
+     *
+     * @return string
+     */
+    public function getUri(){
+        return $this->_requestUri;
     }
 
-    public static function getFullUrl(){
-        if(!self::$_fullUrl) self::requestUri();
-        return self::$_fullUrl;
+    /*
+     * 获取完整url
+     *
+     * @return string : url
+     */
+    public function getFullUrl(){
+        return $this->_fullUrl;
     }
 
-    public static function getQuery(){
-        if(!self::$_fullUrl) self::requestUri();
-        return self::$_requestQuery;
+    /*
+     * 获取uri中?后面query部分
+     *
+     * @return string
+     */
+    public function getQuery(){
+        return $this->_requestQuery;
     }
 
-    public static function getPath(){
-        if(!self::$_requestPath) self::uriParse();
-        return self::$_requestPath;
+    /*
+     * 获取uri中path部分
+     *
+     * @return string
+     */
+    public function getPath(){
+        return $this->_requestPath;
     }
 
-    private static function requestUri(){
+    /*
+     * 全面解析当前url
+     * --说明:解析出完整url,uri,path部分,query部分
+     *
+     * @return void.
+     */
+    private function parseUrl(){
         # 解决通用问题
         $requestUri = '';
         if (isset($_SERVER['REQUEST_URI'])) { #$_SERVER["REQUEST_URI"] 只有 apache 才支持,
@@ -92,7 +109,7 @@ class Request {
         $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/",true).$https;
         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
         # 获取的完整url
-        self::$_fullUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$requestUri;
+        $this->_fullUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$requestUri;
 
         # 当前脚本名称
         $script_name  = $_SERVER['SCRIPT_NAME'];
@@ -101,14 +118,12 @@ class Request {
         # 去除uri中当前脚本文件名 (如果存在)
         $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
 
-        self::$_requestUri = substr($requestUri,strlen($script));
+        $this->_requestUri = substr($requestUri,strlen($script));
+
+        # 去除uri中当前脚本目录'/'
+        $uriParam = parse_url($this->_requestUri);
+        $this->_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '/';
+        $this->_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '/';
     }
 
-    private static function uriParse(){
-        if(!self::$_requestUri) self::requestUri();
-        # 去除uri中当前脚本目录'/'
-        $uriParam = parse_url(self::$_requestUri);
-        self::$_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '/';
-        self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '/';
-    }
 }

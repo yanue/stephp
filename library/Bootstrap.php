@@ -1,6 +1,5 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
-
 define('VERSION', '1.1.4');
 
 /**

@@ -14,13 +14,8 @@ class IndexController extends Controller{
     }
 
     public function indexAction(){
-//        echo $this->session->get('asda');
-//        echo $this->session->get('asd').'|';
-//        echo '<br />';
-//        echo $this->uri->getQuery('module');
-//        echo $this->uri->getUrl();
-//        echo '<br />';
-//        echo $this->uri->getUri(1);
-//        new UserModel();
+        $this->view->setLayout('layout');
+        $this->view->aa = 'asds';
+        $this->uri->getUriString();
     }
 }

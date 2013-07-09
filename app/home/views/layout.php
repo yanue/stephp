@@ -1,8 +1,16 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>哈哈哈 - perfect</title>
+</head>
+<body>
+
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: yanue
- * Date: 13-6-30
- * Time: PM8:27
- * To change this template use File | Settings | File Templates.
- */
+$this->render('header');
+
+$this->content();
+?>
+
+</body>
+</html>

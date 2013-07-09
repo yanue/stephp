@@ -1,8 +1,6 @@
+<br>
+hello world!  this is view page;
+<br>
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: yanue
- * Date: 13-6-30
- * Time: PM8:34
- * To change this template use File | Settings | File Templates.
- */
+echo $this->aa;
+?>
