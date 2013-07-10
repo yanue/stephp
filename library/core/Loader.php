@@ -26,14 +26,6 @@ class Loader {
     }
 
     /*
-     * 追加目录到include_path
-     *
-     */
-    public function addIncludePath($path){
-        $this->setIncludePath($path);
-    }
-
-    /*
      * 获取(单个)系统配置信息
      *
      * @param string $key 具体需要获取的键名
@@ -54,6 +46,15 @@ class Loader {
         $file = $class.'.php';
         include_once $file;
     }
+
+    /*
+     * 追加目录到include_path
+     *
+     */
+    public function addToPath($path){
+        $this->setIncludePath($path);
+    }
+
 
     /*
      * 设置新目录并合并添加到include_path

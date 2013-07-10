@@ -2,15 +2,15 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <title>哈哈哈 - perfect</title>
+    <title>hello world - stephp</title>
 </head>
 <body>
-
 <?php
-$this->render('header');
-
-$this->content();
+    $this->render('header');
+    echo '<hr>';
+    $this->content();
+    echo '<hr>';
+    $this->render('footer');
 ?>
-
 </body>
 </html>

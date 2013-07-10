@@ -4,6 +4,7 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 /**
  * session 处理库
+ *
  * @example     Session::instance()->get("key")
  * @copyright	http://yanue.net/
  * @author 		yanue <yanue@outlook.com>

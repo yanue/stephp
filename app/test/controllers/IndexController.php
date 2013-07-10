@@ -9,9 +9,6 @@
 
 class IndexController extends Controller{
     public function indexAction(){
-        echo '<pre>';
-        echo 'hhh';
-        new UserModel();
-        echo 'last ';
+        $this->view->setLayout();
     }
 }

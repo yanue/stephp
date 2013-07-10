@@ -1,21 +1,17 @@
 {
-  "name": "yanue/stephp",
-  "type": "library",
-  "description":"A Simple Tiny Easy PHP Framework",
-  "keywords": ["stephp", "yanue"],
-  "homepage": "http://yanue.github.io/stephp",
-  "license": "MIT",
-  "authors": [{
-    "name": "yanue",
-    "role": "Developer",
-    "link": "http://yanue.net/"
-  }],
-  "require": {
-    "php": ">= 5.3.2"
-  },
-  "autoload": {
-    "files": [
-        "library/Bootscrap.php"
-    ]
-  }
+    "name": "yanue/stephp",
+    "type": "Framework",
+    "description": "A Simple Tiny Easy PHP Framework",
+    "version": "1.1.5",
+    "keywords": ["stephp", "yanue"],
+    "homepage": "http://yanue.github.io/stephp",
+    "authors": [{
+        "name": "yanue",
+        "role": "Developer",
+        "link": "http://yanue.net/"
+    }],
+    "require": {
+        "php": ">= 5.3.2"
+    },
+    "license": "MIT"
 }

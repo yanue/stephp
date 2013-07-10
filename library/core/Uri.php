@@ -142,6 +142,11 @@ final class Uri extends Dispatcher{
         $uriPath = $mvcUri.$lastParam.$this->_urlSuffix;
         # 返回后面的query参数
         $request_uri = $getQueryString==true && $this->request->getQuery() ? $uriPath.'?'.$this->request->getQuery() : $uriPath;
-        return Request::baseUrl($request_uri);
+        return $this->request->getBaseUrl().$request_uri;
+    }
+
+
+    public function baseUrl($request_uri=''){
+        return $this->request->getBaseUrl().$request_uri;
     }
 }

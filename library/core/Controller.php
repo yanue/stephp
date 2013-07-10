@@ -62,6 +62,30 @@ class Controller
 	}
 
     /*
+     * 跨module引用模型
+     * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
+     *
+     * @param $model 模型名称(不包含'Model',如'UserModel'则输入'user').
+     * @param $module 模块名称(需要跨的模块)
+     * @return void.
+     */
+    public function loadModel($model,$module=''){
+        //TODO
+    }
+
+    /*
+    * 跨module引用模型
+    * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
+    *
+    * @param $model 模型名称(不包含'Model',如'UserModel'则输入'user').
+    * @param $module 模块名称(需要跨的模块)
+    * @return void.
+    */
+    public function loadHelper($helper,$module=''){
+        //TODO
+    }
+
+    /*
      * load plugins
      *
      */

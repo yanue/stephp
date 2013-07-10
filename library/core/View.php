@@ -51,6 +51,10 @@ class View
     public function uri(){
         return $this->uri;
     }
+
+    public function baseUrl($uri=''){
+        return $this->uri->baseUrl($uri);
+    }
     
     /*
      * render  -- to include template
@@ -128,13 +132,14 @@ class View
      *
      */
     private function display(){
-        // 页面缓存
-        ob_start();
-        ob_implicit_flush(0);
-        // 模板阵列变量分解成为独立变量
         // 直接载入PHP模板
         if($this->_layout){
-            include_once $this->uri->getModulePath().'views/'.$this->_layout.'.php';
+            $layout = $this->uri->getModulePath().'views/'.$this->_layout.'.php';
+            if(file_exists($layout)){
+                include_once $layout;
+            }else{
+                echo 'layout文件不存在!';
+            }
         }
     }
 

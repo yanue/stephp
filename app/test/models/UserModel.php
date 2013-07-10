@@ -11,6 +11,6 @@ class UserModel {
 
     public function __construct()
     {
-        echo '----------------admin - usermodel--------------';
+        echo '---------------- admin - usermodel --------------';
     }
 }

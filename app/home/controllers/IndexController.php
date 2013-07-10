@@ -15,7 +15,7 @@ class IndexController extends Controller{
 
     public function indexAction(){
         $this->view->setLayout('layout');
-        $this->view->aa = 'asds';
-        $this->uri->getUriString();
+        $this->view->enjoy = 'just enjoy it !';
+        #echo $this->uri->getFullUrl();
     }
 }

@@ -17,7 +17,7 @@ class Request {
     /*
      * 完整url
      */
-    private $_fullUrl        = null;
+    private $_fullUrl       = null;
 
     /*
      * uri中?后query部分
@@ -27,7 +27,12 @@ class Request {
     /*
      * uri中path部分
      */
-    private $_requestPath  = null;
+    private $_requestPath   = null;
+
+    /*
+     * uri中baseUrl
+     */
+    private $_baseUrl       = null;
 
     /*
      * 初始化并解析
@@ -35,20 +40,32 @@ class Request {
     public function __construct(){
         # 解析url
         $this->parseUrl();
+        $this->baseUrl();
     }
+
+
 
     /* *
      * 获取基本地址: baseUrl
-     * 说明: 返回不包含mvc结构,可以通过uri参数传入设置
+     * --说明: 返回不包含mvc结构,可以通过uri参数传入设置
      *
      * @param string $uri 包含mvc结构的uri参数
      * @return string
      * */
-    public static function baseUrl($uri=''){
+    private function baseUrl(){
         $baseUrl = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
         $baseUrl .= isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : getenv('HTTP_HOST');
         $baseUrl .= isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
-        return $baseUrl.'/'.$uri;
+        $this->_baseUrl = $baseUrl.'/';
+    }
+
+    /*
+     * 获取baseUrl部分
+     *
+     * @return string
+     */
+    public function getBaseUrl(){
+        return $this->_baseUrl;
     }
 
     /*

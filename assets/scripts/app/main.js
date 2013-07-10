@@ -1,7 +1,6 @@
 define(function(reqire,exports){
     exports.test = function(){
-        $('#test').live('click',function(){
-            seajs.log($(this).text());
-        });
+        $('#content').append('我是动态生成的哦!');
+        seajs.log('hello seajs');
     }
 });
