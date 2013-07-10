@@ -1,7 +1,7 @@
 mvc
 ===
 
-a simple php mvc framework
+A Simple Tiny Easy PHP MVC Framework
 
 --命名规则:
 -遵循骆驼峰命名规则,类名需要首字母大写
