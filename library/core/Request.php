@@ -4,37 +4,39 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 /**
  * Request represents an HTTP request.
  *
- * @author yanue <yanue@outlook.comt>
- * @copyright	http://yanue.net/
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 class Request {
 
-    /*
+    /**
      * uri部分
      */
     private $_requestUri 	= null;
 
-    /*
+    /**
      * 完整url
      */
     private $_fullUrl       = null;
 
-    /*
+    /**
      * uri中?后query部分
      */
     private $_requestQuery  = null;
 
-    /*
+    /**
      * uri中path部分
      */
     private $_requestPath   = null;
 
-    /*
+    /**
      * uri中baseUrl
      */
     private $_baseUrl       = null;
 
-    /*
+    /**
      * 初始化并解析
      */
     public function __construct(){
@@ -45,7 +47,7 @@ class Request {
 
 
 
-    /* *
+    /** *
      * 获取基本地址: baseUrl
      * --说明: 返回不包含mvc结构,可以通过uri参数传入设置
      *
@@ -59,7 +61,7 @@ class Request {
         $this->_baseUrl = $baseUrl.'/';
     }
 
-    /*
+    /**
      * 获取baseUrl部分
      *
      * @return string
@@ -68,7 +70,7 @@ class Request {
         return $this->_baseUrl;
     }
 
-    /*
+    /**
      * 获取uri部分
      *
      * @return string
@@ -77,7 +79,7 @@ class Request {
         return $this->_requestUri;
     }
 
-    /*
+    /**
      * 获取完整url
      *
      * @return string : url
@@ -86,7 +88,7 @@ class Request {
         return $this->_fullUrl;
     }
 
-    /*
+    /**
      * 获取uri中?后面query部分
      *
      * @return string
@@ -95,7 +97,7 @@ class Request {
         return $this->_requestQuery;
     }
 
-    /*
+    /**
      * 获取uri中path部分
      *
      * @return string
@@ -104,7 +106,7 @@ class Request {
         return $this->_requestPath;
     }
 
-    /*
+    /**
      * 全面解析当前url
      * --说明:解析出完整url,uri,path部分,query部分
      *

@@ -3,11 +3,17 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 
 /**
+ * CSRF 处理
+ *
+ *
  * A cross-site request forgery prevention class for Kohana 3. Includes user-agent
  * string validation, private key (secret) validation, and an expiration time.
  * The expiration time can be passed as 0, FALSE, or NULL to indicate no expiration.
  *
- * Requirements: the PHP mcrypt module (php-mcrypt or php5-mcrypt)
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/util
+ * @time     2013-07-11
  */
 class CSRF {
 

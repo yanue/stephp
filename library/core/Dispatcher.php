@@ -1,14 +1,14 @@
 <?php
 /**
  * 分发类，负责解析url分配mvc名称及请求数组
- * 
- * @author yanue <yanue@outlook.com>
- * @copyright http://yanue.net/
- * @version 1.0.0 2013-07-04
+ *
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 class Dispatcher
 {
-    protected $_appPath         = '';
     protected $_moduleCurPath   = null;
     protected $_moduleName      = 'default';
     protected $_controllerName 	= 'index';  // 控制器
@@ -27,7 +27,7 @@ class Dispatcher
         $this->requestParam(); // 合并请求进行组合
 	}
 
-    /*
+    /**
      * 获取控制器名
      *
      * @return $string
@@ -36,7 +36,7 @@ class Dispatcher
         return $this->_controllerName;
     }
 
-    /*
+    /**
      * 获取模块名称
      *
      * @return $string
@@ -45,7 +45,7 @@ class Dispatcher
         return $this->_moduleName;
     }
 
-    /*
+    /**
      * 获取方法名称
      *
      * @return $string
@@ -54,7 +54,7 @@ class Dispatcher
         return $this->_actionName;
     }
 
-    /*
+    /**
      * 获取当前模块目录
      *
      * @return $string
@@ -141,7 +141,7 @@ class Dispatcher
         $this->_requestPath     = $_requestPath;
     }
 
-    /*
+    /**
      * 合并所有请求
      *
      * @return array

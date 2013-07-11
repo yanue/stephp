@@ -1,14 +1,13 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-/*
- * Func.php
- *------------------------------------------------------------------------------
- * @copyright : yanue.net
- *------------------------------------------------------------------------------
- * @author : yanue
- * @date : 13-6-17
- *------------------------------------------------------------------------------
+/**
+ * 共用函数 - Bootstrap.php
+ *
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/func
+ * @time     2013-07-11
  */
 
 class Func {
@@ -51,7 +50,7 @@ class Func {
         return $str;
     }
 
-    /*
+    /**
     重置图片高宽和位置，溢出隐藏
     保证在规定窗口满窗显示
     直接在图片style上使用输出

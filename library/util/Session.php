@@ -1,28 +1,29 @@
 <?php
-
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
-
+ini_set('session.use_cookies',1);
 /**
  * session 处理库
  *
- * @example     Session::instance()->get("key")
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.1 - 2013-07-02
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/util
+ * @time     2013-07-11
  */
-
-//使用 COOKIE 保存 SESSION ID 的方法
-ini_set('session.use_cookies',1);
-
 class Session
 {
+    /**
+     * @var bool
+     */
     private $sessionState = false;
+
+    /**
+     * @var int
+     */
     protected $session_cache_expire = 300;
 
     /**
-     * 开启session
+     * 初始化
      *
-     * @return boolean
      */
     function __construct() {
         session_cache_expire($this->session_cache_expire);
@@ -34,7 +35,7 @@ class Session
         return $this->sessionState;
     }
 
-    /*
+    /**
      * 设置session过期时间
      *
      * @param $time 时间长度(秒)
@@ -46,7 +47,7 @@ class Session
     }
 
 
-    /**
+    /***
      * 实例化对象
      *
      * @return  object
@@ -128,7 +129,7 @@ class Session
 
 
     /**
-     * 清楚session
+     * 清除session
      *
      * @return boolean
      */

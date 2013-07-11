@@ -2,9 +2,12 @@
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 /**
- * User: yanue
- * Date: 13-1-4
- * Time: 下午2:24
+ * 数据库操作处理 - Db.php
+ *
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/db
+ * @time     2013-07-11
  */
 class Db {
     private static $db = null;
@@ -182,7 +185,7 @@ class Db {
         //$this->connection();
         if(count($sqlQueue)>0)
         {
-            /*
+            /**
              * Manual says:
              * If you do not fetch all of the data in a result set before issuing your next call to PDO::query(), your call may fail. Call PDOStatement::closeCursor() to release the database resources associated with the PDOStatement object before issuing your next call to PDO::query().
              * */

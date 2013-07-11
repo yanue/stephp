@@ -1,25 +1,37 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-/*
+/**
  * 路由分发
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.2 - 2013-07-09
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 
 class Router {
 
-    private static $router = null; # 路由后的key=>val请求信息
+    /**
+     * # 路由后的key=>val请求信息
+     * @var null
+     */
+    private static $router = null;
 
-    private static $fetchedStep = 0; # 第几个正则匹配到
+    /**
+     * # 第几个正则匹配到
+     * @var int
+     */
+    private static $fetchedStep = 0;
 
+    /**
+     *
+     */
     public function __construct(){
 
     }
 
-    /*
+    /**
      * 静态路由
      *
      *
@@ -36,7 +48,7 @@ class Router {
         }
     }
 
-    /*
+    /**
      * 正则路由
      */
     public function routeRegex ($pettern,$mvc='',$req=''){
@@ -54,7 +66,7 @@ class Router {
         }
     }
 
-    /*
+    /**
      * 添加路由
      *
      */
@@ -65,7 +77,7 @@ class Router {
         }
     }
 
-    /*
+    /**
      * 设置url信息
      *
      */

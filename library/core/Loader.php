@@ -2,20 +2,23 @@
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 /**
- *
  * 类库自动加载器 -  Loader.php
- * --外接口
+ *
+ * <pre>
+ * --外接口:
  *  -addIncludePath() 追加目录到include_path
  *  -getConfig() 获取(单个)系统配置信息
+ * </pre>
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.1 - 13-7-4
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 
 class Loader {
 
-    /*
+    /**
      * 初始化
      *
      */
@@ -25,7 +28,7 @@ class Loader {
         spl_autoload_register(array($this,'loadClass'));
     }
 
-    /*
+    /**
      * 获取(单个)系统配置信息
      *
      * @param string $key 具体需要获取的键名
@@ -37,7 +40,7 @@ class Loader {
         return isset($settings[$key]) ? $settings[$key] : '' ;
     }
 
-    /*
+    /**
      * 自动加载library下面的类
      *
      */
@@ -47,7 +50,7 @@ class Loader {
         include_once $file;
     }
 
-    /*
+    /**
      * 追加目录到include_path
      *
      */
@@ -56,7 +59,7 @@ class Loader {
     }
 
 
-    /*
+    /**
      * 设置新目录并合并添加到include_path
      *
      * @return bool

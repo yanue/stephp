@@ -1,24 +1,37 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
-/*
+/**
  * 数据处理模型类
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.1 - 13-7-5
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 
 class Model extends Db
 {
+    /**
+     * 初始化模型
+     *
+     * @param string $DB_TYPE
+     * @param string $DB_HOST
+     * @param string $DB_PORT
+     * @param string $DB_NAME
+     * @param string $DB_USER
+     * @param string $DB_PASS
+     */
     public function __construct($DB_TYPE='', $DB_HOST='',$DB_PORT='', $DB_NAME='', $DB_USER='', $DB_PASS=''){
         $this->init();
-        parent::__construct(DB_TYPE, DB_HOST,DB_PORT, DB_NAME, DB_USER, DB_PASS);
         if(Db::$errcode!=0){
             $this->sqlError(Db::$errmsg,Db::$errcode);
         }
     }
 
+    /**
+     *
+     */
     public function init(){
         $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
         defined('DB_TYPE') || define('DB_TYPE',isset($settings['db.type'])?$settings['db.type']:'mysql');

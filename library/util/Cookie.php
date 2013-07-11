@@ -1,11 +1,12 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
-/*
+/**
  * cookie 处理类
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.0 - 13-7-2
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/util
+ * @time     2013-07-11
  */
 
 

@@ -3,31 +3,32 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 /**
  * 控制器处理类
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.3 - 13-7-9
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/core
+ * @time     2013-07-11
  */
 class Controller
 {
-    /*
+    /**
      * 视图
      *
      */
     public $view = NULL;
 
-    /*
+    /**
      * url全局处理
      *
      */
     public $uri = NULL;
 
-    /*
+    /**
      * session处理
      *
      */
     public $session = null;
 
-    /*
+    /**
      * 初始化控制器
      *
      */
@@ -37,7 +38,7 @@ class Controller
         $this->session = new Session();
     }
 
-    /*
+    /**
      * load file
      *
      */
@@ -50,7 +51,7 @@ class Controller
         return false;
     }
 
-	/*
+	/**
 	 * load configs file
 	 *
 	 */
@@ -61,7 +62,7 @@ class Controller
 		}
 	}
 
-    /*
+    /**
      * 跨module引用模型
      * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
      *
@@ -73,7 +74,7 @@ class Controller
         //TODO
     }
 
-    /*
+    /**
     * 跨module引用模型
     * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
     *
@@ -85,7 +86,7 @@ class Controller
         //TODO
     }
 
-    /*
+    /**
      * load plugins
      *
      */

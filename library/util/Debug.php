@@ -4,11 +4,11 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 /**
  * Debug 错误调试调试
  *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.1 - 2013-07-10
+ * @author 	 yanue <yanue@outlook.com>
+ * @link	 http://stephp.yanue.net/
+ * @package  lib/util
+ * @time     2013-07-11
  */
-
 class Debug {
 
     private static $isInitCss = false;
@@ -18,7 +18,7 @@ class Debug {
         self::startMT();
     }
 
-    /*
+    /**
      * 开始监测时间和内存
      *
      */
@@ -27,7 +27,7 @@ class Debug {
         $GLOBALS['_startTime'] = microtime(true);
     }
 
-    /*
+    /**
      * 输出内存和时间消耗信息
      * --注意:如果需要检测某个位置,先注册 Debug::startMT() 进行检测再使用
      *
@@ -44,7 +44,7 @@ class Debug {
         echo $str;
     }
 
-    /*
+    /**
      * 默认trace的css样式
      *
      */
@@ -64,7 +64,7 @@ class Debug {
         }
     }
 
-    /*
+    /**
      * 结构化输出信息
      *
      * @param $mixed mixed : 字串,数组..
@@ -79,7 +79,7 @@ class Debug {
 //        self::memAndTime();
     }
 
-    /**
+    /***
      * 分段运行时间
      * --说明: 打印代码执行的行数.以及执行花费时间.
      *
@@ -93,7 +93,7 @@ class Debug {
         echo  '<p class="trance"><code>File:</code>'.$debug[0]['file']." | <code>Line</code>:".$debug[0] ['line'] . "  | <code>" . $du . "</code> 秒</p>";
     }
 
-    /*
+    /**
      * 输出代码追踪信息
      *
      * @return void
@@ -128,7 +128,7 @@ class Debug {
         self::half($errno, $errMsg, $errfile, $errline);
     }
 
-    /*
+    /**
      * 错误终止
      *
      * @return void
@@ -140,7 +140,7 @@ class Debug {
         }
     }
 
-    /*
+    /**
      * 错误异常输出
      *
      * @return void
@@ -160,7 +160,7 @@ class Debug {
         echo  '<p class="trance">[第'.$error['line'].'行] '.$error['file'].' <br />错误信息: '.$error['message'].'</p>';
     }
 
-    /*
+    /**
      * 字节转换
      *
      * @return string.
@@ -170,7 +170,7 @@ class Debug {
         return round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
-    /*
+    /**
      * 输出错误信息
      *
      * @return void
