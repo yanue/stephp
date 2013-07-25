@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Util;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 /**
  * cookie 处理类
  *
@@ -12,7 +14,6 @@ if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 class Cookie
 {
-
 
     const OneHour = 3600;
 

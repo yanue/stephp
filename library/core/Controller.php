@@ -1,5 +1,10 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Core;
+
+use Library\Util\Session;
+use Library\Core\Request;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 /**
  * 控制器处理类
  *
@@ -44,7 +49,7 @@ class Controller
      *
      */
     public function loadFile($name) {
-        $path = ROOT_PATH.$name;
+        $path = LIB_PATH.$name;
         if (file_exists($path)) {
             include_once $path;
             return true;
@@ -111,7 +116,7 @@ class Controller
      *
      */
     public function loadPlugin($name) {
-        $path = ROOT_PATH.'plugins/'.$name.'.class.php';
+        $path = LIB_PATH.'plugins/'.$name.'.class.php';
         if (file_exists($path)) {
             require_once $path;
         }

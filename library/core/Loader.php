@@ -1,31 +1,146 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Core;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
- * 类库自动加载器 -  Loader.php
+ * SplClassLoader implementation that implements the technical interoperability
+ * standards for PHP 5.3 namespaces and class names.
  *
- * <pre>
- * --外接口:
- *  -addIncludePath() 追加目录到include_path
- *  -getConfig() 获取(单个)系统配置信息
- * </pre>
+ * http://groups.google.com/group/php-standards/web/final-proposal
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
- * @package  lib/core
- * @time     2013-07-11
+ *     // Example which loads classes for the Doctrine Common package in the
+ *     // Doctrine\Common namespace.
+ *     $classLoader = new SplClassLoader('Doctrine\Common', '/path/to/doctrine');
+ *     $classLoader->register();
+ *
+ * @author Jonathan H. Wage <jonwage@gmail.com>
+ * @author Roman S. Borschel <roman@code-factory.org>
+ * @author Matthew Weier O'Phinney <matthew@zend.com>
+ * @author Kris Wallsmith <kris.wallsmith@gmail.com>
+ * @author Fabien Potencier <fabien.potencier@symfony-project.org>
  */
-
-class Loader {
+class Loader
+{
+    private $_fileExtension = '.php';
+    private $_namespace;
+    private $_includePath;
+    private $_namespaceSeparator = '\\';
 
     /**
-     * 初始化
+     * Creates a new <tt>SplClassLoader</tt> that loads classes of the
+     * specified namespace.
      *
+     * @param string $ns The namespace to use.
      */
-    public function __construct() {
-        $include_paths = array('./library/core','./library/db','./library/func','./library/util');
-        $this->setIncludePath($include_paths);
-        spl_autoload_register(array($this,'loadClass'));
+    public function __construct($includePath = null,$ns = null)
+    {
+        $this->_namespace = $ns;
+        $this->_includePath = $includePath;
+    }
+
+    /**
+     * Sets the namespace separator used by classes in the namespace of this class loader.
+     *
+     * @param string $sep The separator to use.
+     */
+    public function setNamespaceSeparator($sep)
+    {
+        $this->_namespaceSeparator = $sep;
+    }
+
+    /**
+     * Gets the namespace seperator used by classes in the namespace of this class loader.
+     *
+     * @return void
+     */
+    public function getNamespaceSeparator()
+    {
+        return $this->_namespaceSeparator;
+    }
+
+    /**
+     * Sets the base include path for all class files in the namespace of this class loader.
+     *
+     * @param string $includePath
+     */
+    public function setIncludePath($includePath)
+    {
+        $this->_includePath = $includePath;
+    }
+
+    /**
+     * Gets the base include path for all class files in the namespace of this class loader.
+     *
+     * @return string $includePath
+     */
+    public function getIncludePath()
+    {
+        return $this->_includePath;
+    }
+
+    /**
+     * Sets the file extension of class files in the namespace of this class loader.
+     *
+     * @param string $fileExtension
+     */
+    public function setFileExtension($fileExtension)
+    {
+        $this->_fileExtension = $fileExtension;
+    }
+
+    /**
+     * Gets the file extension of class files in the namespace of this class loader.
+     *
+     * @return string $fileExtension
+     */
+    public function getFileExtension()
+    {
+        return $this->_fileExtension;
+    }
+
+    /**
+     * Installs this class loader on the SPL autoload stack.
+     */
+    public function register()
+    {
+        spl_autoload_register(array($this, 'loadClass'));
+    }
+
+    /**
+     * Uninstalls this class loader from the SPL autoloader stack.
+     */
+    public function unregister()
+    {
+        spl_autoload_unregister(array($this, 'loadClass'));
+    }
+
+    /**
+     * Loads the given class or interface.
+     *
+     * @param string $className The name of the class to load.
+     * @return void
+     */
+    public function loadClass($className)
+    {
+        if (null === $this->_namespace || $this->_namespace.$this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace.$this->_namespaceSeparator))) {
+
+            $fileName = '';
+            if (false !== ($lastNsPos = strripos($className, $this->_namespaceSeparator))) {
+                $namespace = substr($className, 0, $lastNsPos);
+                $className = substr($className, $lastNsPos + 1);
+                $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+            }
+
+            $fileName = strtolower($fileName) . str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
+            $file = ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
+
+            if(file_exists($file)){
+                require $file;
+            }else{
+                echo '"'.$fileName.'" is not exists';
+            }
+        }
     }
 
     /**
@@ -35,47 +150,8 @@ class Loader {
      * @return mixed
      */
     public static function getConfig($key=''){
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        $settings = parse_ini_file(WEB_ROOT.'/config/application.ini');
         if (!$key ){ return $settings; }
         return isset($settings[$key]) ? $settings[$key] : '' ;
-    }
-
-    /**
-     * 自动加载library下面的类
-     *
-     */
-    private function loadClass($class){
-        # 文件名就是类名
-        $file = $class.'.php';
-        include_once $file;
-    }
-
-    /**
-     * 追加目录到include_path
-     *
-     */
-    public function addToPath($path){
-        $this->setIncludePath($path);
-    }
-
-
-    /**
-     * 设置新目录并合并添加到include_path
-     *
-     * @return bool
-     */
-    private function setIncludePath($paths){
-        if( !$paths ){ return false; }
-        # 原始路径
-        $old_paths = get_include_path();
-        $old_paths_arr =  explode(PATH_SEPARATOR,$old_paths);
-        # 要添加的路径
-        $new_paths = is_array($paths) ? $paths : array($paths);
-        # 合并,保持唯一,生成字串
-        $now_paths = array_unique(array_merge($old_paths_arr , $new_paths));
-        $include_paths = implode(PATH_SEPARATOR,$now_paths);
-        # 设置到include_path
-        set_include_path($include_paths);
-        return true;
     }
 }

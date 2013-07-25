@@ -1,4 +1,9 @@
 <?php
+namespace Library\Util\Ajax;
+
+use Library\Util\Session;
+use Library\Util\Hash;
+use Library\Util\Cookie;
 
 /**
  * ajax api 信息处理

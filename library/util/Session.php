@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Util;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 ini_set('session.use_cookies',1);
 /**
  * session 处理库

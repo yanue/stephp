@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Db;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * 数据库操作处理 - Db.php

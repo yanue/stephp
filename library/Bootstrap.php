@@ -1,6 +1,15 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library;
+
+use Library\Core\Dispatcher;
+use Library\Core\Loader;
+use Library\Util\Debug;
+use Library\Util\Session;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+
 define('VERSION', '1.1.6');
+
 
 /**
  * 应用入口初始化 - Bootstrap.php
@@ -9,7 +18,6 @@ define('VERSION', '1.1.6');
  * @link	 http://stephp.yanue.net/
  * @time     2013-07-11
  */
-
 class Bootstrap {
 
     public function __construct(){
@@ -23,24 +31,25 @@ class Bootstrap {
      *
      */
     public function init(){
-        require_once ROOT_PATH.'library/core/'.'Loader.php';
+        require_once LIB_PATH . '/core/' . 'Loader.php';
 
         // 初始化自动加载
-        $loader = new Loader();
+        $loader = new Loader(WEB_ROOT);
+        $loader->register();
 
         // 执行分发过程,获取mvc结构
         $disp = new Dispatcher();
         $controller = $disp->getController();
         $action     = $disp->getAction();
-        $modulePath = $disp->getModulePath();
-
-        // model的路径根据不同的module会变,因此需要解析玩url才分配
-        // 并且只能分配当前模块model的路径.
-        $loader->addToPath($modulePath.'model');
-        $loader->addToPath($modulePath.'helper');
+        $getModule = $disp->getModule();
 
         // 最终执行控制器的方法
-        $this->_execute($modulePath,$controller,$action);
+        $this->_execute($getModule,$controller,$action);
+        $loader->unregister($loader,'loadClass');
+        spl_autoload_register(array($this, 'loadClass'));
+    }
+    public function loadClass($className){
+        echo $className;
     }
 
     /**
@@ -57,45 +66,14 @@ class Bootstrap {
      * @param $string $action 当前方法名称
      * @return null
      */
-    private function _execute($modulePath,$controller,$action){
-
+    private function _execute($module,$controller,$action){
         // 控制器:首字母大写的控制器+Controller
-        $controller = ucfirst($controller) . 'Controller';
-        // 方法名+action
-        $action = $action.'Action';
         // 控制器文件位于当前模块下的controller目录
-        $file = $modulePath . 'controller/' . $controller . '.php';
-
-        // 判断并执行
-        if (file_exists($file)) {
-            require_once $file;
-            if (! method_exists($controller, $action)) {
-                $this->_error($modulePath,'方法不存在!');
-            }else{
-                $controllerObj = new $controller();
-                $controllerObj->{$action}();
-            }
-        } else {
-            $this->_error($modulePath,'控制器不存在!');
-        }
-    }
-
-    /**
-     * 错误提示
-     *
-     * @return null
-     */
-    private function _error($modulePath,$msg='') {
-        $file = $modulePath . 'ErrorController.php';
-        $msg = $msg ? $msg : '访问地址不存在!';
-        if(file_exists($file)){
-            require_once $file;
-            $controllerObj = new ErrorController();
-            $controllerObj->indexAction();
-        }else{
-            Debug::trace();
-            
-        }
+        // 初始化自动加载
+        $_namespaceClass = '\App\\'.ucfirst($module).'\Controller\\'.ucfirst($controller).'Controller';
+        $controllerObj = new $_namespaceClass();
+        // 方法名+action
+        $controllerObj->{$action.'Action'}();
     }
 
 }

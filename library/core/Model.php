@@ -1,5 +1,9 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+
+namespace Library\Core;
+
+use Library\Db\Db;
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * 数据处理模型类
@@ -34,7 +38,7 @@ class Model extends Db
      *
      */
     public function init(){
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        $settings = parse_ini_file(LIB_PATH.'configs/application.ini');
         defined('DB_TYPE') || define('DB_TYPE',isset($settings['db.type'])?$settings['db.type']:'mysql');
         defined('DB_HOST') || define('DB_HOST',$settings['db.host']);
         defined('DB_PORT') || define('DB_PORT',isset($settings['db.port'])?$settings['db.type']:'3306');
@@ -45,7 +49,7 @@ class Model extends Db
 
     // load configs file
     public function loadConfig ($file){
-        $file = ROOT_PATH.'configs/'.$file.'.php';
+        $file = LIB_PATH.'configs/'.$file.'.php';
         if(file_exists($file)){
             include_once $file;
         }
@@ -53,7 +57,7 @@ class Model extends Db
 
     // load configs file
     public function loadModel ($file){
-        $file = ROOT_PATH.'model/'.ucfirst($file).'Model.php';
+        $file = LIB_PATH.'model/'.ucfirst($file).'Model.php';
         if(file_exists($file)){
             include_once $file;
         }

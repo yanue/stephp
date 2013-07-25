@@ -1,4 +1,10 @@
 <?php
+namespace Library\Core;
+
+use Library\Core\Request;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+
 /**
  * 分发类，负责解析url分配mvc名称及请求数组
  *
@@ -9,7 +15,6 @@
  */
 class Dispatcher
 {
-    protected $_moduleCurPath   = null;
     protected $_moduleName      = 'default';
     protected $_controllerName 	= 'index';  // 控制器
     protected $_actionName 		= 'index';  // 方法
@@ -23,7 +28,7 @@ class Dispatcher
 
 
 	public function __construct(){
-        $this->_appPath = ROOT_PATH.(Loader::getConfig('application.path') ? Loader::getConfig('application.path') : 'app').'/';
+        $this->_appPath = WEB_ROOT.'/app';
         $this->request = new Request();
         $this->urlParse();// url解析mvc
         $this->requestParam(); // 合并请求进行组合
@@ -71,7 +76,7 @@ class Dispatcher
      * @return $string
      */
     public function getModulePath(){
-        return $this->_moduleCurPath;
+        return $this->_appPath.'/'.$this->_moduleName;
     }
 
     /**
@@ -130,7 +135,7 @@ class Dispatcher
             $action     = isset($requestPath[2]) && $requestPath[2]!='' ? $requestPath[2] : $action ;
         }else{
             # 第一个参数与默认的module名不相同,则判断以它为module是否存在,
-            if(isset($requestPath[0]) && file_exists($this->_appPath . $requestPath[0])){
+            if(isset($requestPath[0]) && file_exists($this->_appPath .'/'. $requestPath[0])){
                 # 模块文件夹存在
                 $module     = isset($requestPath[0]) && $requestPath[0]!='' ? $requestPath[0] : $module ;
                 $controller = isset($requestPath[1]) && $requestPath[1]!='' ? $requestPath[1] : $controller ;
@@ -151,12 +156,10 @@ class Dispatcher
 
         # 去除 mvc 结构后面的目录结构数组
         $_requestPath = array_values(array_diff($requestPath,array_values($paramMvc)));
-
         # 静态变量赋值
         $this->_moduleName      = $module;
         $this->_controllerName  = $controller;
         $this->_actionName      = $action;
-        $this->_moduleCurPath   = $this->_appPath . $this->_moduleName.'/';
         $this->_requestPath     = $_requestPath;
     }
 

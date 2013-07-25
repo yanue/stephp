@@ -7,7 +7,11 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class UserModel {
+namespace App\Home\Model;
+
+use Library\Core\Model;
+
+class UserModel extends Model{
     function __construct(){
         echo '<br >------------------UserModel-------------------<br >';
     }

@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Core;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * 路由分发
@@ -82,7 +84,7 @@ class Router {
      *
      */
     private function setUrl($requestParams){
-        $settings = parse_ini_file(ROOT_PATH.'configs/application.ini');
+        $settings = parse_ini_file(LIB_PATH.'configs/application.ini');
         Bootstrap::$_moduleName = isset($requestParams['module']) && $requestParams['module'] ? $requestParams['module'] : $settings['application.default.module'];
         Bootstrap::$_controllerName = isset($requestParams['controller']) && $requestParams['controller'] ? $requestParams['controller'] : $settings['application.default.controller'];
         Bootstrap::$_actionName = isset($requestParams['action']) && $requestParams['action'] ? $requestParams['action'] : $settings['application.default.action'];

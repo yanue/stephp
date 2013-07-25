@@ -1,4 +1,6 @@
 <?php
+namespace Library\Util;
+
 /**
  * errorCode.php
  *

@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Util\Csrf;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 
 /**

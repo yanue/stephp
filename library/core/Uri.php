@@ -1,5 +1,7 @@
 <?php
-if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
+namespace Library\Core;
+
+if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * uri各种参数获取综合类
