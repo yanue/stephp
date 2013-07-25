@@ -1,6 +1,6 @@
 <?php
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
-define('VERSION', '1.1.5');
+define('VERSION', '1.1.6');
 
 /**
  * 应用入口初始化 - Bootstrap.php
@@ -34,10 +34,10 @@ class Bootstrap {
         $action     = $disp->getAction();
         $modulePath = $disp->getModulePath();
 
-        // models的路径根据不同的module会变,因此需要解析玩url才分配
-        // 并且只能分配当前模块models的路径.
-        $loader->addToPath($modulePath.'models');
-        $loader->addToPath($modulePath.'helpers');
+        // model的路径根据不同的module会变,因此需要解析玩url才分配
+        // 并且只能分配当前模块model的路径.
+        $loader->addToPath($modulePath.'model');
+        $loader->addToPath($modulePath.'helper');
 
         // 最终执行控制器的方法
         $this->_execute($modulePath,$controller,$action);
@@ -49,7 +49,7 @@ class Bootstrap {
      *  -骆驼峰命名规则,类名需要首字母大写
      *  -控制器: 控制器名称+Controller.php 控制器类名和文件名相同 例: testController.php,控制器类名:testController
      *  -控制器方法: 方法名+action 例: testAction();
-     * --控制器文件位于当前模块下的controllers目录
+     * --控制器文件位于当前模块下的controller目录
      *
      *
      * @param $string $modulePath 当前模块目录
@@ -63,8 +63,8 @@ class Bootstrap {
         $controller = ucfirst($controller) . 'Controller';
         // 方法名+action
         $action = $action.'Action';
-        // 控制器文件位于当前模块下的controllers目录
-        $file = $modulePath . 'controllers/' . $controller . '.php';
+        // 控制器文件位于当前模块下的controller目录
+        $file = $modulePath . 'controller/' . $controller . '.php';
 
         // 判断并执行
         if (file_exists($file)) {
@@ -94,7 +94,7 @@ class Bootstrap {
             $controllerObj->indexAction();
         }else{
             Debug::trace();
-
+            
         }
     }
 

@@ -36,6 +36,7 @@ class Controller
         $this->view = new View();
         $this->uri = & $this->view->uri();
         $this->session = new Session();
+        $this->request = new Request();
     }
 
     /**
@@ -63,15 +64,34 @@ class Controller
 	}
 
     /**
+     * baseUrl快捷使用方式
+     * -- controller上使用
+     *
+     * @param string $uri
+     * @return string
+     */
+    public function baseUrl($uri=''){
+        return $this->uri->baseUrl($uri);
+    }
+
+    /**
      * 跨module引用模型
      * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
-     *
+     * //TODO
      * @param $model 模型名称(不包含'Model',如'UserModel'则输入'user').
      * @param $module 模块名称(需要跨的模块)
      * @return void.
      */
     public function loadModel($model,$module=''){
-        //TODO
+        $modelClass = ucfirst($model).'Model';
+        if($module){
+            $file = $this->uri->getAppPath().'/'.$module.'/model/'.$modelClass.'.php';
+            if(file_exists($file)){
+                require_once $file;
+            }else{
+                echo $modelClass.'.php 文件不存在';
+            }
+        }
     }
 
     /**

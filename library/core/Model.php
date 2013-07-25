@@ -27,6 +27,7 @@ class Model extends Db
         if(Db::$errcode!=0){
             $this->sqlError(Db::$errmsg,Db::$errcode);
         }
+        parent::__construct(DB_TYPE, DB_HOST,DB_PORT, DB_NAME, DB_USER, DB_PASS);
     }
 
     /**
@@ -52,7 +53,7 @@ class Model extends Db
 
     // load configs file
     public function loadModel ($file){
-        $file = ROOT_PATH.'models/'.ucfirst($file).'Model.php';
+        $file = ROOT_PATH.'model/'.ucfirst($file).'Model.php';
         if(file_exists($file)){
             include_once $file;
         }

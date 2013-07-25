@@ -24,7 +24,8 @@ class Db {
         );
         // Create a new PDO instanace
         try{
-            self::$db = new PDO($DB_TYPE.':dbname='.$DB_NAME.';host='.$DB_HOST.';port='.$DB_PORT,$DB_USER,$DB_PASS,$options);
+            $dsn = $DB_TYPE.':dbname='.$DB_NAME.';host='.$DB_HOST.';port='.$DB_PORT;
+            self::$db = new PDO($dsn,$DB_USER,$DB_PASS,$options);
         } catch(PDOException $e){ // Catch any errors
             self::$errmsg = $e->getMessage();
             self::$errcode = $e->getCode();

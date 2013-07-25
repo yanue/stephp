@@ -45,8 +45,48 @@ class Request {
         $this->baseUrl();
     }
 
+    /**
+     * return get method val by key($_name)
+     *
+     * @param $_name
+     * @param null $default
+     * @return null
+     */
+    public function get($_name,$default=null){
+        return isset($_GET[$_name]) ? $_GET[$_name] : $default;
+    }
 
 
+    /**
+     * return post method val by key($_name)
+     *
+     * @param $_name
+     * @param null $default
+     * @return null
+     */
+    public function post($_name,$default=null){
+        return isset($_POST[$_name]) ? $_POST[$_name] : $default;
+    }
+
+    /**
+     * return $_REQUEST (get or post) val by key($_name)
+     *
+     * @param $_name
+     * @param null $default
+     * @return null
+     */
+    public function request($_name,$default=null){
+        return isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
+    }
+
+    /**
+     * get http referer
+     * @return string
+     */
+    public function getReferer(){
+        return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+    }
+    
     /** *
      * 获取基本地址: baseUrl
      * --说明: 返回不包含mvc结构,可以通过uri参数传入设置

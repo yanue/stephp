@@ -2,13 +2,15 @@
 if ( ! defined('ROOT_PATH')) exit('No direct script access allowed');
 
 /**
- * 共用函数 - Bootstrap.php
+ * 共用函数 - Func.php
  *
  * @author 	 yanue <yanue@outlook.com>
  * @link	 http://stephp.yanue.net/
  * @package  lib/func
  * @time     2013-07-11
  */
+
+
 
 class Func {
 

@@ -133,7 +133,6 @@ class Session
      *
      * @return boolean
      */
-
     public function destroy()
     {
         if ($this->sessionState)

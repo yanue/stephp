@@ -34,25 +34,22 @@ class View
      * 初始化
      */
     public function __construct (){
-        $this->uri = & $this->initUri();
+        $this->uri = new Uri();
     }
 
     /**
-     * 实例化uri类
-     *
-     * @return object
-     */
-    private function initUri(){
-        return new Uri();
-    }
-
-    /**
-     *
+     * 获取uri对象
      */
     public function uri(){
         return $this->uri;
     }
 
+    /**
+     * baseUrl映射到view上
+     *
+     * @param string $uri
+     * @return mixed
+     */
     public function baseUrl($uri=''){
         return $this->uri->baseUrl($uri);
     }
@@ -64,7 +61,7 @@ class View
      * @return void.
      */
     public function render($name){
-        $file = $this->uri->getModulePath().'views/'.$name.'.php';
+        $file = $this->uri->getModulePath().'view/'.$name.'.php';
         if(file_exists($file)){
             include_once $file;
         }
@@ -122,9 +119,9 @@ class View
      */
     public function content(){
         if($this->_content){
-            include_once $this->uri->getModulePath().'views/'.$this->_content.'.php';
+            include_once $this->uri->getModulePath().'view/'.$this->_content.'.php';
         }else{
-            include_once $this->uri->getModulePath().'views/'.$this->uri->getController().'/'.$this->uri->getAction().'.php';
+            include_once $this->uri->getModulePath().'view/'.$this->uri->getController().'/'.$this->uri->getAction().'.php';
         }
     }
 
@@ -135,7 +132,7 @@ class View
     private function display(){
         // 直接载入PHP模板
         if($this->_layout){
-            $layout = $this->uri->getModulePath().'views/'.$this->_layout.'.php';
+            $layout = $this->uri->getModulePath().'view/'.$this->_layout.'.php';
             if(file_exists($layout)){
                 include_once $layout;
             }else{

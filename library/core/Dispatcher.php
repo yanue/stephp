@@ -17,8 +17,10 @@ class Dispatcher
     protected $_requestPath     = array(); # action 后面的目录结构
     protected $_urlSuffix       = '.html'; # path部分后面
     private $_isRouterMatched = false; # 是否经过路由并验证通过
+    private $_appPath = null;
 
     protected $request = null;
+
 
 	public function __construct(){
         $this->_appPath = ROOT_PATH.(Loader::getConfig('application.path') ? Loader::getConfig('application.path') : 'app').'/';
@@ -55,6 +57,15 @@ class Dispatcher
     }
 
     /**
+     * 获取当前方法名的url
+     *
+     * @return $string
+     */
+    public function getActionUrl(){
+        return $this->request->getBaseUrl().$this->_moduleName.'/'.$this->_controllerName.'/'.$this->_actionName;
+    }
+
+    /**
      * 获取当前模块目录
      *
      * @return $string
@@ -63,6 +74,14 @@ class Dispatcher
         return $this->_moduleCurPath;
     }
 
+    /**
+     * 获取应用目录
+     *
+     * @return $string
+     */
+    public function getAppPath(){
+        return $this->_appPath;
+    }
 
     /**
      * url解析
