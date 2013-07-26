@@ -1,6 +1,7 @@
 <?php
 namespace Library\Db;
-
+use PDOException;
+use PDO;
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**

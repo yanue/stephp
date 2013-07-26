@@ -27,6 +27,7 @@ class IndexController extends Controller{
 //        $this->view->setLayout('layout');
         new UserModel();
 
+
         #echo $this->uri->getFullUrl();
     }
 }

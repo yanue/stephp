@@ -1,10 +1,11 @@
 <?php
 namespace Library\Util;
-
+use Exception;
+use Library\Core\Loader;
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
- * Debug 错误调试调试
+ * Debug 错误调试及异常处理
  *
  * @author 	 yanue <yanue@outlook.com>
  * @link	 http://stephp.yanue.net/
@@ -15,9 +16,40 @@ class Debug {
 
     private static $isInitCss = false;
     private static $isInitErrinfo = false;
-
+    private static $requestParam = null;
     public function __construct(){
         self::startMT();
+    }
+
+    /**
+     * 错误页面处理
+     *
+     * @param string $type
+     */
+    public static function showError($type='page'){
+        $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
+        if(!Loader::getConfig('phpSettings.debug')){
+            header('HTTP/1.1 404 page not found');
+            // 判断是否以ajax方式请求
+            if($isAjax){
+                echo json_encode('');
+            }else{
+                register_shutdown_function(self::errtpl($type));
+            }
+        }
+    }
+
+    /**
+     * set error page template
+     */
+    private static function errtpl($type){
+        echo '<title>404 '.$type.' not found</title>';
+        echo $type.' not found!';
+        return true;
+    }
+
+    public static function setRequestParam($params){
+        self::$requestParam = $params;
     }
 
     /**
@@ -109,7 +141,7 @@ class Debug {
         echo '</pre>';
         echo '<h2 class="traceTitle">Request Parameters :</h2>';
         echo '<pre class="trance">';
-
+        echo var_export(self::$requestParam);
         echo '</pre>';
     }
 
@@ -122,23 +154,41 @@ class Debug {
      * @param int $errline 错误行数
      * @return void
      */
-    public static function appError($errno, $errMsg, $errfile, $errline) {
+    public static function error_handler($errno, $errMsg, $errfile, $errline) {
         self::css();
         # 为了安全起见，不暴露出真实物理路径，下面两行过滤实际路径
         # $errfile=str_replace(getcwd(),"",$errfile);
         # $errMsg=str_replace(getcwd(),"",$errMsg);
-        self::half($errno, $errMsg, $errfile, $errline);
+        self::outMsg($errno, $errMsg, $errfile, $errline);
+
     }
 
     /**
-     * 错误终止
+     * 错误终止 handleShutdown
      *
      * @return void
      */
-    public static function fatalError(){
+    public static function shutdown_handle(){
+        $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
         if($err = error_get_last()){
-            self::css();
-            self::half($err['type'],$err['message'],$err['file'],$err['line']);
+            if(!in_array($err['type'],array(E_PARSE,E_CORE_ERROR,E_USER_ERROR,E_RECOVERABLE_ERROR))){
+                return ;
+            }
+            if(Loader::getConfig('phpSettings.debug')){
+                self::css();
+                self::outMsg($err['type'],$err['message'],$err['file'],$err['line']);
+            }else{
+                header('HTTP/1.1 500 Internal Server Error');
+                // 判断是否以ajax方式请求
+                if($isAjax){
+                    echo json_encode('');
+                }else{
+                    register_shutdown_function(function(){
+                        echo '<title>500 Internal Server Error</title>';
+                        echo '500 Internal Server Error';
+                    });
+                }
+            }
         }
     }
 
@@ -177,7 +227,7 @@ class Debug {
      *
      * @return void
      */
-    private static function half($errno,$errMsg,$errfile,$errline){
+    private static function outMsg($errno,$errMsg,$errfile,$errline){
         // 定义错误字符串的关联数组
         // 在这里我们只考虑
         // E_WARNING, E_NOTICE, E_USER_ERROR,
@@ -197,7 +247,9 @@ class Debug {
             E_STRICT             => 'Runtime Notice',
             E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
         );
+
         $errTypeName = array_key_exists($errno,$errType) ? $errType[$errno] : 'Unknown Error Type';
+
         if(self::$isInitErrinfo==false){
             echo '<h2 class="traceTitle">Exception information :</h2>';
             self::$isInitErrinfo=true;

@@ -2,6 +2,7 @@
 namespace Library\Core;
 
 use Library\Core\Request;
+use Library\Util\Debug;
 
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -32,61 +33,9 @@ class Dispatcher
         $this->request = new Request();
         $this->urlParse();// url解析mvc
         $this->requestParam(); // 合并请求进行组合
+        // set Debug
+        Debug::setRequestParam($this->_requestParams);
 	}
-
-    /**
-     * 获取控制器名
-     *
-     * @return $string
-     */
-    public function getController(){
-        return $this->_controllerName;
-    }
-
-    /**
-     * 获取模块名称
-     *
-     * @return $string
-     */
-    public function getModule(){
-        return $this->_moduleName;
-    }
-
-    /**
-     * 获取方法名称
-     *
-     * @return $string
-     */
-    public function getAction(){
-        return $this->_actionName;
-    }
-
-    /**
-     * 获取当前方法名的url
-     *
-     * @return $string
-     */
-    public function getActionUrl(){
-        return $this->request->getBaseUrl().$this->_moduleName.'/'.$this->_controllerName.'/'.$this->_actionName;
-    }
-
-    /**
-     * 获取当前模块目录
-     *
-     * @return $string
-     */
-    public function getModulePath(){
-        return $this->_appPath.'/'.$this->_moduleName;
-    }
-
-    /**
-     * 获取应用目录
-     *
-     * @return $string
-     */
-    public function getAppPath(){
-        return $this->_appPath;
-    }
 
     /**
      * url解析
@@ -156,6 +105,7 @@ class Dispatcher
 
         # 去除 mvc 结构后面的目录结构数组
         $_requestPath = array_values(array_diff($requestPath,array_values($paramMvc)));
+
         # 静态变量赋值
         $this->_moduleName      = $module;
         $this->_controllerName  = $controller;
@@ -189,9 +139,64 @@ class Dispatcher
         $paramQuery = array();
         $queryString = $this->request->getQuery();
         parse_str($queryString,$paramQuery);
+        $requestParams = array_merge($paramQuery,$paramMvc,$paramPath);
 
         # 合并所有请求,'?'后面的参数如果有与path部分相同的将被覆盖
-        $this->_requestParams = $requestParams = array_merge($paramQuery,$paramMvc,$paramPath);
+        $this->_requestParams = $requestParams;
+    }
+
+    /**
+     * 获取控制器名
+     *
+     * @return $string
+     */
+    public function getController(){
+        return $this->_controllerName;
+    }
+
+    /**
+     * 获取模块名称
+     *
+     * @return $string
+     */
+    public function getModule(){
+        return $this->_moduleName;
+    }
+
+    /**
+     * 获取方法名称
+     *
+     * @return $string
+     */
+    public function getAction(){
+        return $this->_actionName;
+    }
+
+    /**
+     * 获取当前方法名的url
+     *
+     * @return $string
+     */
+    public function getActionUrl(){
+        return $this->request->getBaseUrl().$this->_moduleName.'/'.$this->_controllerName.'/'.$this->_actionName;
+    }
+
+    /**
+     * 获取当前模块目录
+     *
+     * @return $string
+     */
+    public function getModulePath(){
+        return $this->_appPath.'/'.$this->_moduleName;
+    }
+
+    /**
+     * 获取应用目录
+     *
+     * @return $string
+     */
+    public function getAppPath(){
+        return $this->_appPath;
     }
 }
 ?>

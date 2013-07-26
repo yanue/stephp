@@ -1,6 +1,9 @@
 <?php
 namespace Library\Core;
 
+use Library\Bootstrap;
+use Library\Util\Debug;
+
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -117,6 +120,7 @@ class Loader
 
     /**
      * Loads the given class or interface.
+     * --新增控制器不存在错误404.
      *
      * @param string $className The name of the class to load.
      * @return void
@@ -132,13 +136,21 @@ class Loader
                 $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
             }
 
-            $fileName = strtolower($fileName) . str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
-            $file = ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
+            $fileClass = strtolower($fileName) . str_replace('_', DIRECTORY_SEPARATOR, $className);
+            $file = ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileClass . $this->_fileExtension;
 
+            // 加载
             if(file_exists($file)){
-                require $file;
+                require_once $file;
             }else{
-                echo '"'.$fileName.'" is not exists';
+                // 判断加载控制器错误
+                // 以Controller为结尾的就为控制器
+                $pos = strrpos($fileClass,'Controller');
+                $fileLen = strlen($fileClass)-strlen('Controller');
+                // 判断是否包含Controller
+                if($fileLen == $pos){
+                    Debug::showError('File');
+                }
             }
         }
     }

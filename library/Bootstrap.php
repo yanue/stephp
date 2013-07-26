@@ -8,7 +8,7 @@ use Library\Util\Session;
 
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
-define('VERSION', '1.1.6');
+define('VERSION', '2.0.1');
 
 
 /**
@@ -37,6 +37,17 @@ class Bootstrap {
         $loader = new Loader(WEB_ROOT);
         $loader->register();
 
+        # set display_errors
+        ini_set('display_errors',intval($loader->getConfig('phpSettings.display_errors')));
+
+        // 设定错误和异常处理(调试模式有用)
+        if($loader->getConfig('phpSettings.debug')){
+            set_error_handler(array('Library\Util\Debug','error_handler'));
+            set_exception_handler(array('Library\Util\Debug','appException'));
+        }
+        // 监听内部错误 500 错误
+        register_shutdown_function(array('Library\Util\Debug','shutdown_handle'));
+
         // 执行分发过程,获取mvc结构
         $disp = new Dispatcher();
         $controller = $disp->getController();
@@ -45,11 +56,7 @@ class Bootstrap {
 
         // 最终执行控制器的方法
         $this->_execute($getModule,$controller,$action);
-        $loader->unregister($loader,'loadClass');
-        spl_autoload_register(array($this, 'loadClass'));
-    }
-    public function loadClass($className){
-        echo $className;
+
     }
 
     /**
@@ -67,13 +74,21 @@ class Bootstrap {
      * @return null
      */
     private function _execute($module,$controller,$action){
+
         // 控制器:首字母大写的控制器+Controller
         // 控制器文件位于当前模块下的controller目录
         // 初始化自动加载
         $_namespaceClass = '\App\\'.ucfirst($module).'\Controller\\'.ucfirst($controller).'Controller';
+        // 控制器不存在404错误处理见 Loader->loadClass();
         $controllerObj = new $_namespaceClass();
-        // 方法名+action
-        $controllerObj->{$action.'Action'}();
+        $actionA = $action.'Action';
+
+        if(method_exists($controllerObj,$actionA)){
+            $controllerObj->$actionA();
+        }else{
+            Debug::showError();
+        }
     }
+
 
 }

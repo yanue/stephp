@@ -42,6 +42,13 @@ class Request {
      * 初始化并解析
      */
     public function __construct(){
+        $this->instance();
+    }
+
+    /**
+     * 初始化
+     */
+    public function instance(){
         # 解析url
         $this->parseUrl();
         $this->baseUrl();
@@ -102,6 +109,16 @@ class Request {
         $baseUrl .= isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
         $this->_baseUrl = $baseUrl.'/';
     }
+
+    /**
+     * 判断是不是ajax方式请求.
+     * @return bool
+     */
+    function isAjax()
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
+    }
+
 
     /**
      * 获取baseUrl部分
@@ -181,10 +198,10 @@ class Request {
 
         $this->_requestUri = substr($requestUri,strlen($script));
 
-        # 去除uri中当前脚本目录'/'
+        # 去除uri中当前脚本目录 '/'
         $uriParam = parse_url($this->_requestUri);
-        $this->_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '/';
-        $this->_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '/';
+        $this->_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
+        $this->_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
     }
 
 }
