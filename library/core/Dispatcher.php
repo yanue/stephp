@@ -3,6 +3,7 @@ namespace Library\Core;
 
 use Library\Core\Request;
 use Library\Util\Debug;
+use Library\Core\Router;
 
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -16,27 +17,42 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  */
 class Dispatcher
 {
-    protected $_moduleName      = 'default';
-    protected $_controllerName 	= 'index';  // 控制器
-    protected $_actionName 		= 'index';  // 方法
-    protected $_requestParams   = array();
-    protected $_requestPath     = array(); # action 后面的目录结构
-    protected $_urlSuffix       = '.html'; # path部分后面
+    private  $_moduleName      = 'default';
+    private $_controllerName 	= 'index';  // 控制器
+    private $_actionName 		= 'index';  // 方法
+    private $_requestParams   = array();
+    private $_requestPath     = array(); # action 后面的目录结构
+    private $_urlSuffix       = '.html'; # path部分后面
     private $_isRouterMatched = false; # 是否经过路由并验证通过
     private $_appPath = null;
 
-    protected $request = null;
+    public $request = null;
 
 
-	public function __construct(){
+    /**
+     * 初始化请求
+     *
+     */
+    public function __construct(){
         $this->_appPath = WEB_ROOT.'/app';
         $this->request = new Request();
+        $this->request->instance();
+	}
+
+    /**
+     * 执行分发过程
+     *
+     *
+     */
+    public function run(){
+
         $this->urlParse();// url解析mvc
+
         $this->requestParam(); // 合并请求进行组合
         // set Debug
         Debug::setRequestParam($this->_requestParams);
-	}
-
+    }
+    
     /**
      * url解析
      *
@@ -196,6 +212,19 @@ class Dispatcher
      * @return $string
      */
     public function getAppPath(){
+        return $this->_appPath;
+    }
+
+
+    public function getSuffix(){
+        return $this->_urlSuffix;
+    }
+
+    public function getParams(){
+        return $this->_appPath;
+    }
+
+    public function getPathArray(){
         return $this->_appPath;
     }
 }

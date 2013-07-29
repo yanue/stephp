@@ -20,10 +20,22 @@ class IndexController extends Controller{
     }
 
     public function indexAction(){
-        $this->view->enjoy = 'just enjoy it !';
-//        $this->view->setLayout('layout');
-        Debug::trace();
+        echo 'home';
+        echo '<br />';
+        echo $this->uri->getFullUrl();
 
+//        $this->view->setLayout('layout');
+//        Debug::trace();
+//        $this->uri->getAction();
 //        echo $this->uri->getFullUrl();
     }
+}
+
+class a {
+    static $a = 5;
+
+    public function test(){
+        self::$a = 8;
+    }
+
 }

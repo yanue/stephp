@@ -1,6 +1,9 @@
 <?php
 namespace Library\Core;
 
+use Library\Core\Request;
+use Library\Util\Debug;
+
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -20,6 +23,18 @@ class Router {
      */
     private static $router = null;
 
+    protected $_url_delimiter = '/';
+    protected $_var_delimiter = ':';
+
+    /**
+     * 默认的路由
+     *
+     * @var unknown_type
+     */
+    protected $_default = array(':controller/:action/*',
+        array('controller' => ':controller', 'action' => ':action')
+    );
+
     /**
      * # 第几个正则匹配到
      * @var int
@@ -29,8 +44,24 @@ class Router {
     /**
      *
      */
-    public function __construct(){
+    private $request = null;
 
+    private $routerConfig = null;
+
+    /**
+     * 初始化
+     */
+    public function __construct( ){
+
+    }
+
+    /**
+     * run
+     *
+     */
+    public function run($routerConfig){
+        $this->request = new Request();
+        $this->routerConfig = $routerConfig;
     }
 
     /**
@@ -38,12 +69,33 @@ class Router {
      *
      *
      */
-    public function routeStatic($pettern,$params){
+    public function routeStatic($pettern){
+        $uriSufix = Loader::getConfig('application.default.suffix');
+        $requestUri = ltrim($this->request->getPath(),'/');
+        // 去除后缀.html
+        $requestUri = false===strripos($requestUri,$uriSufix) ? $requestUri : substr($requestUri,0,(strlen($requestUri)-strlen($uriSufix)));
+
+        $pettern = false===strripos($pettern,$uriSufix) ? $pettern : substr($pettern,0,(strlen($pettern)-strlen($uriSufix))) ;
+        # 去除后缀进行判断
+        if(!self::$router && $pettern==$requestUri){
+            $this->request->setPath('/index/index');
+        }
+    }
+
+    /**
+     * 静态路由
+     *
+     *
+     */
+    public function routeRule($pettern,$params){
         if(self::$router) return;
         self::$fetchedStep += 1;
-        $requestUri = ltrim(Bootstrap::$_requestUri,'/');
-        $requestUri = false===strripos($requestUri,Bootstrap::$_urlSuffix) ? $requestUri : substr($requestUri,0,(strlen($requestUri)-strlen(Bootstrap::$_urlSuffix))) ;
-        $pettern = false===strripos($pettern,Bootstrap::$_urlSuffix) ? $pettern : substr($pettern,0,(strlen($pettern)-strlen(Bootstrap::$_urlSuffix))) ;
+        $uriSufix = Loader::getConfig('application.default.suffix');
+        echo $requestUri = ltrim($this->request->getUri(),'/');
+        // 去除后缀.html
+        $requestUri = false===strripos($requestUri,$uriSufix) ? $requestUri : substr($requestUri,0,(strlen($requestUri)-strlen($uriSufix)));
+
+        $pettern = false===strripos($pettern,$uriSufix) ? $pettern : substr($pettern,0,(strlen($pettern)-strlen($uriSufix))) ;
         # 去除后缀进行判断
         if(!self::$router && $pettern==$requestUri){
             self::$router = $params;
@@ -73,21 +125,7 @@ class Router {
      *
      */
     public function addRoute(){
-         if(self::$router){
-            Bootstrap::$_isRouterMatched = true;
-            self::setUrl(self::$router);
-        }
+
     }
 
-    /**
-     * 设置url信息
-     *
-     */
-    private function setUrl($requestParams){
-        $settings = parse_ini_file(LIB_PATH.'configs/application.ini');
-        Bootstrap::$_moduleName = isset($requestParams['module']) && $requestParams['module'] ? $requestParams['module'] : $settings['application.default.module'];
-        Bootstrap::$_controllerName = isset($requestParams['controller']) && $requestParams['controller'] ? $requestParams['controller'] : $settings['application.default.controller'];
-        Bootstrap::$_actionName = isset($requestParams['action']) && $requestParams['action'] ? $requestParams['action'] : $settings['application.default.action'];
-        Bootstrap::$_moduleCurPath   = Bootstrap::$_appPath.Bootstrap::$_moduleName.'/';
-    }
 }

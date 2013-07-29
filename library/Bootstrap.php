@@ -3,6 +3,7 @@ namespace Library;
 
 use Library\Core\Dispatcher;
 use Library\Core\Loader;
+use Library\Core\Router;
 use Library\Util\Debug;
 use Library\Util\Session;
 use Library\Core\Exception;
@@ -80,8 +81,16 @@ class Bootstrap {
      * @return null
      */
     private function _execute(){
+        // 执行路由
+        if($conig = include( WEB_ROOT."/config/router.config.php" )){
+            $router = new Router();
+            $router->run($conig);
+        }
+
         // 执行分发过程,获取mvc结构
         $disp = new Dispatcher();
+        $disp->run();
+
         $controller = $disp->getController();
         $action     = $disp->getAction();
         $module = $disp->getModule();

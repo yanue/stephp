@@ -14,24 +14,30 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 class Request {
 
     /**
-     * uri部分
+     * 域名url
      */
-    private $_requestUri 	= null;
+    private $_hostUrl       = null;
 
     /**
-     * 完整url
+     * 当前应用根url地址(针对放在子目录情况)
+     *
      */
-    private $_fullUrl       = null;
+    private $_webrootUrl       = null;
+
+    /**
+     * uri部分
+     */
+    private static $_requestUri 	= null;
 
     /**
      * uri中?后query部分
      */
-    private $_requestQuery  = null;
+    private static $_requestQuery  = null;
 
     /**
      * uri中path部分
      */
-    private $_requestPath   = null;
+    private static $_requestPath   = null;
 
     /**
      * uri中baseUrl
@@ -42,7 +48,6 @@ class Request {
      * 初始化并解析
      */
     public function __construct(){
-        $this->instance();
     }
 
     /**
@@ -135,7 +140,7 @@ class Request {
      * @return string
      */
     public function getUri(){
-        return $this->_requestUri;
+        return self::$_requestUri;
     }
 
     /**
@@ -144,7 +149,7 @@ class Request {
      * @return string : url
      */
     public function getFullUrl(){
-        return $this->_fullUrl;
+        return $this->_webrootUrl.self::$_requestUri;
     }
 
     /**
@@ -153,7 +158,7 @@ class Request {
      * @return string
      */
     public function getQuery(){
-        return $this->_requestQuery;
+        return self::$_requestQuery;
     }
 
     /**
@@ -162,7 +167,7 @@ class Request {
      * @return string
      */
     public function getPath(){
-        return $this->_requestPath;
+        return self::$_requestPath;
     }
 
     /**
@@ -186,8 +191,11 @@ class Request {
         $https = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
         $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/",true).$https;
         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+
+        # 保存地址域
+        $this->_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
         # 获取的完整url
-        $this->_fullUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$requestUri;
+
 
         # 当前脚本名称
         $script_name  = $_SERVER['SCRIPT_NAME'];
@@ -195,13 +203,30 @@ class Request {
         $script_dir  = dirname($_SERVER['SCRIPT_NAME']);
         # 去除uri中当前脚本文件名 (如果存在)
         $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
+        # 当前应用根url
+        $this->_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
 
-        $this->_requestUri = substr($requestUri,strlen($script));
+        self::$_requestUri = substr($requestUri,strlen($script));
 
         # 去除uri中当前脚本目录 '/'
-        $uriParam = parse_url($this->_requestUri);
-        $this->_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
-        $this->_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
+        $uriParam = parse_url(self::$_requestUri);
+        self::$_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
+        self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
     }
 
+    /**
+     * set requestUri
+     *
+     * @param $uri
+     */
+    public function setUri($uri){
+        if($uri){ self::$_requestUri = $uri; }
+    }
+
+    public function setPath($path){
+        if($path){
+            self::$_requestPath = $path;
+            self::$_requestUri = self::$_requestPath.'?'.self::$_requestQuery;
+        }
+    }
 }

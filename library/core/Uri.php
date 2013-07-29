@@ -12,14 +12,15 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @time     2013-07-11
  */
 
-final class Uri extends Dispatcher{
+class Uri{
 
     /**
      * 初始化
      *
      */
     public function __construct(){
-        parent::__construct();
+        $this->dispatcher = new Dispatcher();
+        $this->dispatcher->run();
     }
 
     /**
@@ -31,7 +32,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getParam($key){
-        $params = $this->_requestParams;
+        $params = $this->dispatcher->getParams();
         return isset($params[$key]) ? $params[$key] : false ;
     }
 
@@ -46,7 +47,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getUri($n){
-        $params = $this->_requestPath;
+        $params = $this->dispatcher->getPathArray();
         return isset($params[$n-1]) ? $params[$n-1] : false ;
     }
 
@@ -57,7 +58,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getLastParam(){
-        $params = $this->_requestPath;
+        $params =  $this->dispatcher->getPathArray();
         $len = count($params);
         return $len%2==1 ? $params[$len-1] : null;
     }
@@ -70,7 +71,7 @@ final class Uri extends Dispatcher{
      * @return string 匹配的值
      */
     public function getQuery($key){
-        $params = $this->request->getQuery();
+        $params =  $this->dispatcher->request->getQuery();
         parse_str($params,$paramQuery);
         return isset($paramQuery[$key]) ? $paramQuery[$key] : '' ;
     }
@@ -81,7 +82,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getFullUrl(){
-        return $this->request->getFullUrl();
+        return  $this->dispatcher->request->getFullUrl();
     }
 
     /**
@@ -90,7 +91,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getUriString(){
-        return $this->request->getUri();
+        return  $this->dispatcher->request->getUri();
     }
 
     /**
@@ -99,7 +100,7 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getQueryString(){
-        return $this->request->getQuery();
+        return $this->dispatcher->request->getQuery();
     }
 
     /**
@@ -108,19 +109,19 @@ final class Uri extends Dispatcher{
      * @return string
      */
     public function getPathString(){
-        return $this->request->getUri();
+        return $this->dispatcher->request->getPath();
     }
 
-   /**
-    * url构造(用于分页地址构造等)
-    *
-    * @param array $url_arr array(key=>val) 更新或添加到url中目录结构path部分
-    * @param array $rm_arr array(key) 删除原有path中的匹配key部分
-    * @param bool $getQueryString true/false 是否返回url中?后query部分
-    * @return string 新构造url
-    */
+    /**
+     * url构造(用于分页地址构造等)
+     *
+     * @param array $url_arr array(key=>val) 更新或添加到url中目录结构path部分
+     * @param array $rm_arr array(key) 删除原有path中的匹配key部分
+     * @param bool $getQueryString true/false 是否返回url中?后query部分
+     * @return string 新构造url
+     */
     public function setUrl($add_arr=array(),$rm_arr=array(),$getQueryString=false){
-        $params = $this->_requestPath;
+        $params =  $this->dispatcher->getPathArray();
         $paramPath = array();
         $lastParam = $this->getLastParam();
         if(($len = count($params)) > 0){
@@ -135,21 +136,21 @@ final class Uri extends Dispatcher{
         # 移除匹配参数
         $params = array_diff_key($params,array_flip((array)$rm_arr));
 
-        $mvcUri = $this->_moduleName.'/'.$this->_controllerName.'/'.$this->_actionName;
+        $mvcUri = $this->dispatcher->getModule().'/'.$this->dispatcher->getController().'/'.$this->dispatcher->getAction();
 
         foreach ($params as $k=>$v) {
             $mvcUri .= '/'.$k.'/'.$v;
         }
 
         # 添加最后一个path参数和后缀
-        $uriPath = $mvcUri.$lastParam.$this->_urlSuffix;
+        $uriPath = $mvcUri.$lastParam.$this->dispatcher->getSuffix();
         # 返回后面的query参数
-        $request_uri = $getQueryString==true && $this->request->getQuery() ? $uriPath.'?'.$this->request->getQuery() : $uriPath;
-        return $this->request->getBaseUrl().$request_uri;
+        $request_uri = $getQueryString==true &&  $this->dispatcher->request->getQuery() ? $uriPath.'?'. $this->dispatcher->request->getQuery() : $uriPath;
+        return  $this->dispatcher->request->getBaseUrl().$request_uri;
     }
 
 
     public function baseUrl($request_uri=''){
-        return $this->request->getBaseUrl().$request_uri;
+        return  $this->dispatcher->request->getBaseUrl().$request_uri;
     }
 }
