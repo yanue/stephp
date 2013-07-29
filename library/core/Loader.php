@@ -1,8 +1,7 @@
 <?php
 namespace Library\Core;
 
-use Library\Bootstrap;
-use Library\Util\Debug;
+use Library\Core\Exception;
 
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -142,15 +141,6 @@ class Loader
             // 加载
             if(file_exists($file)){
                 require_once $file;
-            }else{
-                // 判断加载控制器错误
-                // 以Controller为结尾的就为控制器
-                $pos = strrpos($fileClass,'Controller');
-                $fileLen = strlen($fileClass)-strlen('Controller');
-                // 判断是否包含Controller
-                if($fileLen == $pos){
-                    Debug::showError('File');
-                }
             }
         }
     }

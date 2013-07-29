@@ -10,8 +10,7 @@ namespace App\Home\Controller;
 
 use App\Home\Model\UserModel;
 use Library\Core\Controller;
-
-
+use Library\Util\Debug;
 
 
 class IndexController extends Controller{
@@ -21,13 +20,10 @@ class IndexController extends Controller{
     }
 
     public function indexAction(){
-        echo $this->request->get('action');
-        echo 'asd';
         $this->view->enjoy = 'just enjoy it !';
 //        $this->view->setLayout('layout');
-        new UserModel();
+        Debug::trace();
 
-
-        #echo $this->uri->getFullUrl();
+//        echo $this->uri->getFullUrl();
     }
 }
