@@ -1,8 +1,6 @@
 <?php
 namespace Library\Core;
 
-use Library\Core\Exception;
-
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -39,6 +37,47 @@ class Loader
     {
         $this->_namespace = $ns;
         $this->_includePath = $includePath;
+        // 添加到路径,便于多目录引用
+        $this->add_include_path(realpath(LIB_PATH.'/..'));
+        $this->add_include_path(WEB_ROOT);
+    }
+
+    function add_include_path ($path)
+    {
+        foreach (func_get_args() AS $path)
+        {
+            if (!file_exists($path) OR (file_exists($path) && filetype($path) !== 'dir'))
+            {
+                continue;
+            }
+
+            $paths = explode(PATH_SEPARATOR, get_include_path());
+
+            if (array_search($path, $paths) === false)
+                array_push($paths, $path);
+
+            set_include_path(implode(PATH_SEPARATOR, $paths));
+        }
+    }
+
+    function remove_include_path ($path)
+    {
+        foreach (func_get_args() AS $path)
+        {
+            $paths = explode(PATH_SEPARATOR, get_include_path());
+
+            if (($k = array_search($path, $paths)) !== false)
+                unset($paths[$k]);
+            else
+                continue;
+
+            if (!count($paths))
+            {
+                continue;
+            }
+
+            set_include_path(implode(PATH_SEPARATOR, $paths));
+        }
     }
 
     /**
@@ -119,7 +158,9 @@ class Loader
 
     /**
      * Loads the given class or interface.
-     * --新增控制器不存在错误404.
+     * --针对WEB_ROOT,项目根路径下查找并加载文件
+     * --针对LIB_PATH,当前类库下查找并加载文件
+     *   LIB_PATH为类库的根,目录名称为library(不能改变).
      *
      * @param string $className The name of the class to load.
      * @return void
@@ -136,11 +177,10 @@ class Loader
             }
 
             $fileClass = strtolower($fileName) . str_replace('_', DIRECTORY_SEPARATOR, $className);
-            $file = ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileClass . $this->_fileExtension;
-
-            // 加载
-            if(file_exists($file)){
-                require_once $file;
+            $file =  $fileClass . $this->_fileExtension;
+            // LIB_PATH为类库的根,目录名称为library(不能改变)
+            if(file_exists(WEB_ROOT.'/'.$file) || file_exists(LIB_PATH.'/../'.$file)){
+                include_once $file;
             }
         }
     }

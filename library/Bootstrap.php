@@ -2,16 +2,17 @@
 namespace Library;
 
 use Library\Core\Dispatcher;
+use Library\Core\Exception;
 use Library\Core\Loader;
 use Library\Core\Router;
 use Library\Util\Debug;
 use Library\Util\Session;
-use Library\Core\Exception;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
-define('VERSION', '2.0.1');
+define('VERSION', '2.0.8');
 
+defined('LIB_PATH') || define('LIB_PATH',dirname(__FILE__));
+defined('WEB_ROOT') || define('WEB_ROOT',dirname(__FILE__).'/..');
 
 /**
  * 应用入口初始化 - Bootstrap.php
@@ -38,14 +39,14 @@ class Bootstrap {
     public function init(){
         // 初始化自动加载
         require_once LIB_PATH . '/core/' . 'Loader.php';
-        $loader = new Loader(WEB_ROOT);
+        $loader = new Loader();
         $loader->register();
 
         // 错误异常处理
         $this->_errorSetting();
 
-        // 最终执行控制器的方法
-        $this->_execute();
+        // 最终运行控制器的方法
+        $this->_run();
     }
 
     /**
@@ -55,8 +56,8 @@ class Bootstrap {
     private function _errorSetting(){
         # set display_errors
         ini_set('display_errors',intval(Loader::getConfig('phpSettings.display_errors')));
-        $exception = new Exception();
 
+        $exception = new Exception();
         // 监听内部错误 500 错误
         register_shutdown_function(array($exception,'shutdown_handle'));
         // 设定错误和异常处理(调试模式有用)
@@ -80,11 +81,10 @@ class Bootstrap {
      * @param $string $action 当前方法名称
      * @return null
      */
-    private function _execute(){
+    private function _run(){
         // 执行路由
-        if($conig = include( WEB_ROOT."/config/router.config.php" )){
-            $router = new Router();
-            $router->run($conig);
+        if($conig = include( WEB_ROOT."/config/router.php" )){
+            new Router($conig);
         }
 
         // 执行分发过程,获取mvc结构
@@ -98,13 +98,18 @@ class Bootstrap {
         $_namespaceClass = '\App\\'.ucfirst($module).'\Controller\\'.ucfirst($controller).'Controller';
         $actionName = $action.'Action';
 
-        // 判断当前请求的控制器方法是否存在
-        if(method_exists($_namespaceClass,$actionName)){
-            // 执行控制器方法
+        // 判断当前请求的控制器,存在则自动加载
+        if(class_exists($_namespaceClass,true)){
             $controllerObj = new $_namespaceClass();
-            $controllerObj->$actionName();
+            if(method_exists($controllerObj,$actionName)){
+                // 执行action方法
+                $controllerObj->$actionName();
+            }else{
+                # 方法是否存在404处理
+                $this->_error();
+            }
         }else{
-            // 控制器方法不存在404错误处理
+            // 控制器不存在404错误处理
             $this->_error();
         }
     }
@@ -113,7 +118,7 @@ class Bootstrap {
      * 404错误页面显示
      * --判断是否ajax请求
      * --判断是否开启调试
-     * --判断自定义ErrorController->indexAction是否存在
+     * --判断默认module下ErrorController->indexAction是否存在
      *
      */
     private function _error(){
@@ -126,17 +131,23 @@ class Bootstrap {
             header('HTTP/1.1 404 not found');
             echo '<title>404 not found</title>';
 
+            // 默认以当前默认module下的ErrorController作为错误显示页面
             $module = Loader::getConfig('application.default.module');
             $_namespaceClass = '\App\\'.ucfirst($module).'\Controller\\'.'ErrorController';
             $action = 'indexAction';
             // 模块方式输出,还是直接输出错误信息
             // 判断模板
-            if(method_exists($_namespaceClass,$action)){
+            if(class_exists($_namespaceClass,true)){
                 $controllerObj = new $_namespaceClass();
-                $controllerObj->$action();
+                if(method_exists($_namespaceClass,$action)){
+                    $controllerObj->$action();
+                }else{
+                    echo '404 not found';
+                }
             }else{
                 echo '404 not found';
             }
+
         }
     }
 

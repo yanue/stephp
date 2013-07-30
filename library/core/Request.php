@@ -1,6 +1,8 @@
 <?php
 namespace Library\Core;
 
+use Library\Util\Debug;
+
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -23,6 +25,14 @@ class Request {
      *
      */
     private $_webrootUrl       = null;
+
+    /**
+     * List of uri segments
+     *
+     * @var array
+     * @access public
+     */
+    private static $segments		= array();
 
     /**
      * uri部分
@@ -55,53 +65,74 @@ class Request {
      */
     public function instance(){
         # 解析url
-        $this->parseUrl();
-        $this->baseUrl();
+        if(!self::$_requestUri)
+            $this->parseUrl();
+        if(!self::$segments)
+            $this->reParseUri();
+        if(!$this->_baseUrl)
+            $this->baseUrl();
     }
 
     /**
-     * return get method val by key($_name)
+     * 全面解析当前url
+     * --说明:解析出完整url,uri,path部分,query部分
      *
-     * @param $_name
-     * @param null $default
-     * @return null
+     * @return void.
      */
-    public function get($_name,$default=null){
-        return isset($_GET[$_name]) ? $_GET[$_name] : $default;
+    private function parseUrl(){
+        # 解决通用问题
+        $requestUri = '';
+        if (isset($_SERVER['REQUEST_URI'])) { #$_SERVER["REQUEST_URI"] 只有 apache 才支持,
+            $requestUri = $_SERVER['REQUEST_URI'];
+        } else {
+            if (isset($_SERVER['argv'])) {
+                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['argv'][0];
+            } else if(isset($_SERVER['QUERY_STRING'])) {
+                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['QUERY_STRING'];
+            }
+        }
+        $https = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+        $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/",true).$https;
+        $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+
+        # 保存地址域
+        $this->_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
+        # 获取的完整url
+
+
+        # 当前脚本名称
+        $script_name  = $_SERVER['SCRIPT_NAME'];
+        # 当前脚本目录
+        $script_dir  = dirname($_SERVER['SCRIPT_NAME']);
+        # 去除uri中当前脚本文件名 (如果存在)
+        $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
+        # 当前应用根url
+        $this->_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
+
+        self::$_requestUri = substr($requestUri,strlen($script));
     }
 
+    private function reParseUri(){
+        $uriParam = parse_url(self::$_requestUri);
+        $requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
+        $path = ltrim($requestPath,'/');
+        # 判断url后缀是否存在
+        $_url_suffix = Loader::getConfig('application.default.suffix');
+
+        # 截取后缀
+        if(strlen($path)>strlen($_url_suffix)){
+            $path = (false === strripos($path,$_url_suffix,strlen($_url_suffix))) ? $path : substr($path,0,strlen($path)-strlen($_url_suffix));
+        }
+        self::$_requestPath = $path;
+        self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
+
+        # 解析module,controller,action去他参数
+        $requestPath = explode('/', self::$_requestPath);
+        # 去除空项
+        self::$segments = array_values(array_diff($requestPath, array(null)));
+    }
 
     /**
-     * return post method val by key($_name)
-     *
-     * @param $_name
-     * @param null $default
-     * @return null
-     */
-    public function post($_name,$default=null){
-        return isset($_POST[$_name]) ? $_POST[$_name] : $default;
-    }
-
-    /**
-     * return $_REQUEST (get or post) val by key($_name)
-     *
-     * @param $_name
-     * @param null $default
-     * @return null
-     */
-    public function request($_name,$default=null){
-        return isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
-    }
-
-    /**
-     * get http referer
-     * @return string
-     */
-    public function getReferer(){
-        return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
-    }
-    
-    /** *
      * 获取基本地址: baseUrl
      * --说明: 返回不包含mvc结构,可以通过uri参数传入设置
      *
@@ -115,15 +146,40 @@ class Request {
         $this->_baseUrl = $baseUrl.'/';
     }
 
+
     /**
-     * 判断是不是ajax方式请求.
-     * @return bool
+     * get Segment Array
+     *
+     * @return array
      */
-    function isAjax()
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
+    public function getSegments(){
+        return self::$segments;
     }
 
+    /**
+     * set requestUri
+     *
+     * @param $uri
+     */
+    public function setUri($uri){
+        if($uri){ self::$_requestUri = $uri; }
+    }
+
+    public function setPath($path){
+        if($path){
+            self::$_requestPath = $path;
+            self::$_requestUri = self::$_requestPath.'?'.self::$_requestQuery;
+            $this->reParseUri();
+        }
+    }
+
+    /**
+     * get http referer
+     * @return string
+     */
+    public function getReferer(){
+        return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
+    }
 
     /**
      * 获取baseUrl部分
@@ -171,62 +227,36 @@ class Request {
     }
 
     /**
-     * 全面解析当前url
-     * --说明:解析出完整url,uri,path部分,query部分
+     * return get method val by key($_name)
      *
-     * @return void.
+     * @param $_name
+     * @param null $default
+     * @return null
      */
-    private function parseUrl(){
-        # 解决通用问题
-        $requestUri = '';
-        if (isset($_SERVER['REQUEST_URI'])) { #$_SERVER["REQUEST_URI"] 只有 apache 才支持,
-            $requestUri = $_SERVER['REQUEST_URI'];
-        } else {
-            if (isset($_SERVER['argv'])) {
-                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['argv'][0];
-            } else if(isset($_SERVER['QUERY_STRING'])) {
-                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['QUERY_STRING'];
-            }
-        }
-        $https = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
-        $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/",true).$https;
-        $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
-
-        # 保存地址域
-        $this->_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
-        # 获取的完整url
+    public function get($_name,$default=null){
+        return isset($_GET[$_name]) ? $_GET[$_name] : $default;
+    }
 
 
-        # 当前脚本名称
-        $script_name  = $_SERVER['SCRIPT_NAME'];
-        # 当前脚本目录
-        $script_dir  = dirname($_SERVER['SCRIPT_NAME']);
-        # 去除uri中当前脚本文件名 (如果存在)
-        $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
-        # 当前应用根url
-        $this->_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
-
-        self::$_requestUri = substr($requestUri,strlen($script));
-
-        # 去除uri中当前脚本目录 '/'
-        $uriParam = parse_url(self::$_requestUri);
-        self::$_requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
-        self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
+    /**
+     * return post method val by key($_name)
+     *
+     * @param $_name
+     * @param null $default
+     * @return null
+     */
+    public function post($_name,$default=null){
+        return isset($_POST[$_name]) ? $_POST[$_name] : $default;
     }
 
     /**
-     * set requestUri
+     * return $_REQUEST (get or post) val by key($_name)
      *
-     * @param $uri
+     * @param $_name
+     * @param null $default
+     * @return null
      */
-    public function setUri($uri){
-        if($uri){ self::$_requestUri = $uri; }
-    }
-
-    public function setPath($path){
-        if($path){
-            self::$_requestPath = $path;
-            self::$_requestUri = self::$_requestPath.'?'.self::$_requestQuery;
-        }
+    public function request($_name,$default=null){
+        return isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
     }
 }

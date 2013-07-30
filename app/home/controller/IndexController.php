@@ -20,22 +20,16 @@ class IndexController extends Controller{
     }
 
     public function indexAction(){
-        echo 'home';
-        echo '<br />';
-        echo $this->uri->getFullUrl();
-
+        echo '<br >';
+        echo 'home controller';
+        echo '<br >';
 //        $this->view->setLayout('layout');
 //        Debug::trace();
 //        $this->uri->getAction();
 //        echo $this->uri->getFullUrl();
     }
-}
 
-class a {
-    static $a = 5;
-
-    public function test(){
-        self::$a = 8;
+    public function testAction(){
+        echo $this->uri->getUriString();
     }
-
 }

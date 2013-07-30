@@ -23,7 +23,6 @@ class Dispatcher
     private $_requestParams   = array();
     private $_requestPath     = array(); # action 后面的目录结构
     private $_urlSuffix       = '.html'; # path部分后面
-    private $_isRouterMatched = false; # 是否经过路由并验证通过
     private $_appPath = null;
 
     public $request = null;
@@ -46,47 +45,19 @@ class Dispatcher
      */
     public function run(){
 
-        $this->urlParse();// url解析mvc
+        $this->parseMvc();// url解析mvc
 
         $this->requestParam(); // 合并请求进行组合
         // set Debug
         Debug::setRequestParam($this->_requestParams);
-    }
-    
-    /**
-     * url解析
-     *
-     * @return bool
-     */
-    private function urlParse(){
-        if($this->_isRouterMatched == true) return false;#经过路由就不需要下面的处理了
-
-        $path = ltrim($this->request->getPath(),'/');
-
-        # 判断url后缀是否存在
-        $_url_suffix = Loader::getConfig('application.default.suffix');
-        $this->_urlSuffix =  $_url_suffix ? $_url_suffix : $this->_urlSuffix;
-
-        # 截取后缀
-        if(strlen($path)>strlen($this->_urlSuffix)){
-            $path = (false === strripos($path,$this->_urlSuffix,strlen($this->_urlSuffix))) ? $path : substr($path,0,strlen($path)-strlen($this->_urlSuffix));
-        }
-
-        # 解析module,controller,action去他参数
-        $requestPath = explode('/', $path);
-
-        # 去除空项
-        $requestPath = array_values(array_diff($requestPath, array(null)));
-
-        $this->parseMvc($requestPath);
-        return true;
     }
 
     /**
      * 解析mvc结构
      *
      */
-    private function parseMvc($requestPath){
+    private function parseMvc(){
+        $requestPath = $this->request->getSegments();
 
         # 通过'?'后面参数初步设置mvc
         $module     = isset($_GET['module']) && $_GET['module'] ? $_GET['module'] : Loader::getConfig('application.default.module');

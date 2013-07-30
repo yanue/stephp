@@ -63,10 +63,10 @@ class Exception {
      */
     public function shutdown_handle(){
         if($err = error_get_last()){
-            header('HTTP/1.1 500 Internal Server Error');
             if(!in_array($err['type'],array(E_PARSE,E_CORE_ERROR,E_USER_ERROR,E_RECOVERABLE_ERROR))){
                 return ;
             }
+            header('HTTP/1.1 500 Internal Server Error');
             $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
             if(Loader::getConfig('phpSettings.debug')){
                 self::css();

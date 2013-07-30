@@ -39,7 +39,7 @@ class Controller
      */
     public function __construct () {
         $this->view = new View();
-        $this->uri = & $this->view->uri();
+        $this->uri = $this->view->uri();
         $this->session = new Session();
         $this->request = new Request();
     }
@@ -62,7 +62,7 @@ class Controller
 	 *
 	 */
 	public function loadConfig ($file){
-        $file = $this->uri->getModulePath().'configs/'.$file.'.php';
+        $file = $this->uri->dispatcher->getModulePath().'configs/'.$file.'.php';
 		if(file_exists($file)){
 			include_once $file;
 		}

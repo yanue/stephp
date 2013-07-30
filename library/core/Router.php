@@ -15,7 +15,7 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @time     2013-07-11
  */
 
-class Router {
+class Router{
 
     /**
      * # 路由后的key=>val请求信息
@@ -23,108 +23,77 @@ class Router {
      */
     private static $router = null;
 
-    protected $_url_delimiter = '/';
-    protected $_var_delimiter = ':';
-
-    /**
-     * 默认的路由
-     *
-     * @var unknown_type
-     */
-    protected $_default = array(':controller/:action/*',
-        array('controller' => ':controller', 'action' => ':action')
-    );
-
-    /**
-     * # 第几个正则匹配到
-     * @var int
-     */
-    private static $fetchedStep = 0;
-
     /**
      *
      */
     private $request = null;
 
-    private $routerConfig = null;
+    private $rules = null;
+
+    private $segments = null;
 
     /**
      * 初始化
      */
-    public function __construct( ){
-
+    public function __construct($rules){
+        if($rules){
+            $this->rules = $rules;
+            $this->request = new Request();
+            $this->request->instance();
+            $this->request->getSegments();
+            $this->run();
+        }
     }
 
-    /**
-     * run
-     *
-     */
-    public function run($routerConfig){
-        $this->request = new Request();
-        $this->routerConfig = $routerConfig;
+
+    public function run(){
+        foreach ($this->rules as $key => $rules) {
+            if(!in_array($key,array('static','rule','regex','domain'))){
+                return;
+            }
+            $act = 'route'.ucfirst($key);
+            $this->$act($rules);
+        }
     }
+    
 
     /**
      * 静态路由
      *
      *
      */
-    public function routeStatic($pettern){
-        $uriSufix = Loader::getConfig('application.default.suffix');
-        $requestUri = ltrim($this->request->getPath(),'/');
-        // 去除后缀.html
-        $requestUri = false===strripos($requestUri,$uriSufix) ? $requestUri : substr($requestUri,0,(strlen($requestUri)-strlen($uriSufix)));
-
-        $pettern = false===strripos($pettern,$uriSufix) ? $pettern : substr($pettern,0,(strlen($pettern)-strlen($uriSufix))) ;
-        # 去除后缀进行判断
-        if(!self::$router && $pettern==$requestUri){
-            $this->request->setPath('/index/index');
+    public function routeStatic($rules){
+        $this->request->getPath();
+        $requestPath = $this->request->getPath();
+        foreach ($rules as $rule=>$path) {
+            if($rule==$requestPath){
+                $this->request->setPath($path);
+                echo $path;
+                return;
+            }
         }
     }
 
     /**
-     * 静态路由
+     * 规则路由
      *
      *
      */
-    public function routeRule($pettern,$params){
-        if(self::$router) return;
-        self::$fetchedStep += 1;
-        $uriSufix = Loader::getConfig('application.default.suffix');
-        echo $requestUri = ltrim($this->request->getUri(),'/');
-        // 去除后缀.html
-        $requestUri = false===strripos($requestUri,$uriSufix) ? $requestUri : substr($requestUri,0,(strlen($requestUri)-strlen($uriSufix)));
+    public function routeRule($pettern){
 
-        $pettern = false===strripos($pettern,$uriSufix) ? $pettern : substr($pettern,0,(strlen($pettern)-strlen($uriSufix))) ;
-        # 去除后缀进行判断
-        if(!self::$router && $pettern==$requestUri){
-            self::$router = $params;
-        }
     }
 
     /**
      * 正则路由
      */
-    public function routeRegex ($pettern,$mvc='',$req=''){
-        if(self::$router) return;
-        self::$fetchedStep += 1;
-        $requestUri = ltrim(Bootstrap::$_requestUri,'/');
-        $arr = array();
-        if(preg_match($pettern,$requestUri,$uris)){
-            foreach ($uris as $k=>$v) {
-                if(isset($req[$k])){
-                    $arr[$req[$k]] = $v;
-                }
-            }
-            self::$router = array_merge($mvc,$arr);
-        }
+    public function routeRegex ($pettern){
+
     }
 
     /**
-     * 添加路由
-     *
+     * 正则域名
      */
-    public function addRoute(){
+    public function routeDomain ($pettern){
 
     }
 

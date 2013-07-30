@@ -13,7 +13,7 @@ use Library\Core\Controller;
 use Library\Core\Exception;
 use Library\Util\Debug;
 
-class ErrorController extends Controller{
+class Error1Controller extends Controller{
 
     public function __construct(){
     }
