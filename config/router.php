@@ -2,7 +2,7 @@
 // 路由设置
 // 静态路由
 $route['static']['welcome'] = "index/index";
-$route['static']['login/test'] = "index/test";
+$route['static']['login'] = "index/test";
 // 规则路由
 $route['rule']['login'] = "index/index";
 $route['rule']['login/test'] = "index/test";

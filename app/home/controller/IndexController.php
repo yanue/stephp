@@ -30,6 +30,7 @@ class IndexController extends Controller{
     }
 
     public function testAction(){
-        echo $this->uri->getUriString();
+        echo 'here is home controller test action';
+//        echo $this->uri->getUriString();
     }
 }
