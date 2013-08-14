@@ -1,7 +1,9 @@
 stephp
 ======
-A Simple Tiny Easy PHP MVC Framework
+A Simple Tiny Easy PHP mvc Framework
 ------------------------------------
+### 查看文档
+1.[查看文档](http://stephp.yanue.net)<br />
 
 ### --命名规则:
 
