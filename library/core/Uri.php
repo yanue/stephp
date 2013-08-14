@@ -12,15 +12,15 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @time     2013-07-11
  */
 
-class Uri{
+class Uri extends Dispatcher{
 
     /**
      * 初始化
      *
      */
     public function __construct(){
-        $this->dispatcher = new Dispatcher();
-        $this->dispatcher->run();
+        parent::__construct();
+        parent::run();
     }
 
     /**
@@ -32,7 +32,7 @@ class Uri{
      * @return string
      */
     public function getParam($key){
-        $params = $this->dispatcher->getParams();
+        $params = $this->getParams();
         return isset($params[$key]) ? $params[$key] : false ;
     }
 
@@ -47,7 +47,7 @@ class Uri{
      * @return string
      */
     public function getUri($n){
-        $params = $this->dispatcher->getPathArray();
+        $params = $this->getPathArray();
         return isset($params[$n-1]) ? $params[$n-1] : false ;
     }
 
@@ -58,7 +58,7 @@ class Uri{
      * @return string
      */
     public function getLastParam(){
-        $params =  $this->dispatcher->getPathArray();
+        $params =  $this->getPathArray();
         $len = count($params);
         return $len%2==1 ? $params[$len-1] : null;
     }
@@ -71,7 +71,7 @@ class Uri{
      * @return string 匹配的值
      */
     public function getQuery($key){
-        $params =  $this->dispatcher->request->getQuery();
+        $params =  $this->request->getQuery();
         parse_str($params,$paramQuery);
         return isset($paramQuery[$key]) ? $paramQuery[$key] : '' ;
     }
@@ -82,7 +82,7 @@ class Uri{
      * @return string
      */
     public function getFullUrl(){
-        return  $this->dispatcher->request->getFullUrl();
+        return  $this->request->getFullUrl();
     }
 
     /**
@@ -91,7 +91,7 @@ class Uri{
      * @return string
      */
     public function getUriString(){
-        return  $this->dispatcher->request->getUri();
+        return  $this->request->getUri();
     }
 
     /**
@@ -100,7 +100,7 @@ class Uri{
      * @return string
      */
     public function getQueryString(){
-        return $this->dispatcher->request->getQuery();
+        return $this->request->getQuery();
     }
 
     /**
@@ -109,7 +109,7 @@ class Uri{
      * @return string
      */
     public function getPathString(){
-        return $this->dispatcher->request->getPath();
+        return $this->request->getPath();
     }
 
     /**
@@ -121,7 +121,7 @@ class Uri{
      * @return string 新构造url
      */
     public function setUrl($add_arr=array(),$rm_arr=array(),$getQueryString=false){
-        $params =  $this->dispatcher->getPathArray();
+        $params =  $this->getPathArray();
         $paramPath = array();
         $lastParam = $this->getLastParam();
         if(($len = count($params)) > 0){
@@ -136,21 +136,21 @@ class Uri{
         # 移除匹配参数
         $params = array_diff_key($params,array_flip((array)$rm_arr));
 
-        $mvcUri = $this->dispatcher->getModule().'/'.$this->dispatcher->getController().'/'.$this->dispatcher->getAction();
+        $mvcUri = $this->getModule().'/'.$this->getController().'/'.$this->getAction();
 
         foreach ($params as $k=>$v) {
             $mvcUri .= '/'.$k.'/'.$v;
         }
 
         # 添加最后一个path参数和后缀
-        $uriPath = $mvcUri.$lastParam.$this->dispatcher->getSuffix();
+        $uriPath = $mvcUri.$lastParam.$this->getSuffix();
         # 返回后面的query参数
-        $request_uri = $getQueryString==true &&  $this->dispatcher->request->getQuery() ? $uriPath.'?'. $this->dispatcher->request->getQuery() : $uriPath;
-        return  $this->dispatcher->request->getBaseUrl().$request_uri;
+        $request_uri = $getQueryString==true &&  $this->request->getQuery() ? $uriPath.'?'. $this->request->getQuery() : $uriPath;
+        return  $this->request->getBaseUrl().$request_uri;
     }
 
 
     public function baseUrl($request_uri=''){
-        return  $this->dispatcher->request->getBaseUrl().$request_uri;
+        return  $this->request->getBaseUrl().$request_uri;
     }
 }

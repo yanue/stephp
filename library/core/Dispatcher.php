@@ -192,11 +192,11 @@ class Dispatcher
     }
 
     public function getParams(){
-        return $this->_appPath;
+        return $this->_requestParams;
     }
 
     public function getPathArray(){
-        return $this->_appPath;
+        return $this->_requestPath;
     }
 }
 ?>

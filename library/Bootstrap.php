@@ -105,10 +105,16 @@ class Bootstrap {
                 // 执行action方法
                 $controllerObj->$actionName();
             }else{
+                if(Loader::getConfig('phpSettings.debug')){
+                    echo '方法不存在：'.$actionName;
+                }
                 # 方法是否存在404处理
                 $this->_error();
             }
         }else{
+            if(Loader::getConfig('phpSettings.debug')){
+                echo '控制器不存在：'.$_namespaceClass.' (请检查命名空间及路径和文件是否存在)<br >';
+            }
             // 控制器不存在404错误处理
             $this->_error();
         }

@@ -18,13 +18,13 @@ class Request {
     /**
      * 域名url
      */
-    private $_hostUrl       = null;
+    private static $_hostUrl       = null;
 
     /**
      * 当前应用根url地址(针对放在子目录情况)
      *
      */
-    private $_webrootUrl       = null;
+    private static $_webrootUrl       = null;
 
     /**
      * List of uri segments
@@ -96,7 +96,7 @@ class Request {
         $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
 
         # 保存地址域
-        $this->_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
+        self::$_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
         # 获取的完整url
 
 
@@ -107,7 +107,7 @@ class Request {
         # 去除uri中当前脚本文件名 (如果存在)
         $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
         # 当前应用根url
-        $this->_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
+        self::$_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
 
         self::$_requestUri = substr($requestUri,strlen($script));
     }
@@ -142,8 +142,9 @@ class Request {
     private function baseUrl(){
         $baseUrl = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
         $baseUrl .= isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : getenv('HTTP_HOST');
-        $baseUrl .= isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
-        $this->_baseUrl = $baseUrl.'/';
+        $dirname = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
+        $dir = $dirname=='/'? '' :$dirname; // 避免根目录情况下多一个'/'
+        $this->_baseUrl = $baseUrl.$dir.'/';
     }
 
 
@@ -205,7 +206,7 @@ class Request {
      * @return string : url
      */
     public function getFullUrl(){
-        return $this->_webrootUrl.self::$_requestUri;
+        return self::$_webrootUrl.self::$_requestUri;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Library\Core;
 
 use Library\Db\Db;
+use Library\Core\Loader;
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -38,13 +39,14 @@ class Model extends Db
      *
      */
     public function init(){
-        $settings = parse_ini_file(LIB_PATH.'configs/application.ini');
-        defined('DB_TYPE') || define('DB_TYPE',isset($settings['db.type'])?$settings['db.type']:'mysql');
-        defined('DB_HOST') || define('DB_HOST',$settings['db.host']);
-        defined('DB_PORT') || define('DB_PORT',isset($settings['db.port'])?$settings['db.type']:'3306');
-        defined('DB_NAME') || define('DB_NAME',$settings['db.dbname']);
-        defined('DB_USER') || define('DB_USER',$settings['db.username']);
-        defined('DB_PASS') || define('DB_PASS',$settings['db.password']);
+        $type  =Loader::getConfig('db.type');
+        $port = Loader::getConfig('db.port');
+        defined('DB_TYPE') || define('DB_TYPE',isset($type) ? $type :'mysql');
+        defined('DB_HOST') || define('DB_HOST',Loader::getConfig('db.host'));
+        defined('DB_PORT') || define('DB_PORT',isset($port) ? $port :'3306');
+        defined('DB_NAME') || define('DB_NAME',Loader::getConfig('db.dbname'));
+        defined('DB_USER') || define('DB_USER',Loader::getConfig('db.username'));
+        defined('DB_PASS') || define('DB_PASS',Loader::getConfig('db.password'));
     }
 
     // load configs file

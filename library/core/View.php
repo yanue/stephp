@@ -65,7 +65,7 @@ class View
      * @return void.
      */
     public function render($name){
-        $file = $this->uri->getModulePath().'view/'.$name.'.php';
+        $file = $this->uri->getModulePath().'/view/'.$name.'.php';
         if(file_exists($file)){
             include_once $file;
         }
@@ -123,9 +123,9 @@ class View
      */
     public function content(){
         if($this->_content){
-            include_once $this->uri->getModulePath().'view/'.$this->_content.'.php';
+            include_once $this->uri->getModulePath().'/view/'.$this->_content.'.php';
         }else{
-            include_once $this->uri->getModulePath().'view/'.$this->uri->getController().'/'.$this->uri->getAction().'.php';
+            include_once $this->uri->getModulePath().'/view/'.$this->uri->getController().'/'.$this->uri->getAction().'.php';
         }
     }
 
@@ -136,7 +136,7 @@ class View
     private function display(){
         // 直接载入PHP模板
         if($this->_layout){
-            $layout = $this->uri->getModulePath().'view/'.$this->_layout.'.php';
+            $layout = $this->uri->getModulePath().'/view/'.$this->_layout.'.php';
             if(file_exists($layout)){
                 include_once $layout;
             }else{

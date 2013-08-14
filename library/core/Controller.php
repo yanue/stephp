@@ -42,6 +42,9 @@ class Controller
         $this->uri = $this->view->uri();
         $this->session = new Session();
         $this->request = new Request();
+        $this->controller = $this->view->controller = $this->uri->getController();
+        $this->action = $this->view->action = $this->uri->getAction();
+        $this->module = $this->view->module = $this->uri->getModule();
     }
 
     /**
@@ -62,7 +65,7 @@ class Controller
 	 *
 	 */
 	public function loadConfig ($file){
-        $file = $this->uri->dispatcher->getModulePath().'configs/'.$file.'.php';
+        $file = $this->uri->getModulePath().'/configs/'.$file.'.php';
 		if(file_exists($file)){
 			include_once $file;
 		}

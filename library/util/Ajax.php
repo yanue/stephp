@@ -1,5 +1,5 @@
 <?php
-namespace Library\Util\Ajax;
+namespace Library\Util;
 
 use Library\Util\Session;
 use Library\Util\Hash;
@@ -91,10 +91,10 @@ class Ajax {
      *
      * @param $data
      */
-    public function outRight($data){
+    public function outRight($msg='',$data=''){
         $data = is_array($data) ? $this->urlEncodeArray($data) : urlencode($data);
         $result = array(
-            'error'=>array('code'=>0,'msg'=>''),
+            'error'=>array('code'=>0,'msg'=>urlencode($msg)),
             'data'=>$data
         );
         echo urldecode(json_encode($result));
