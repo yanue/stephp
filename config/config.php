@@ -2,8 +2,8 @@
 
 # ==== php配置 ====
 $config['timezone'] = "PRC";
-$config['display_errors'] = true;
-$config['debug'] = true;
+$config['display_errors'] = false;
+$config['debug'] = false;
 
 # ==== 默认应用配置 =====
 $config['module'] = "home"; #默认模块

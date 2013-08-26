@@ -12,7 +12,7 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @author 	 yanue <yanue@outlook.com>
  * @link	 http://stephp.yanue.net/
  * @package  lib/core
- * @time     2013-07-11
+ * @time     2013-08-26
  */
 
 class Router{
@@ -21,93 +21,58 @@ class Router{
      * # 路由后的key=>val请求信息
      * @var null
      */
-    private static $router = null;
+    private $routes = null;
 
     /**
      *
      */
     private $request = null;
 
-    private $rules = null;
-
-    private $segments = null;
-
-    private static $_matched = null;
     /**
      * 初始化
      */
     public function __construct($rules){
         if($rules){
-            $this->rules = $rules;
+            $this->routes = $rules;
             $this->request = new Request();
-            $this->request->getSegments();
-            $this->run();
+            // 解析路由
+            $this->_parse_routes();
         }
     }
 
     /**
-     * 执行
+     * 参见ci之Router
      *
      */
-    public function run(){
-        foreach ($this->rules as $key => $rules) {
-            if(!in_array($key,array('static','rule','regex','domain'))){
-                return;
+    function _parse_routes()
+    {
+        // Turn the segment array into a URI string
+        $uri = $this->request->getPath();
+
+        // 直接匹配
+        // Is there a literal match?  If so we're done
+        if (isset($this->routes[$uri]))
+        {
+            $this->request->setPath($this->routes[$uri]);
+            return ;
+        }
+
+        // Loop through the route array looking for wild-cards
+        foreach ($this->routes as $key => $val)
+        {
+            // Convert wild-cards to RegEx
+            $key = str_replace(':any', '.+', str_replace(':num', '[0-9]+', $key));
+            // Does the RegEx match?
+            if (preg_match('#^'.$key.'$#', $uri))
+            {
+                // Do we have a back-reference?
+                if (strpos($val, '$') !== FALSE AND strpos($key, '(') !== FALSE)
+                {
+                    $val = preg_replace('#^'.$key.'$#', $val, $uri);
+                }
+                $this->request->setPath($val);
+                return ;
             }
-            $act = 'route'.ucfirst($key);
-
-            $this->$act($rules);
-        }
-    }
-
-
-    /**
-     * 静态路由
-     *
-     */
-    public function routeStatic($rules){
-        if(self::$_matched){
-            return;
-        }
-        $this->request->getPath();
-        $requestPath = $this->request->getPath();
-
-        foreach ($rules as $rule=>$path) {
-            if($rule==$requestPath){
-                $this->request->setPath($path);
-                self::$_matched = array('static'=>$rule);
-                return;
-            }
-        }
-    }
-
-    /**
-     * 规则路由
-     * todo
-     */
-    public function routeRule($rules){
-        if(self::$_matched){
-            return;
-        }
-    }
-
-    /**
-     * 正则路由
-     * todo
-     */
-    public function routeRegex ($rules){
-        if(self::$_matched){
-            return;
-        }
-    }
-
-    /**
-     * 正则域名
-     * todo
-     */
-    public function routeDomain ($rules){
-        if(self::$_matched){
-            return;
         }
     }
 

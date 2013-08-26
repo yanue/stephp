@@ -123,7 +123,7 @@ class Request {
         }
         self::$_requestPath = $pathStr;
         self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
-        Debug::dump($pathStr);
+
         # 解析module,controller,action去他参数
         $requestPath = explode('/', self::$_requestPath);
         # 去除空项

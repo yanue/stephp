@@ -29,4 +29,19 @@ class IndexController extends Controller{
         echo 'here is home controller test action';
 //        echo $this->uri->getUriString();
     }
+
+    public function numAction(){
+        echo 'num action';
+        echo $this->uri->getParam('id');
+    }
+
+    public function anyAction(){
+        echo 'any action';
+        echo $this->uri->getParam('sub');
+    }
+
+    public function regxAction(){
+        echo 'regx action';
+        echo $this->uri->getParam('id');
+    }
 }
