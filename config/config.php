@@ -9,7 +9,7 @@ $config['debug'] = true;
 $config['module'] = "home"; #默认模块
 $config['controller'] = "index";
 $config['action'] = "index";
-$config['suffix'] = "html";# 请不要保护那个'.'
+$config['suffix'] = ".html";# 请不要保护那个'.'
 
 
 # ==== smarty配置 ====

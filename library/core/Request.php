@@ -109,17 +109,21 @@ class Request {
     private function reParseUri(){
         $uriParam = parse_url(self::$_requestUri);
         $requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
-        $path = ltrim($requestPath,'/');
+        $pathStr = ltrim($requestPath,'/');
+
         # 判断url后缀是否存在
         $_url_suffix = Loader::getConfig('suffix');
 
         # 截取后缀
-        if(strlen($path)>strlen($_url_suffix)){
-            $path = (false === strripos($path,$_url_suffix,strlen($_url_suffix))) ? $path : substr($path,0,strlen($path)-strlen($_url_suffix));
+        if(strlen($pathStr)>strlen($_url_suffix)){
+            # 获取到后缀的位置
+            $sfxpos = strripos($pathStr,$_url_suffix);
+            # 后缀的位置处于url中path部分最后
+            $pathStr = (false !== $sfxpos && $sfxpos == (strlen($pathStr)-strlen($_url_suffix))) ? substr($pathStr,0,strlen($pathStr)-strlen($_url_suffix)) : $pathStr ;
         }
-        self::$_requestPath = $path;
+        self::$_requestPath = $pathStr;
         self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
-
+        Debug::dump($pathStr);
         # 解析module,controller,action去他参数
         $requestPath = explode('/', self::$_requestPath);
         # 去除空项
