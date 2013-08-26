@@ -56,7 +56,9 @@ class Bootstrap {
     private function _errorSetting(){
         # set display_errors
         ini_set('display_errors',intval(Loader::getConfig('display_errors')));
-
+        if(Loader::getConfig('display_errors')){
+            error_reporting(E_ALL);
+        }
         $exception = new Exception();
         // 监听内部错误 500 错误
         register_shutdown_function(array($exception,'shutdown_handle'));

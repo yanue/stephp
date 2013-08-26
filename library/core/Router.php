@@ -40,7 +40,6 @@ class Router{
         if($rules){
             $this->rules = $rules;
             $this->request = new Request();
-            $this->request->instance();
             $this->request->getSegments();
             $this->run();
         }

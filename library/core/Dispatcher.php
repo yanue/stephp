@@ -35,7 +35,6 @@ class Dispatcher
     public function __construct(){
         $this->_appPath = WEB_ROOT.'/app';
         $this->request = new Request();
-        $this->request->instance();
 	}
 
     /**

@@ -20,13 +20,9 @@ class IndexController extends Controller{
     }
 
     public function indexAction(){
-        echo '<br >';
-        echo 'home controller';
-        echo '<br >';
-//        $this->view->setLayout('layout');
-//        Debug::trace();
-//        $this->uri->getAction();
-//        echo $this->uri->getFullUrl();
+        echo $this->module.'<br >';
+        echo $this->controller.'<br >';
+        echo $this->action.'<br >';
     }
 
     public function testAction(){

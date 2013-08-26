@@ -58,12 +58,6 @@ class Request {
      * 初始化并解析
      */
     public function __construct(){
-    }
-
-    /**
-     * 初始化
-     */
-    public function instance(){
         # 解析url
         if(!self::$_requestUri)
             $this->parseUrl();
