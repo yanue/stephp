@@ -55,13 +55,13 @@ class Bootstrap {
      */
     private function _errorSetting(){
         # set display_errors
-        ini_set('display_errors',intval(Loader::getConfig('phpSettings.display_errors')));
+        ini_set('display_errors',intval(Loader::getConfig('display_errors')));
 
         $exception = new Exception();
         // 监听内部错误 500 错误
         register_shutdown_function(array($exception,'shutdown_handle'));
         // 设定错误和异常处理(调试模式有用)
-        if(Loader::getConfig('phpSettings.debug')){
+        if(Loader::getConfig('debug')){
             set_error_handler(array($exception,'error_handler'));
             set_exception_handler(array($exception,'exception_handler'));
         }
@@ -105,14 +105,14 @@ class Bootstrap {
                 // 执行action方法
                 $controllerObj->$actionName();
             }else{
-                if(Loader::getConfig('phpSettings.debug')){
+                if(Loader::getConfig('debug')){
                     echo '方法不存在：'.$actionName;
                 }
                 # 方法是否存在404处理
                 $this->_error();
             }
         }else{
-            if(Loader::getConfig('phpSettings.debug')){
+            if(Loader::getConfig('debug')){
                 echo '控制器不存在：'.$_namespaceClass.' (请检查命名空间及路径和文件是否存在)<br >';
             }
             // 控制器不存在404错误处理
@@ -138,7 +138,7 @@ class Bootstrap {
             echo '<title>404 not found</title>';
 
             // 默认以当前默认module下的ErrorController作为错误显示页面
-            $module = Loader::getConfig('application.default.module');
+            $module = Loader::getConfig('module');
             $_namespaceClass = '\App\\'.ucfirst($module).'\Controller\\'.'ErrorController';
             $action = 'indexAction';
             // 模块方式输出,还是直接输出错误信息

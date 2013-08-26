@@ -117,7 +117,7 @@ class Request {
         $requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
         $path = ltrim($requestPath,'/');
         # 判断url后缀是否存在
-        $_url_suffix = Loader::getConfig('application.default.suffix');
+        $_url_suffix = Loader::getConfig('suffix');
 
         # 截取后缀
         if(strlen($path)>strlen($_url_suffix)){

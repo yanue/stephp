@@ -29,8 +29,9 @@ A Simple Tiny Easy PHP mvc Framework
     │  ├─images     # 图片
     │  ├─scripts    # 脚本
     │  └─styles     # 样式
-    ├─configs 配置文件
-    │  └─application.ini    # 应用配置
+    ├─config 配置文件
+    │  ├─config.php   # 应用配置
+    │  └─router.php   # 路由配置
     ├─data      # 数据存放
     ├─library   # 系统类库
     │  ├─core   # 系统初始化核心处理

@@ -68,7 +68,7 @@ class Exception {
             }
             header('HTTP/1.1 500 Internal Server Error');
             $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
-            if(Loader::getConfig('phpSettings.debug')){
+            if(Loader::getConfig('debug')){
                 self::css();
                 self::outMsg($err['type'],$err['message'],$err['file'],$err['line']);
             }else{

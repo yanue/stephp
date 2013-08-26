@@ -60,12 +60,12 @@ class Dispatcher
         $requestPath = $this->request->getSegments();
 
         # 通过'?'后面参数初步设置mvc
-        $module     = isset($_GET['module']) && $_GET['module'] ? $_GET['module'] : Loader::getConfig('application.default.module');
-        $controller = isset($_GET['controller']) && $_GET['controller'] ? $_GET['controller'] : Loader::getConfig('application.default.controller');
-        $action     = isset($_GET['action']) && $_GET['action'] ? $_GET['action'] : Loader::getConfig('application.default.action');
+        $module     = isset($_GET['module']) && $_GET['module'] ? $_GET['module'] : Loader::getConfig('module');
+        $controller = isset($_GET['controller']) && $_GET['controller'] ? $_GET['controller'] : Loader::getConfig('controller');
+        $action     = isset($_GET['action']) && $_GET['action'] ? $_GET['action'] : Loader::getConfig('action');
 
         # 第一个参数与默认的module名相同
-        if(isset($requestPath[0]) && Loader::getConfig('application.default.module') == $requestPath[0]){
+        if(isset($requestPath[0]) && Loader::getConfig('module') == $requestPath[0]){
             $module     = isset($requestPath[0]) && $requestPath[0]!='' ? $requestPath[0] : $module ;
             $controller = isset($requestPath[1]) && $requestPath[1]!='' ? $requestPath[1] : $controller ;
             $action     = isset($requestPath[2]) && $requestPath[2]!='' ? $requestPath[2] : $action ;

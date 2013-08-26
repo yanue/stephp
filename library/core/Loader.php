@@ -26,7 +26,7 @@ class Loader
     private $_namespace;
     private $_includePath;
     private $_namespaceSeparator = '\\';
-
+    private static $settings = null;
     /**
      * Creates a new <tt>SplClassLoader</tt> that loads classes of the
      * specified namespace.
@@ -192,8 +192,10 @@ class Loader
      * @return mixed
      */
     public static function getConfig($key=''){
-        $settings = parse_ini_file(WEB_ROOT.'/config/application.ini');
-        if (!$key ){ return $settings; }
-        return isset($settings[$key]) ? $settings[$key] : '' ;
+        if(!self::$settings){
+            self::$settings = include(WEB_ROOT.'/config/config.php');
+        }
+        if (!$key ){ return self::$settings; }
+        return isset(self::$settings[$key]) ? self::$settings[$key] : '' ;
     }
 }
