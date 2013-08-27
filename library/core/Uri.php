@@ -20,7 +20,6 @@ class Uri extends Dispatcher{
      */
     public function __construct(){
         parent::__construct();
-        parent::run();
     }
 
     /**

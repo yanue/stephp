@@ -35,21 +35,12 @@ class Dispatcher
     public function __construct(){
         $this->_appPath = WEB_ROOT.'/app';
         $this->request = new Request();
-	}
-
-    /**
-     * 执行分发过程
-     *
-     *
-     */
-    public function run(){
-
         $this->parseMvc();// url解析mvc
 
         $this->requestParam(); // 合并请求进行组合
         // set Debug
         Debug::setRequestParam($this->_requestParams);
-    }
+	}
 
     /**
      * 解析mvc结构

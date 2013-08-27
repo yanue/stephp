@@ -175,12 +175,24 @@ class Loader
                 $className = substr($className, $lastNsPos + 1);
                 $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
             }
-
-            $fileClass = strtolower($fileName) . str_replace('_', DIRECTORY_SEPARATOR, $className);
+            // 由命名空间转换而来的文件路径
+            $file_path = strtolower($fileName);
+            $fileClass = $file_path. str_replace('_', DIRECTORY_SEPARATOR, $className);
             $file =  $fileClass . $this->_fileExtension;
+
+            // 处于核心类库则加载核心类库
             // LIB_PATH为类库的根,目录名称为library(不能改变)
-            if(file_exists(WEB_ROOT.'/'.$file) || file_exists(LIB_PATH.'/../'.$file)){
-                include_once $file;
+            if(in_array($file_path,array('library/core/','library/util/','library/db/'))){
+                $lib_file = realpath(LIB_PATH.'/../'.$file);
+                if(file_exists($lib_file)){
+                    require_once $lib_file;
+                }
+            }else{
+                // 这里加载其他类(如数据操作模型等)
+                $class = realpath(WEB_ROOT.'/'.$file);
+                if(file_exists($class)){
+                    include_once $class;
+                }
             }
         }
     }

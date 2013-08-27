@@ -91,7 +91,6 @@ class Bootstrap {
 
         // 执行分发过程,获取mvc结构
         $disp = new Dispatcher();
-        $disp->run();
 
         $controller = $disp->getController();
         $action     = $disp->getAction();

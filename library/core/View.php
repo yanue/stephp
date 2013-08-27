@@ -32,7 +32,7 @@ class View
      * uri全局处理
      *
      */
-    private $uri = null;
+    public $uri = null;
 
     /**
      * 初始化

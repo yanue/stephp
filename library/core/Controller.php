@@ -65,7 +65,7 @@ class Controller
 	 *
 	 */
 	public function loadConfig ($file){
-        $file = $this->uri->getModulePath().'/configs/'.$file.'.php';
+        $file = $this->uri->getModulePath().'/config/'.$file.'.php';
 		if(file_exists($file)){
 			include_once $file;
 		}
@@ -119,7 +119,7 @@ class Controller
      *
      */
     public function loadPlugin($name) {
-        $path = LIB_PATH.'plugins/'.$name.'.class.php';
+        $path = WEB_ROOT.'plugins/'.$name.'.class.php';
         if (file_exists($path)) {
             require_once $path;
         }
