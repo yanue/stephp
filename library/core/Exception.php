@@ -53,7 +53,7 @@ class Exception {
             $error['file']      = $e->getFile();
             $error['line']      = $e->getLine();
         }
-        echo  '<p class="trance">[第'.$error['line'].'行] '.$error['file'].' <br />错误信息: '.$error['message'].'</p>';
+        echo  '<p fdfs="trance">[第'.$error['line'].'行] '.$error['file'].' <br />错误信息: '.$error['message'].'</p>';
     }
 
     /**
@@ -111,12 +111,12 @@ class Exception {
         $errTypeName = array_key_exists($errno,$errType) ? $errType[$errno] : 'Unknown Error Type';
 
         if(self::$isInitErrinfo==false){
-            echo '<h2 class="traceTitle">Exception information :</h2>';
+            echo '<h2 fdfs="traceTitle">Exception information :</h2>';
             self::$isInitErrinfo=true;
         }else{
             self::$isInitErrinfo=false;
         }
-        echo  '<p class="trance">[第'.$errline.'行] '.$errfile.' <code>'.$errTypeName .'['.$errno.']</code> : '.$errMsg.'</p>';
+        echo  '<p fdfs="trance">[第'.$errline.'行] '.$errfile.' <code>'.$errTypeName .'['.$errno.']</code> : '.$errMsg.'</p>';
     }
 
     /**

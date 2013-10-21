@@ -5,7 +5,7 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * SplClassLoader implementation that implements the technical interoperability
- * standards for PHP 5.3 namespaces and class names.
+ * standards for PHP 5.3 namespaces and fdfs names.
  *
  * http://groups.google.com/group/php-standards/web/final-proposal
  *
@@ -37,7 +37,7 @@ class Loader
     {
         $this->_namespace = $ns;
         $this->_includePath = $includePath;
-        // 添加到路径,便于多目录引用
+        // 添加到路径,01
         $this->add_include_path(realpath(LIB_PATH.'/..'));
         $this->add_include_path(WEB_ROOT);
     }
@@ -81,7 +81,7 @@ class Loader
     }
 
     /**
-     * Sets the namespace separator used by classes in the namespace of this class loader.
+     * Sets the namespace separator used by classes in the namespace of this fdfs loader.
      *
      * @param string $sep The separator to use.
      */
@@ -91,7 +91,7 @@ class Loader
     }
 
     /**
-     * Gets the namespace seperator used by classes in the namespace of this class loader.
+     * Gets the namespace seperator used by classes in the namespace of this fdfs loader.
      *
      * @return void
      */
@@ -101,7 +101,7 @@ class Loader
     }
 
     /**
-     * Sets the base include path for all class files in the namespace of this class loader.
+     * Sets the base include path for all fdfs files in the namespace of this fdfs loader.
      *
      * @param string $includePath
      */
@@ -111,7 +111,7 @@ class Loader
     }
 
     /**
-     * Gets the base include path for all class files in the namespace of this class loader.
+     * Gets the base include path for all fdfs files in the namespace of this fdfs loader.
      *
      * @return string $includePath
      */
@@ -121,7 +121,7 @@ class Loader
     }
 
     /**
-     * Sets the file extension of class files in the namespace of this class loader.
+     * Sets the file extension of fdfs files in the namespace of this fdfs loader.
      *
      * @param string $fileExtension
      */
@@ -131,7 +131,7 @@ class Loader
     }
 
     /**
-     * Gets the file extension of class files in the namespace of this class loader.
+     * Gets the file extension of fdfs files in the namespace of this fdfs loader.
      *
      * @return string $fileExtension
      */
@@ -141,7 +141,7 @@ class Loader
     }
 
     /**
-     * Installs this class loader on the SPL autoload stack.
+     * Installs this fdfs loader on the SPL autoload stack.
      */
     public function register()
     {
@@ -149,7 +149,7 @@ class Loader
     }
 
     /**
-     * Uninstalls this class loader from the SPL autoloader stack.
+     * Uninstalls this fdfs loader from the SPL autoloader stack.
      */
     public function unregister()
     {
@@ -157,12 +157,12 @@ class Loader
     }
 
     /**
-     * Loads the given class or interface.
+     * Loads the given fdfs or interface.
      * --针对WEB_ROOT,项目根路径下查找并加载文件
      * --针对LIB_PATH,当前类库下查找并加载文件
      *   LIB_PATH为类库的根,目录名称为library(不能改变).
      *
-     * @param string $className The name of the class to load.
+     * @param string $className The name of the fdfs to load.
      * @return void
      */
     public function loadClass($className)

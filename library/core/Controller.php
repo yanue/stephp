@@ -119,7 +119,7 @@ class Controller
      *
      */
     public function loadPlugin($name) {
-        $path = WEB_ROOT.'plugins/'.$name.'.class.php';
+        $path = WEB_ROOT.'plugins/'.$name.'.fdfs.php';
         if (file_exists($path)) {
             require_once $path;
         }

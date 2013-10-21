@@ -2,8 +2,11 @@
 
 namespace Library\Core;
 
-use Library\Db\Db;
 use Library\Core\Loader;
+use Library\Fluent\FluentPDO;
+use PDO;
+use PDOException;
+use Library\Fluent\FluentStructure;
 if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -15,24 +18,51 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @time     2013-07-11
  */
 
-class Model extends Db
-{
+class Model {
+    public  $errmsg = null;
+    public  $errcode = null;
+    public $db = null;
+    public $_pdo = null;
+
     /**
      * 初始化模型
      *
-     * @param string $DB_TYPE
-     * @param string $DB_HOST
-     * @param string $DB_PORT
-     * @param string $DB_NAME
-     * @param string $DB_USER
-     * @param string $DB_PASS
+     * @param string $db_type
+     * @param string $db_host
+     * @param string $db_port
+     * @param string $db_name
+     * @param string $db_user
+     * @param string $db_pass
      */
-    public function __construct($DB_TYPE='', $DB_HOST='',$DB_PORT='', $DB_NAME='', $DB_USER='', $DB_PASS=''){
+    public function __construct($db_type='', $db_host='',$db_port='', $db_name='', $db_user='', $db_pass=''){
+        // replace default settings
+        $this->db_type = $db_type;
+        $this->db_host = $db_host;
+        $this->db_port = $db_port;
+        $this->db_name = $db_name;
+        $this->db_user = $db_user;
+        $this->db_pass = $db_pass;
         $this->init();
-        if(Db::$errcode!=0){
-            $this->sqlError(Db::$errmsg,Db::$errcode);
+        $this->conn();
+        $this->db = new FluentPDO($this->_pdo);
+    }
+
+    public function conn(){
+        // Set DSN
+        // Set options
+        $options = array(
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'set names \'utf8\'',
+            PDO::ATTR_PERSISTENT            => true,# ?
+            PDO::ATTR_ERRMODE               => PDO::ERRMODE_EXCEPTION ,#err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
+        );
+        // Create a new PDO instanace
+        try{
+            $dsn = $this->db_type.':dbname='.$this->db_name.';host='.$this->db_host.';port='.$this->db_port;
+            $this->_pdo = new PDO($dsn,$this->db_user,$this->db_pass,$options);
+        } catch(PDOException $e){ // Catch any errors
+           echo  $this->errmsg = $e->getMessage();
+           echo $this->errcode = $e->getCode();
         }
-        parent::__construct(DB_TYPE, DB_HOST,DB_PORT, DB_NAME, DB_USER, DB_PASS);
     }
 
     /**
@@ -41,12 +71,12 @@ class Model extends Db
     public function init(){
         $type  =Loader::getConfig('db.type');
         $port = Loader::getConfig('db.port');
-        defined('DB_TYPE') || define('DB_TYPE',isset($type) ? $type :'mysql');
-        defined('DB_HOST') || define('DB_HOST',Loader::getConfig('db.host'));
-        defined('DB_PORT') || define('DB_PORT',isset($port) ? $port :'3306');
-        defined('DB_NAME') || define('DB_NAME',Loader::getConfig('db.dbname'));
-        defined('DB_USER') || define('DB_USER',Loader::getConfig('db.username'));
-        defined('DB_PASS') || define('DB_PASS',Loader::getConfig('db.password'));
+        $this->db_type = isset($type) ? $type :'mysql';
+        $this->db_port = isset($port) ? $port :'3306';
+        $this->db_host = Loader::getConfig('db.host');
+        $this->db_name = Loader::getConfig('db.name');
+        $this->db_user = Loader::getConfig('db.user');
+        $this->db_pass = Loader::getConfig('db.pass');
     }
 
     // load configs file

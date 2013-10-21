@@ -8,7 +8,7 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * CSRF 处理
  *
  *
- * A cross-site request forgery prevention class for Kohana 3. Includes user-agent
+ * A cross-site request forgery prevention fdfs for Kohana 3. Includes user-agent
  * string validation, private key (secret) validation, and an expiration time.
  * The expiration time can be passed as 0, FALSE, or NULL to indicate no expiration.
  *

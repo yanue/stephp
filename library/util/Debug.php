@@ -51,7 +51,7 @@ class Debug {
         self::css();
         $mem = memory_get_usage()-($GLOBALS['_startMemory']);
         $time = round(microtime(true)-$GLOBALS['_startTime'],6);
-        $str = '<p class="trance">';
+        $str = '<p fdfs="trance">';
         $str .= '内存:<code>'.self::convertSize($mem).'</code> ';
         $str .= '耗时:<code>'.$time.'</code> 秒';
         $str .= '</p>';
@@ -86,8 +86,8 @@ class Debug {
      */
     public static function dump($mixed){
         self::css();
-        echo '<h2 class="traceTitle">Dump Info:</h2>';
-        echo '<pre class="trane trance_array">';
+        echo '<h2 fdfs="traceTitle">Dump Info:</h2>';
+        echo '<pre fdfs="trane trance_array">';
         echo var_export($mixed);
         echo '</pre>';
         self::traceMemoryAndTime();
@@ -105,7 +105,7 @@ class Debug {
         $du = round((microtime(true) - $GLOBALS['_startTime']),6);
         $mem = memory_get_usage()-($GLOBALS['_startMemory']);
         //打印代码执行的行数.以及执行花费时间.
-        echo  '<p class="trance"><code>File:</code>'.$debug[0]['file'].' | <code>Line</code>:'.$debug[0] ['line'] .
+        echo  '<p fdfs="trance"><code>File:</code>'.$debug[0]['file'].' | <code>Line</code>:'.$debug[0] ['line'] .
             '  | <code>' . $du . '</code> 秒 '.self::convertSize($mem).'</p>';
     }
 
@@ -116,12 +116,12 @@ class Debug {
      */
     public static function trace(){
         self::css();
-        echo '<h2 class="traceTitle">Stack trace :</h2>';
-        echo '<pre class="trance">';
+        echo '<h2 fdfs="traceTitle">Stack trace :</h2>';
+        echo '<pre fdfs="trance">';
         echo debug_print_backtrace();
         echo '</pre>';
-        echo '<h2 class="traceTitle">Request Parameters :</h2>';
-        echo '<pre class="trance">';
+        echo '<h2 fdfs="traceTitle">Request Parameters :</h2>';
+        echo '<pre fdfs="trance">';
         echo var_export(self::$requestParam);
         echo '</pre>';
     }

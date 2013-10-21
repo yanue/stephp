@@ -2,8 +2,8 @@
 
 # ==== php配置 ====
 $config['timezone'] = "PRC";
-$config['display_errors'] = false;
-$config['debug'] = false;
+$config['display_errors'] = true;
+$config['debug'] = true;
 
 # ==== 默认应用配置 =====
 $config['module'] = "home"; #默认模块
@@ -12,12 +12,12 @@ $config['action'] = "index";
 $config['suffix'] = ".html";# 请不要保护那个'.'
 
 
-# ==== smarty配置 ====
-$config['db.type']         = 'mysql';
-$config['db.host']         = 'localhost';
-$config['db.port']         = '3306';
-$config['db.username']     = 'root';
-$config['db.password']     = 'root';
-$config['db.dbname']       = 'looklo_pay';
+# ==== mysql ====
+$config['db.type']          = 'mysql';
+$config['db.host']          = '192.168.1.168';
+$config['db.port']          = '3306';
+$config['db.user']          = 'ainana';
+$config['db.pass']          = 'ainana';
+$config['db.name']          = 'test';
 
 return $config;
