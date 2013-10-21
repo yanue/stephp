@@ -50,9 +50,9 @@ class Dispatcher
         $requestPath = $this->request->getSegments();
 
         # 通过'?'后面参数初步设置mvc
-        $module     = isset($_GET['module']) && $_GET['module'] ? $_GET['module'] : Loader::getConfig('module');
-        $controller = isset($_GET['controller']) && $_GET['controller'] ? $_GET['controller'] : Loader::getConfig('controller');
-        $action     = isset($_GET['action']) && $_GET['action'] ? $_GET['action'] : Loader::getConfig('action');
+        $module     = isset($_GET['m']) && $_GET['m'] ? $_GET['m'] : Loader::getConfig('module');
+        $controller = isset($_GET['c']) && $_GET['c'] ? $_GET['c'] : Loader::getConfig('controller');
+        $action     = isset($_GET['a']) && $_GET['a'] ? $_GET['a'] : Loader::getConfig('action');
 
         # 第一个参数与默认的module名相同
         if(isset($requestPath[0]) && Loader::getConfig('module') == $requestPath[0]){
