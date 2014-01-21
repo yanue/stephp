@@ -26,9 +26,8 @@ class IndexController extends Controller{
     }
 
     public function testAction(){
-        echo 'sd';
-//        $userModel = new UserModel();
-//        $userModel->getTest();
+        $userModel = new UserModel();
+        $userModel->getTest();
     }
 
     public function numAction(){
