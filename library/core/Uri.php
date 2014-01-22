@@ -1,24 +1,25 @@
 <?php
 namespace Library\Core;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * uri各种参数获取综合类
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/core
  * @time     2013-07-11
  */
-
-class Uri extends Dispatcher{
+final class Uri extends Dispatcher
+{
 
     /**
      * 初始化
      *
      */
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
 
@@ -27,12 +28,14 @@ class Uri extends Dispatcher{
      * --说明: 可以通过key获取包含path部分和?后面的query部分以key=>val结构的val
      *  -例http://localhost/mvc/index/index/te/ed/test/a/p/2/a.html?c=d 通过te可以获取ed,c获取d
      *
-     * @param string $key
-     * @return string
+     * @param $key
+     * @param null $default
+     * @return null
      */
-    public function getParam($key){
+    public function getParam($key, $default = null)
+    {
         $params = $this->getParams();
-        return isset($params[$key]) ? $params[$key] : false ;
+        return isset($params[$key]) ? $params[$key] : $default;
     }
 
     /**
@@ -45,9 +48,16 @@ class Uri extends Dispatcher{
      * @param int $n 除去mvc结构的第n个参数
      * @return string
      */
-    public function getUri($n){
+    public function getUri($n)
+    {
         $params = $this->getPathArray();
-        return isset($params[$n-1]) ? $params[$n-1] : false ;
+        return isset($params[$n - 1]) ? $params[$n - 1] : false;
+    }
+
+    public function getMvcString()
+    {
+        $moduleUri = $this->getModule() != Config::getBase('module') ? $this->getModule() . '/' : '';
+        return $moduleUri . $this->getController() . '/' . $this->getAction();
     }
 
     /**
@@ -56,10 +66,11 @@ class Uri extends Dispatcher{
      *
      * @return string
      */
-    public function getLastParam(){
-        $params =  $this->getPathArray();
+    public function getLastParam()
+    {
+        $params = $this->getPathArray();
         $len = count($params);
-        return $len%2==1 ? $params[$len-1] : null;
+        return $len % 2 == 1 ? $params[$len - 1] : null;
     }
 
     /**
@@ -69,10 +80,11 @@ class Uri extends Dispatcher{
      * @param string $key 例:(a=b&c=d)中=前面参数a
      * @return string 匹配的值
      */
-    public function getQuery($key){
-        $params =  $this->request->getQuery();
-        parse_str($params,$paramQuery);
-        return isset($paramQuery[$key]) ? $paramQuery[$key] : '' ;
+    public function getQuery($key)
+    {
+        $params = $this->request->getQuery();
+        parse_str($params, $paramQuery);
+        return isset($paramQuery[$key]) ? $paramQuery[$key] : '';
     }
 
     /**
@@ -80,8 +92,9 @@ class Uri extends Dispatcher{
      *
      * @return string
      */
-    public function getFullUrl(){
-        return  $this->request->getFullUrl();
+    public function getFullUrl()
+    {
+        return $this->request->getFullUrl();
     }
 
     /**
@@ -89,8 +102,9 @@ class Uri extends Dispatcher{
      *
      * @return string
      */
-    public function getUriString(){
-        return  $this->request->getUri();
+    public function getUriString()
+    {
+        return $this->request->getUri();
     }
 
     /**
@@ -98,7 +112,8 @@ class Uri extends Dispatcher{
      *
      * @return string
      */
-    public function getQueryString(){
+    public function getQueryString()
+    {
         return $this->request->getQuery();
     }
 
@@ -107,7 +122,8 @@ class Uri extends Dispatcher{
      *
      * @return string
      */
-    public function getPathString(){
+    public function getPathString()
+    {
         return $this->request->getPath();
     }
 
@@ -119,37 +135,59 @@ class Uri extends Dispatcher{
      * @param bool $getQueryString true/false 是否返回url中?后query部分
      * @return string 新构造url
      */
-    public function setUrl($add_arr=array(),$rm_arr=array(),$getQueryString=false){
-        $params =  $this->getPathArray();
+    /**
+     *
+     * @param array $add_arr array(key=>val) 更新或添加到url中目录结构path部分
+     * @param array $rm_arr array(key) 删除原有path中的匹配key部分(querystring)
+     * @param bool $getQueryString
+     * @return string
+     */
+    public function setUrl($add_arr = array(), $rm_arr = array(), $getQueryString = false)
+    {
+        $params = $this->getPathArray();
         $paramPath = array();
         $lastParam = $this->getLastParam();
-        if(($len = count($params)) > 0){
-            for($i=0;$i<ceil(($len)/2);$i++){
-                if(isset($params[$i*2+1]) && $params[$i*2+1]){ #去掉空值的部分
-                    $paramPath[$params[$i*2]] = $params[$i*2+1];
+        if (($len = count($params)) > 0) {
+            for ($i = 0; $i < ceil(($len) / 2); $i++) {
+                if (isset($params[$i * 2 + 1]) && $params[$i * 2 + 1]) { #去掉空值的部分
+                    $paramPath[$params[$i * 2]] = $params[$i * 2 + 1];
                 }
             }
         }
         # 添加新的参数
-        $params = array_merge($paramPath,(array)$add_arr);
+        $params = array_merge($paramPath, (array)$add_arr);
         # 移除匹配参数
-        $params = array_diff_key($params,array_flip((array)$rm_arr));
+        $params = array_diff_key($params, array_flip((array)$rm_arr));
+        $moduleUri = $this->getModule() != Config::getBase('module') ? '/' . $this->getModule() : '';
+        $mvcUri = $moduleUri . '/' . $this->getController() . '/' . $this->getAction();
 
-        $mvcUri = $this->getModule().'/'.$this->getController().'/'.$this->getAction();
-
-        foreach ($params as $k=>$v) {
-            $mvcUri .= '/'.$k.'/'.$v;
+        foreach ($params as $k => $v) {
+            $mvcUri .= '/' . $k . '/' . $v;
         }
 
         # 添加最后一个path参数和后缀
-        $uriPath = $mvcUri.$lastParam.$this->getSuffix();
+        $uriPath = $mvcUri . $lastParam . $this->getSuffix();
         # 返回后面的query参数
-        $request_uri = $getQueryString==true &&  $this->request->getQuery() ? $uriPath.'?'. $this->request->getQuery() : $uriPath;
-        return  $this->request->getBaseUrl().$request_uri;
+        $request_uri = $getQueryString == true && $this->request->getQuery() ? $uriPath . '?' . $this->request->getQuery() : $uriPath;
+        $url = $this->request->getBaseUrl() . '/' . ltrim($request_uri, '/');
+        return $url;
     }
 
 
-    public function baseUrl($request_uri=''){
-        return  $this->request->getBaseUrl().$request_uri;
+    /**
+     * baseUrl
+     *
+     */
+    public function baseUrl($uri = '', $setSuffix = true)
+    {
+        $baseUrl = rtrim($this->request->getBaseUrl(), '/');
+
+        // 避免根上加.html后缀
+        if (!ltrim($uri, '/')) {
+            return $baseUrl;
+        }
+
+        // add uri to url
+        return $this->addUri($baseUrl, $uri, $setSuffix);
     }
 }

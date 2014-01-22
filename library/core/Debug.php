@@ -1,23 +1,24 @@
 <?php
-namespace Library\Util;
-use Exception;
-use Library\Core\Loader;
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+namespace Library\Core;
+
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * Debug 调试输出信息
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/util
  * @time     2013-07-11
  */
-class Debug {
+class Debug
+{
 
     private static $isInitCss = false;
     private static $requestParam = null;
 
-    public function __construct(){
+    public function __construct()
+    {
         self::startMemoryAndTime();
     }
 
@@ -28,7 +29,8 @@ class Debug {
      *
      * @param $params
      */
-    public static function setRequestParam(& $params){
+    public static function setRequestParam(& $params)
+    {
         self::$requestParam = $params;
     }
 
@@ -36,7 +38,8 @@ class Debug {
      * 从当前开始监测时间和内存
      *
      */
-    public static function startMemoryAndTime(){
+    public static function startMemoryAndTime()
+    {
         $GLOBALS['_startMemory'] = memory_get_usage();
         $GLOBALS['_startTime'] = microtime(true);
     }
@@ -47,13 +50,14 @@ class Debug {
      *
      * @return void
      */
-    public static function traceMemoryAndTime(){
+    public static function traceMemoryAndTime()
+    {
         self::css();
-        $mem = memory_get_usage()-($GLOBALS['_startMemory']);
-        $time = round(microtime(true)-$GLOBALS['_startTime'],6);
+        $mem = memory_get_usage() - ($GLOBALS['_startMemory']);
+        $time = round(microtime(true) - $GLOBALS['_startTime'], 6);
         $str = '<p fdfs="trance">';
-        $str .= '内存:<code>'.self::convertSize($mem).'</code> ';
-        $str .= '耗时:<code>'.$time.'</code> 秒';
+        $str .= '内存:<code>' . self::convertSize($mem) . '</code> ';
+        $str .= '耗时:<code>' . $time . '</code> 秒';
         $str .= '</p>';
         echo $str;
     }
@@ -62,19 +66,20 @@ class Debug {
      * 默认trace的css样式
      *
      */
-    private static function css(){
+    private static function css()
+    {
         $css = '<style>';
         $css .= 'body{position:relative;}';
         $css .= '.trance{font-size:12px;font-family:"monospace";line-height:180%;margin:0;passing:0;}';
         $css .= 'h2.traceTitle{font-size:14px;}';
         $css .= '.trance code{background:#ddf0dd;color:#0066ff;}';
         $css .= '.trance_array{background:#f0f0f0;color:#06c;}';
-        $css .='</style>';
-        if(self::$isInitCss==false){
+        $css .= '</style>';
+        if (self::$isInitCss == false) {
             echo $css;
-            self::$isInitCss=true;
-        }else{
-            self::$isInitCss=false;
+            self::$isInitCss = true;
+        } else {
+            self::$isInitCss = false;
         }
     }
 
@@ -84,7 +89,8 @@ class Debug {
      * @param $mixed mixed : 字串,数组..
      * @return void
      */
-    public static function dump($mixed){
+    public static function dump($mixed)
+    {
         self::css();
         echo '<h2 fdfs="traceTitle">Dump Info:</h2>';
         echo '<pre fdfs="trane trance_array">';
@@ -99,14 +105,15 @@ class Debug {
      *
      * @return void
      */
-    public static function runtime() {
+    public static function runtime()
+    {
         self::css();
-        $debug = debug_backtrace ();
-        $du = round((microtime(true) - $GLOBALS['_startTime']),6);
-        $mem = memory_get_usage()-($GLOBALS['_startMemory']);
+        $debug = debug_backtrace();
+        $du = round((microtime(true) - $GLOBALS['_startTime']), 6);
+        $mem = memory_get_usage() - ($GLOBALS['_startMemory']);
         //打印代码执行的行数.以及执行花费时间.
-        echo  '<p fdfs="trance"><code>File:</code>'.$debug[0]['file'].' | <code>Line</code>:'.$debug[0] ['line'] .
-            '  | <code>' . $du . '</code> 秒 '.self::convertSize($mem).'</p>';
+        echo '<p fdfs="trance"><code>File:</code>' . $debug[0]['file'] . ' | <code>Line</code>:' . $debug[0] ['line'] .
+            '  | <code>' . $du . '</code> 秒 ' . self::convertSize($mem) . '</p>';
     }
 
     /**
@@ -114,7 +121,8 @@ class Debug {
      *
      * @return void
      */
-    public static function trace(){
+    public static function trace()
+    {
         self::css();
         echo '<h2 fdfs="traceTitle">Stack trace :</h2>';
         echo '<pre fdfs="trance">';
@@ -131,9 +139,43 @@ class Debug {
      *
      * @return string.
      */
-    private static function convertSize($size){
-        $unit=array('byte','kb','mb','gb','tb','pb');
-        return round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    private static function convertSize($size)
+    {
+        $unit = array('byte', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+    }
+
+    public static function log($msg, $level = 'INFO')
+    {
+        $level = strtoupper($level);
+
+        $filepath = WEB_ROOT . '/log/' . date('Y-m') . '/log-' . date('m-d') . '.log';
+        $message = '';
+        $base = dirname($filepath);
+        if (!is_dir($base)) {
+            mkdir($base, 0777, true);
+        }
+
+        if (!file_exists($filepath)) {
+            $newfile = TRUE;
+        }
+
+        if (!$fp = fopen($filepath, 'a+')) {
+            return FALSE;
+        }
+
+        $message .= $level . ' ' . ($level === 'INFO' ? ' -' : '-') . ' ' . date('Y-m-d H:i:s') . ' --> ' . $msg . "\n";
+
+        flock($fp, LOCK_EX);
+        fwrite($fp, $message);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+
+        if (isset($newfile) && $newfile === TRUE) {
+            @chmod($filepath, 0777);
+        }
+
+        return TRUE;
     }
 
 }

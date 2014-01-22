@@ -1,30 +1,29 @@
 <?php
 namespace Library\Core;
 
-use Library\Util\Debug;
-
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * Request represents an HTTP request.
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/core
  * @time     2013-07-11
  */
-class Request {
+class Request
+{
 
     /**
      * 域名url
      */
-    private static $_hostUrl       = null;
+    private static $_hostUrl = null;
 
     /**
      * 当前应用根url地址(针对放在子目录情况)
      *
      */
-    private static $_webrootUrl       = null;
+    private static $_webrootUrl = null;
 
     /**
      * List of uri segments
@@ -32,38 +31,39 @@ class Request {
      * @var array
      * @access public
      */
-    private static $segments		= array();
+    private static $segments = array();
 
     /**
      * uri部分
      */
-    private static $_requestUri 	= null;
+    private static $_requestUri = null;
 
     /**
      * uri中?后query部分
      */
-    private static $_requestQuery  = null;
+    private static $_requestQuery = null;
 
     /**
      * uri中path部分
      */
-    private static $_requestPath   = null;
+    private static $_requestPath = null;
 
     /**
      * uri中baseUrl
      */
-    private $_baseUrl       = null;
+    private $_baseUrl = null;
 
     /**
      * 初始化并解析
      */
-    public function __construct(){
+    public function __construct()
+    {
         # 解析url
-        if(!self::$_requestUri)
+        if (!self::$_requestUri)
             $this->parseUrl();
-        if(!self::$segments)
+        if (!self::$segments)
             $this->reParseUri();
-        if(!$this->_baseUrl)
+        if (!$this->_baseUrl)
             $this->baseUrl();
     }
 
@@ -73,53 +73,55 @@ class Request {
      *
      * @return void.
      */
-    private function parseUrl(){
+    private function parseUrl()
+    {
         # 解决通用问题
         $requestUri = '';
         if (isset($_SERVER['REQUEST_URI'])) { #$_SERVER["REQUEST_URI"] 只有 apache 才支持,
             $requestUri = $_SERVER['REQUEST_URI'];
         } else {
             if (isset($_SERVER['argv'])) {
-                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['argv'][0];
-            } else if(isset($_SERVER['QUERY_STRING'])) {
-                $requestUri = $_SERVER['PHP_SELF'] .'?'. $_SERVER['QUERY_STRING'];
+                $requestUri = $_SERVER['PHP_SELF'] . '?' . $_SERVER['argv'][0];
+            } else if (isset($_SERVER['QUERY_STRING'])) {
+                $requestUri = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
             }
         }
         $https = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
-        $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/",true).$https;
-        $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":".$_SERVER["SERVER_PORT"]);
+        $protocol = strstr(strtolower($_SERVER["SERVER_PROTOCOL"]), "/", true) . $https;
+        $port = ($_SERVER["SERVER_PORT"] == "80") ? "" : (":" . $_SERVER["SERVER_PORT"]);
 
         # 保存地址域
-        self::$_hostUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port;
+        self::$_hostUrl = $protocol . "://" . $_SERVER['HTTP_HOST'] . $port;
         # 获取的完整url
 
 
         # 当前脚本名称
-        $script_name  = $_SERVER['SCRIPT_NAME'];
+        $script_name = $_SERVER['SCRIPT_NAME'];
         # 当前脚本目录
-        $script_dir  = dirname($_SERVER['SCRIPT_NAME']);
+        $script_dir = dirname($_SERVER['SCRIPT_NAME']);
         # 去除uri中当前脚本文件名 (如果存在)
-        $script = false === strpos($requestUri,$script_name) ? $script_dir : $script_name ;
+        $script = false === strpos($requestUri, $script_name) ? $script_dir : $script_name;
+        $script = str_replace('\\', '/', $script);
         # 当前应用根url
-        self::$_webrootUrl = $protocol."://".$_SERVER['SERVER_NAME'].$port.$script;
-
-        self::$_requestUri = substr($requestUri,strlen($script));
+        self::$_webrootUrl = self::$_hostUrl . $script;
+        self::$_requestUri = substr($requestUri, strlen($script));
     }
 
-    private function reParseUri(){
+    private function reParseUri()
+    {
         $uriParam = parse_url(self::$_requestUri);
         $requestPath = isset($uriParam['path']) ? $uriParam['path'] : '';
-        $pathStr = ltrim($requestPath,'/');
+        $pathStr = ltrim($requestPath, '/');
 
         # 判断url后缀是否存在
-        $_url_suffix = Loader::getConfig('suffix');
+        $_url_suffix = Config::getBase('suffix');
 
         # 截取后缀
-        if(strlen($pathStr)>strlen($_url_suffix)){
+        if (strlen($pathStr) > strlen($_url_suffix)) {
             # 获取到后缀的位置
-            $sfxpos = strripos($pathStr,$_url_suffix);
+            $sfxpos = strripos($pathStr, $_url_suffix);
             # 后缀的位置处于url中path部分最后
-            $pathStr = (false !== $sfxpos && $sfxpos == (strlen($pathStr)-strlen($_url_suffix))) ? substr($pathStr,0,strlen($pathStr)-strlen($_url_suffix)) : $pathStr ;
+            $pathStr = (false !== $sfxpos && $sfxpos == (strlen($pathStr) - strlen($_url_suffix))) ? substr($pathStr, 0, strlen($pathStr) - strlen($_url_suffix)) : $pathStr;
         }
         self::$_requestPath = $pathStr;
         self::$_requestQuery = isset($uriParam['query']) ? $uriParam['query'] : '';
@@ -137,12 +139,14 @@ class Request {
      * @param string $uri 包含mvc结构的uri参数
      * @return string
      * */
-    private function baseUrl(){
-        $baseUrl = ( isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
+    private function baseUrl()
+    {
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
         $baseUrl .= isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : getenv('HTTP_HOST');
         $dirname = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
-        $dir = $dirname=='/'? '' :$dirname; // 避免根目录情况下多一个'/'
-        $this->_baseUrl = $baseUrl.$dir.'/';
+        $dir = $dirname=='/'? '' : $dirname; // 避免根目录情况下多一个'/'
+        $dir = str_replace($dir,'\\','/');
+        $this->_baseUrl = rtrim($baseUrl.$dir,'/');
     }
 
 
@@ -151,7 +155,8 @@ class Request {
      *
      * @return array
      */
-    public function getSegments(){
+    public function getSegments()
+    {
         return self::$segments;
     }
 
@@ -160,14 +165,18 @@ class Request {
      *
      * @param $uri
      */
-    public function setUri($uri){
-        if($uri){ self::$_requestUri = $uri; }
+    public function setUri($uri)
+    {
+        if ($uri) {
+            self::$_requestUri = $uri;
+        }
     }
 
-    public function setPath($path){
-        if($path){
+    public function setPath($path)
+    {
+        if ($path) {
             self::$_requestPath = $path;
-            self::$_requestUri = self::$_requestPath.'?'.self::$_requestQuery;
+            self::$_requestUri = self::$_requestPath . '?' . self::$_requestQuery;
             $this->reParseUri();
         }
     }
@@ -176,7 +185,8 @@ class Request {
      * get http referer
      * @return string
      */
-    public function getReferer(){
+    public function getReferer()
+    {
         return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
     }
 
@@ -185,7 +195,8 @@ class Request {
      *
      * @return string
      */
-    public function getBaseUrl(){
+    public function getBaseUrl()
+    {
         return $this->_baseUrl;
     }
 
@@ -194,7 +205,8 @@ class Request {
      *
      * @return string
      */
-    public function getUri(){
+    public function getUri()
+    {
         return self::$_requestUri;
     }
 
@@ -203,8 +215,9 @@ class Request {
      *
      * @return string : url
      */
-    public function getFullUrl(){
-        return self::$_webrootUrl.self::$_requestUri;
+    public function getFullUrl()
+    {
+        return self::$_webrootUrl . self::$_requestUri;
     }
 
     /**
@@ -212,7 +225,8 @@ class Request {
      *
      * @return string
      */
-    public function getQuery(){
+    public function getQuery()
+    {
         return self::$_requestQuery;
     }
 
@@ -221,41 +235,31 @@ class Request {
      *
      * @return string
      */
-    public function getPath(){
+    public function getPath()
+    {
         return self::$_requestPath;
     }
 
-    /**
-     * return get method val by key($_name)
-     *
-     * @param $_name
-     * @param null $default
-     * @return null
-     */
-    public function get($_name,$default=null){
-        return isset($_GET[$_name]) ? $_GET[$_name] : $default;
-    }
-
-
-    /**
-     * return post method val by key($_name)
-     *
-     * @param $_name
-     * @param null $default
-     * @return null
-     */
-    public function post($_name,$default=null){
-        return isset($_POST[$_name]) ? $_POST[$_name] : $default;
-    }
-
-    /**
-     * return $_REQUEST (get or post) val by key($_name)
-     *
-     * @param $_name
-     * @param null $default
-     * @return null
-     */
-    public function request($_name,$default=null){
-        return isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
+    public function getIP()
+    {
+        static $realip;
+        if (isset($_SERVER)) {
+            if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+                $realip = $_SERVER["HTTP_X_FORWARDED_FOR"];
+            } else if (isset($_SERVER["HTTP_CLIENT_IP"])) {
+                $realip = $_SERVER["HTTP_CLIENT_IP"];
+            } else {
+                $realip = $_SERVER["REMOTE_ADDR"];
+            }
+        } else {
+            if (getenv("HTTP_X_FORWARDED_FOR")) {
+                $realip = getenv("HTTP_X_FORWARDED_FOR");
+            } else if (getenv("HTTP_CLIENT_IP")) {
+                $realip = getenv("HTTP_CLIENT_IP");
+            } else {
+                $realip = getenv("REMOTE_ADDR");
+            }
+        }
+        return $realip;
     }
 }

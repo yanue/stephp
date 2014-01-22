@@ -1,6 +1,6 @@
 <?php
 namespace Library\Fluent;
-use Library\Fluent\CommonQuery;
+
 /** UPDATE query builder
  *
  * @method UpdateQuery  leftJoin(string $statement) add LEFT JOIN to query
@@ -10,78 +10,84 @@ use Library\Fluent\CommonQuery;
  * @method UpdateQuery  orderBy(string $column) add ORDER BY to query
  * @method UpdateQuery  limit(int $limit) add LIMIT to query
  */
-class UpdateQuery extends CommonQuery {
+class UpdateQuery extends CommonQuery
+{
 
-	public function __construct(FluentPDO $fpdo, $table) {
-		$clauses = array(
-			'UPDATE' => array($this, 'getClauseUpdate'),
-			'JOIN' => array($this, 'getClauseJoin'),
-			'SET' => array($this, 'getClauseSet'),
-			'WHERE' => ' AND ',
-			'ORDER BY' => ', ',
-			'LIMIT' => null,
-		);
-		parent::__construct($fpdo, $clauses);
+    public function __construct(FluentPDO $fpdo, $table)
+    {
+        $clauses = array(
+            'UPDATE' => array($this, 'getClauseUpdate'),
+            'JOIN' => array($this, 'getClauseJoin'),
+            'SET' => array($this, 'getClauseSet'),
+            'WHERE' => ' AND ',
+            'ORDER BY' => ', ',
+            'LIMIT' => null,
+        );
+        parent::__construct($fpdo, $clauses);
 
-		$this->statements['UPDATE'] = $table;
+        $this->statements['UPDATE'] = $table;
 
-		$tableParts = explode(' ', $table);
-		$this->joins[] = end($tableParts);
-	}
+        $tableParts = explode(' ', $table);
+        $this->joins[] = end($tableParts);
+    }
 
-	/**
-	 * @param string|array $fieldOrArray
-	 * @param null $value
-	 * @return $this
-	 * @throws Exception
-	 */
-	public function set($fieldOrArray, $value = false) {
-		if (!$fieldOrArray) {
-			return $this;
-		}
-		if (is_string($fieldOrArray) && $value !== false) {
-			$this->statements['SET'][$fieldOrArray] = $value;
-		} else {
-			if (!is_array($fieldOrArray)) {
-				throw new Exception('You must pass a value, or provide the SET list as an associative array. column => value');
-			} else {
-				foreach ($fieldOrArray as $field => $value) {
-					$this->statements['SET'][$field] = $value;
-				}
-			}
-		}
+    /**
+     * @param string|array $fieldOrArray
+     * @param null $value
+     * @return $this
+     * @throws Exception
+     */
+    public function set($fieldOrArray, $value = false)
+    {
+        if (!$fieldOrArray) {
+            return $this;
+        }
+        if (is_string($fieldOrArray) && $value !== false) {
+            $this->statements['SET'][$fieldOrArray] = $value;
+        } else {
+            if (!is_array($fieldOrArray)) {
+                throw new Exception('You must pass a value, or provide the SET list as an associative array. column => value');
+            } else {
+                foreach ($fieldOrArray as $field => $value) {
+                    $this->statements['SET'][$field] = $value;
+                }
+            }
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/** Execute update query
-	 * @return boolean
-	 */
-	public function execute() {
-		$result = parent::execute();
-		if ($result) {
-			return $result->rowCount();
-		}
-		return false;
-	}
+    /** Execute update query
+     * @return boolean
+     */
+    public function execute()
+    {
+        $result = parent::execute();
+        if ($result) {
+            return $result->rowCount();
+        }
+        return false;
+    }
 
-	protected function getClauseUpdate() {
-		return 'UPDATE ' . $this->statements['UPDATE'];
-	}
+    protected function getClauseUpdate()
+    {
+        return 'UPDATE ' . $this->statements['UPDATE'];
+    }
 
-	protected function getClauseSet() {
-		$setArray = array();
-		foreach ($this->statements['SET'] as $field => $value) {
-			if ($value instanceof FluentLiteral) {
-				$setArray[] = $field . ' = ' . $value;
-			} else {
-				$setArray[] = $field . ' = ?';
-				$this->parameters['SET'][$field] = $value;
-			}
-		}
+    protected function getClauseSet()
+    {
+        $setArray = array();
+        foreach ($this->statements['SET'] as $field => $value) {
+            if ($value instanceof FluentLiteral) {
+                $setArray[] = $field . ' = ' . $value;
+            } else {
+                $setArray[] = $field . ' = ?';
+                $this->parameters['SET'][$field] = $value;
+            }
+        }
 
-		return ' SET ' . implode(', ', $setArray);
-	}
+        return ' SET ' . implode(', ', $setArray);
+    }
 }
 
 

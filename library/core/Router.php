@@ -1,21 +1,18 @@
 <?php
 namespace Library\Core;
 
-use Library\Core\Request;
-use Library\Util\Debug;
-
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * 路由分发
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/core
  * @time     2013-08-26
  */
-
-class Router{
+class Router
+{
 
     /**
      * # 路由后的key=>val请求信息
@@ -31,8 +28,9 @@ class Router{
     /**
      * 初始化
      */
-    public function __construct($rules){
-        if($rules){
+    public function __construct($rules)
+    {
+        if ($rules) {
             $this->routes = $rules;
             $this->request = new Request();
             // 解析路由
@@ -51,27 +49,23 @@ class Router{
 
         // 直接匹配
         // Is there a literal match?  If so we're done
-        if (isset($this->routes[$uri]))
-        {
+        if (isset($this->routes[$uri])) {
             $this->request->setPath($this->routes[$uri]);
-            return ;
+            return;
         }
 
         // Loop through the route array looking for wild-cards
-        foreach ($this->routes as $key => $val)
-        {
+        foreach ($this->routes as $key => $val) {
             // Convert wild-cards to RegEx
             $key = str_replace(':any', '.+', str_replace(':num', '[0-9]+', $key));
             // Does the RegEx match?
-            if (preg_match('#^'.$key.'$#', $uri))
-            {
+            if (preg_match('#^' . $key . '$#', $uri)) {
                 // Do we have a back-reference?
-                if (strpos($val, '$') !== FALSE AND strpos($key, '(') !== FALSE)
-                {
-                    $val = preg_replace('#^'.$key.'$#', $val, $uri);
+                if (strpos($val, '$') !== FALSE AND strpos($key, '(') !== FALSE) {
+                    $val = preg_replace('#^' . $key . '$#', $val, $uri);
                 }
                 $this->request->setPath($val);
-                return ;
+                return;
             }
         }
     }

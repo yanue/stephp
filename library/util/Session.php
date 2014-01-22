@@ -1,13 +1,14 @@
 <?php
 namespace Library\Util;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
-ini_set('session.use_cookies',1);
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
+ini_set('session.use_cookies', 1);
+
 /**
  * session 处理库
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/util
  * @time     2013-07-11
  */
@@ -27,12 +28,12 @@ class Session
      * 初始化
      *
      */
-    function __construct() {
+    function __construct()
+    {
         session_cache_expire($this->session_cache_expire);
-        if( session_id() == '' )
-        {
+        if (session_id() == '') {
             $this->sessionState = session_start();
-            session_set_cookie_params(time()+3600, '/', '/', NULL, NULL);
+            session_set_cookie_params(time() + 3600, '/', '/', NULL, NULL);
         }
         return $this->sessionState;
     }
@@ -42,8 +43,9 @@ class Session
      *
      * @param $time 时间长度(秒)
      */
-    public function setExpire($time){
-        if($time){
+    public function setExpire($time)
+    {
+        if ($time) {
             session_cache_expire($time);
         }
     }
@@ -55,9 +57,10 @@ class Session
      * @return  object
      */
 
-    public static function instance(){
+    public static function instance()
+    {
         static $obj;
-        if(!$obj) $obj =  new self();
+        if (!$obj) $obj = new self();
         return $obj;
     }
 
@@ -70,18 +73,19 @@ class Session
      * @return void
      */
 
-    public function set( $name , $value ){
+    public function set($name, $value)
+    {
         $_SESSION[$name] = $value;
     }
 
     /**
      * get 获取变量
      *
-     * @param string  $name
+     * @param string $name
      * @return sring|int|array
      */
 
-    public function get( $name, $default = '' )
+    public function get($name, $default = '')
     {
         return (isset($_SESSION[$name]) ? $_SESSION[$name] : $default);
     }
@@ -114,7 +118,7 @@ class Session
      * @param string $name
      * @return boolean
      */
-    public function exists( $name )
+    public function exists($name)
     {
         return isset($_SESSION[$name]);
     }
@@ -124,9 +128,9 @@ class Session
      *
      * @param string $name
      */
-    public function del( $name )
+    public function del($name)
     {
-        unset( $_SESSION[$name] );
+        unset($_SESSION[$name]);
     }
 
 
@@ -137,10 +141,9 @@ class Session
      */
     public function destroy()
     {
-        if ($this->sessionState)
-        {
+        if ($this->sessionState) {
             $this->sessionState = !session_destroy();
-            unset($_SESSION );
+            unset($_SESSION);
             return true;
         }
         return FALSE;

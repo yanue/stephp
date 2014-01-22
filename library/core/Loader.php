@@ -1,11 +1,11 @@
 <?php
 namespace Library\Core;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
  * SplClassLoader implementation that implements the technical interoperability
- * standards for PHP 5.3 namespaces and fdfs names.
+ * standards for PHP 5.3 namespaces and class names.
  *
  * http://groups.google.com/group/php-standards/web/final-proposal
  *
@@ -19,6 +19,7 @@ if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
  * @author Matthew Weier O'Phinney <matthew@zend.com>
  * @author Kris Wallsmith <kris.wallsmith@gmail.com>
  * @author Fabien Potencier <fabien.potencier@symfony-project.org>
+ * modify by yanue
  */
 class Loader
 {
@@ -26,28 +27,28 @@ class Loader
     private $_namespace;
     private $_includePath;
     private $_namespaceSeparator = '\\';
-    private static $settings = null;
+
     /**
      * Creates a new <tt>SplClassLoader</tt> that loads classes of the
      * specified namespace.
      *
-     * @param string $ns The namespace to use.
+     * @param null $includePath
+     * @param null $ns
      */
-    public function __construct($includePath = null,$ns = null)
+    public function __construct($includePath = null, $ns = null)
     {
         $this->_namespace = $ns;
         $this->_includePath = $includePath;
         // 添加到路径,01
-        $this->add_include_path(realpath(LIB_PATH.'/..'));
+        $this->add_include_path(realpath(LIB_PATH . '/..'));
         $this->add_include_path(WEB_ROOT);
     }
 
-    function add_include_path ($path)
+    // 添加路径
+    function add_include_path($path)
     {
-        foreach (func_get_args() AS $path)
-        {
-            if (!file_exists($path) OR (file_exists($path) && filetype($path) !== 'dir'))
-            {
+        foreach (func_get_args() AS $path) {
+            if (!file_exists($path) OR (file_exists($path) && filetype($path) !== 'dir')) {
                 continue;
             }
 
@@ -60,10 +61,10 @@ class Loader
         }
     }
 
-    function remove_include_path ($path)
+    // 移除路径
+    function remove_include_path($path)
     {
-        foreach (func_get_args() AS $path)
-        {
+        foreach (func_get_args() AS $path) {
             $paths = explode(PATH_SEPARATOR, get_include_path());
 
             if (($k = array_search($path, $paths)) !== false)
@@ -71,8 +72,7 @@ class Loader
             else
                 continue;
 
-            if (!count($paths))
-            {
+            if (!count($paths)) {
                 continue;
             }
 
@@ -81,79 +81,11 @@ class Loader
     }
 
     /**
-     * Sets the namespace separator used by classes in the namespace of this fdfs loader.
-     *
-     * @param string $sep The separator to use.
-     */
-    public function setNamespaceSeparator($sep)
-    {
-        $this->_namespaceSeparator = $sep;
-    }
-
-    /**
-     * Gets the namespace seperator used by classes in the namespace of this fdfs loader.
-     *
-     * @return void
-     */
-    public function getNamespaceSeparator()
-    {
-        return $this->_namespaceSeparator;
-    }
-
-    /**
-     * Sets the base include path for all fdfs files in the namespace of this fdfs loader.
-     *
-     * @param string $includePath
-     */
-    public function setIncludePath($includePath)
-    {
-        $this->_includePath = $includePath;
-    }
-
-    /**
-     * Gets the base include path for all fdfs files in the namespace of this fdfs loader.
-     *
-     * @return string $includePath
-     */
-    public function getIncludePath()
-    {
-        return $this->_includePath;
-    }
-
-    /**
-     * Sets the file extension of fdfs files in the namespace of this fdfs loader.
-     *
-     * @param string $fileExtension
-     */
-    public function setFileExtension($fileExtension)
-    {
-        $this->_fileExtension = $fileExtension;
-    }
-
-    /**
-     * Gets the file extension of fdfs files in the namespace of this fdfs loader.
-     *
-     * @return string $fileExtension
-     */
-    public function getFileExtension()
-    {
-        return $this->_fileExtension;
-    }
-
-    /**
      * Installs this fdfs loader on the SPL autoload stack.
      */
     public function register()
     {
         spl_autoload_register(array($this, 'loadClass'));
-    }
-
-    /**
-     * Uninstalls this fdfs loader from the SPL autoloader stack.
-     */
-    public function unregister()
-    {
-        spl_autoload_unregister(array($this, 'loadClass'));
     }
 
     /**
@@ -167,47 +99,35 @@ class Loader
      */
     public function loadClass($className)
     {
-        if (null === $this->_namespace || $this->_namespace.$this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace.$this->_namespaceSeparator))) {
+        if (null === $this->_namespace || $this->_namespace . $this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace . $this->_namespaceSeparator))) {
 
-            $fileName = '';
+            $namespace_path = '';
             if (false !== ($lastNsPos = strripos($className, $this->_namespaceSeparator))) {
                 $namespace = substr($className, 0, $lastNsPos);
                 $className = substr($className, $lastNsPos + 1);
-                $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+                $namespace_path = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
             }
+
             // 由命名空间转换而来的文件路径
-            $file_path = strtolower($fileName);
-            $fileClass = $file_path. str_replace('_', DIRECTORY_SEPARATOR, $className);
-            $file =  $fileClass . $this->_fileExtension;
+            $file_path = strtolower($namespace_path);
+            $fileClass = $file_path . $className;
+            $file = $fileClass . $this->_fileExtension;
 
             // 处于核心类库则加载核心类库
             // LIB_PATH为类库的根,目录名称为library(不能改变)
-            if(in_array($file_path,array('library/core/','library/util/','library/db/'))){
-                $lib_file = realpath(LIB_PATH.'/../'.$file);
-                if(file_exists($lib_file)){
+            if (in_array($file_path, array('library/core/', 'library/util/', 'library/db/'))) {
+                $lib_file = realpath(LIB_PATH . '/../' . $file);
+                if (file_exists($lib_file)) {
                     require_once $lib_file;
                 }
-            }else{
+            } else {
                 // 这里加载其他类(如数据操作模型等)
-                $class = realpath(WEB_ROOT.'/'.$file);
-                if(file_exists($class)){
+                $class = realpath(WEB_ROOT . '/' . $file);
+                if (file_exists($class)) {
                     include_once $class;
                 }
             }
         }
     }
 
-    /**
-     * 获取(单个)系统配置信息
-     *
-     * @param string $key 具体需要获取的键名
-     * @return mixed
-     */
-    public static function getConfig($key=''){
-        if(!self::$settings){
-            self::$settings = include(WEB_ROOT.'/config/config.php');
-        }
-        if (!$key ){ return self::$settings; }
-        return isset(self::$settings[$key]) ? self::$settings[$key] : '' ;
-    }
 }

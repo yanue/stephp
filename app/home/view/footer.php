@@ -1,2 +1,2 @@
 <?php
-Debug::traceMemoryAndTime();
+\Library\Util\Debug::traceMemoryAndTime();

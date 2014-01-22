@@ -3,7 +3,6 @@
 </p>
 <p>
     <?php
-    echo $this->enjoy;
     ?>
 </p>
 <p>

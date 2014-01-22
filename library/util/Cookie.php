@@ -1,17 +1,16 @@
 <?php
 namespace Library\Util;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
+
 /**
  * cookie 处理类
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/util
  * @time     2013-07-11
  */
-
-
 class Cookie
 {
 
@@ -76,10 +75,9 @@ class Cookie
     static public function set($name, $value, $expiry = self::OneHour, $path = '/', $domain = false)
     {
         $retval = false;
-        if (!headers_sent())
-        {
+        if (!headers_sent()) {
             if ($domain === false)
-                $domain = $_SERVER['HTTP_HOST']!='localhost' ? $_SERVER['HTTP_HOST'] : '';
+                $domain = $_SERVER['HTTP_HOST'] != 'localhost' ? $_SERVER['HTTP_HOST'] : '';
 
             if ($expiry === -1)
                 $expiry = 1893456000; // Lifetime = 2030-01-01 00:00:00
@@ -109,13 +107,21 @@ class Cookie
         $retval = false;
         if (!headers_sent())
         {
-            if ($domain === false)
+            if ($domain === false) {
                 $domain = $_SERVER['HTTP_HOST']!='localhost' ? $_SERVER['HTTP_HOST'] : '';
-
+            }
+            if(!empty($domain)) {
+                $domain = explode('.', $domain);
+                $domain = array_reverse($domain);
+                $ext = current($domain);
+                $main = next($domain);
+                $domain = $main . "." . $ext;
+            }
             $retval = setcookie($name, '', time() - 3600, $path, $domain);
 
-            if ($remove_from_global)
+            if ($remove_from_global) {
                 unset($_COOKIE[$name]);
+            }
         }
         return $retval;
     }
@@ -131,11 +137,11 @@ class Cookie
         // unset cookies
         if (isset($_SERVER['HTTP_COOKIE'])) {
             $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
-            foreach($cookies as $cookie) {
+            foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $name = trim($parts[0]);
-                setcookie($name, '', time()-1000);
-                setcookie($name, '', time()-1000, '/');
+                setcookie($name, '', time() - 1000);
+                setcookie($name, '', time() - 1000, '/');
             }
         }
     }

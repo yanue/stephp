@@ -13,5 +13,6 @@
     echo '<hr>';
     $this->render('footer');
 ?>
+aaaa
 </body>
 </html>

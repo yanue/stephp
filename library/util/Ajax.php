@@ -1,19 +1,18 @@
 <?php
 namespace Library\Util;
 
-use Library\Util\Session;
-use Library\Util\Hash;
-use Library\Util\Cookie;
+use Library\Core\Config;
 
 /**
- * ajax api 信息处理
+ * ajax handle for web api
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/util
  * @time     2013-07-11
  */
-class Ajax {
+class Ajax
+{
 
     /**
      * error msg for defined code
@@ -27,115 +26,54 @@ class Ajax {
      * init session
      *
      */
-    public function __construct(){
-        $this->session = new Session();
-    }
-    
-    /**
-     * set api signature
-     *
-     * @return string
-     */
-    public function createSign(){
-        $sign = Hash::create('sha1',md5('stephp'.time()));
-        $this->session->set('sign',$sign);
-        return $sign;
-    }
-
-
-    /**
-     * clear api signature for safety
-     *
-     */
-    public function clearSign(){
-        $this->session->del('sign');
-    }
-
-    /**
-     * check api signature
-     *
-     * @param $request_sign
-     * @return bool
-     */
-    public function checkSign(){
-        $request_sign = isset($_REQUEST['sign']) ? $_REQUEST['sign'] : null;
-        $sess_sign = $this->session->get('sign');
-        $res = $request_sign == $sess_sign ? true : false ;
-        if(!$res){
-            self::outError(ERROR_ILLEGAL_API_SIGNATURE);
-        }
-        return $res;
-    }
-
-    /**
-     * check Login Status
-     *
-     */
-    public function checkLogin(){
-        $cert = Cookie::get('_CERT');
-        $uid  = Cookie::get('_CUID');
-        if(Hash::create('sha1','stephp'.$uid) != $cert){
-            $uid = 0;
-            Cookie::del('_CUID');
-            Cookie::del('_CUSR');
-            Cookie::del('_CERT');
-        }
-        if($uid == 0){
-            $this->outError(ERROR_USER_HAS_NOT_LOGIN);
-        }
-        return $uid;
+    public function __construct()
+    {
+        self::$errmsg = Config::getSite('errcode');
     }
 
     /**
      * echo right json data
      *
-     * @param $data
+     * @param string $msg
+     * @param string $data
      */
-    public function outRight($msg='',$data=''){
-        $data = is_array($data) ? $this->urlEncodeArray($data) : urlencode($data);
+    public static function outRight($msg = '', $data = '')
+    {
+        self::setHead();
         $result = array(
-            'error'=>array('code'=>0,'msg'=>urlencode($msg)),
-            'data'=>$data
+            'error' => array('code' => 0, 'msg' => $msg, 'more' => $msg),
+            'result' => 1,
+            'data' => $data
         );
-        echo urldecode(json_encode($result));
+
+        if (isset($_REQUEST['callback']) && $_REQUEST['callback']) {
+            echo $_REQUEST["callback"] . '(' . json_encode($result, JSON_UNESCAPED_UNICODE) . ')'; // php 5.4
+        } else {
+            echo json_encode($result, JSON_UNESCAPED_UNICODE); // php 5.4
+        }
         exit;
     }
 
-    /**
-     * 递归多维数组进行 urlencode
-     *
-     * @param $arr
-     * @return array
-     */
-    private function urlEncodeArray(& $arr){
-        if(is_array($arr)){
-            foreach ($arr as $k=>$v) {
-                if(is_array($v)){
-                    // 递归子数组
-                    self::urlEncodeArray($arr[$k]);
-                }else{
-                    // url encode for value
-                    $arr[$k] = urlencode($v);
-                }
-            }
-        }
-        return $arr;
-    }
-    
+
     /**
      * echo error json data
      *
      * @param $code
      * @param string $msg
-     * @param bool $exit
      */
-    public function outError($code,$msg='',$exit=true){
-        $msg = is_array($msg) ? $this->urlEncodeArray($msg) : urlencode($msg);
+    public static function outError($code, $msg = '')
+    {
+        self::setHead();
         $result = array(
-            'error'=>array('code'=>$code,'msg'=>urlencode($this->getErrorMsg($code)),'more'=>$msg)
+            'error' => array('code' => $code, 'msg' => self::getErrorMsg($code), 'more' => $msg),
+            'result' => 0,
         );
-        echo urldecode(json_encode($result));
-        if($exit) exit;
+        if (isset($_REQUEST['callback']) && $_REQUEST['callback']) {
+            echo $_REQUEST["callback"] . '(' . json_encode($result, JSON_UNESCAPED_UNICODE) . ')'; // php 5.4
+        } else {
+            echo json_encode($result, JSON_UNESCAPED_UNICODE); // php 5.4
+        }
+        exit;
     }
 
     /**
@@ -143,7 +81,26 @@ class Ajax {
      * @param $code
      * @return string
      */
-    private function getErrorMsg($code){
+    public static function getErrorMsg($code)
+    {
         return isset($code) && isset(self::$errmsg[$code]) ? self::$errmsg[$code] : '';
+    }
+
+    /**
+     * 设置ajax跨域head
+     */
+    public static function setHead()
+    {
+        header("content-type: text/javascript; charset=utf-8");
+        header("Access-Control-Allow-Origin: *"); # 跨域处理
+        header("Access-Control-Allow-Headers: content-disposition, origin, content-type, accept");
+        header("Access-Control-Allow-Credentials: true");
+
+        // Make sure file is not cached (as it happens for example on iOS devices)
+        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+        header("Cache-Control: no-store, no-cache, must-revalidate");
+        header("Cache-Control: post-check=0, pre-check=0", false);
+        header("Pragma: no-cache");
     }
 }

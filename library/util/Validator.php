@@ -1,29 +1,31 @@
 <?php
 namespace Library\Util;
 
-/**
- * errorCode.php
- *
- * @copyright	http://yanue.net/
- * @author 		yanue <yanue@outlook.com>
- * @version		1.0.0 - 2013-07-19
- */
+    /**
+     * errorCode.php
+     *
+     * @copyright    http://yanue.net/
+     * @author        yanue <yanue@outlook.com>
+     * @version        1.0.0 - 2013-07-19
+     */
 
 /**
  * Class Validator
  *
  */
-class Validator{
+class Validator
+{
 
     /**
      * Create a new Validator instance.
      *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
+     * @param  array $data
+     * @param  array $rules
+     * @param  array $messages
      * @return void
      */
-    public function __construct(){
+    public function __construct()
+    {
 
     }
 
@@ -33,11 +35,12 @@ class Validator{
      * @param $username
      * @return array|int
      */
-    public function validUsername($username){
-        if(strlen($username) > 16 || strlen($username) < 5){
+    public function validUsername($username)
+    {
+        if (strlen($username) > 16 || strlen($username) < 5) {
             return ERROR_USER_IS_INVALID;
         }
-        if(preg_match('/^([a-z]+)([a-z0-9]+)$/i', $username)==0){
+        if (preg_match('/^([a-z]+)([a-z0-9]+)$/i', $username) == 0) {
             return ERROR_USER_IS_INVALID;
         };
         return true;
@@ -49,8 +52,9 @@ class Validator{
      * @param $username
      * @return array|int
      */
-    public function validPassword($passwd){
-        if(strlen($passwd) > 16 || strlen($passwd) < 6){
+    public function validPassword($passwd)
+    {
+        if (strlen($passwd) > 16 || strlen($passwd) < 6) {
             return ERROR_PASSWD_IS_INVALID;
         }
         return true;
@@ -59,8 +63,8 @@ class Validator{
     /**
      * Validate that an attribute is numeric.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateNumeric($value)
@@ -71,9 +75,9 @@ class Validator{
     /**
      * Validate an attribute is contained within a list of values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateIn($value, $parameters)
@@ -84,24 +88,22 @@ class Validator{
     /**
      * Validate an attribute is not contained within a list of values.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateNotIn($value, $parameters)
     {
-        return ! in_array($value, $parameters);
+        return !in_array($value, $parameters);
     }
-
-
 
 
     /**
      * Validate that an attribute is a valid IP.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateIp($value)
@@ -112,8 +114,8 @@ class Validator{
     /**
      * Validate that an attribute is a valid e-mail address.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validEmail($value)
@@ -124,8 +126,8 @@ class Validator{
     /**
      * Validate that an attribute is a valid URL.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateUrl($value)
@@ -136,8 +138,8 @@ class Validator{
     /**
      * Validate that an attribute is an active URL.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateActiveUrl($value)
@@ -150,8 +152,8 @@ class Validator{
     /**
      * Validate the MIME type of a file is an image MIME type.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateImage($value)
@@ -162,15 +164,14 @@ class Validator{
     /**
      * Validate the MIME type of a file upload attribute is in a set of MIME types.
      *
-     * @param  string  $attribute
-     * @param  array   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  array $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateMimes($value, $parameters)
     {
-        if ( ! $value instanceof File or $value->getPath() == '')
-        {
+        if (!$value instanceof File or $value->getPath() == '') {
             return true;
         }
 
@@ -183,8 +184,8 @@ class Validator{
     /**
      * Validate that an attribute contains only alphabetic characters.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateAlpha($value)
@@ -195,8 +196,8 @@ class Validator{
     /**
      * Validate that an attribute contains only alpha-numeric characters.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateAlphaNum($value)
@@ -207,8 +208,8 @@ class Validator{
     /**
      * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateAlphaDash($value)
@@ -219,9 +220,9 @@ class Validator{
     /**
      * Validate that an attribute passes a regular expression check.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateRegex($value, $parameters)
@@ -232,8 +233,8 @@ class Validator{
     /**
      * Validate that an attribute is a valid date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param  string $attribute
+     * @param  mixed $value
      * @return bool
      */
     public function validateDate($value)
@@ -250,9 +251,9 @@ class Validator{
     /**
      * Validate that an attribute matches a date format.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateDateFormat($value, $parameters)
@@ -265,19 +266,16 @@ class Validator{
     /**
      * Validate the date is before a given date.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param  string $attribute
+     * @param  mixed $value
+     * @param  array $parameters
      * @return bool
      */
     public function validateBefore($value, $parameters)
     {
-        if ( ! ($date = strtotime($parameters[0])))
-        {
+        if (!($date = strtotime($parameters[0]))) {
             return strtotime($value) < strtotime($this->getValue($parameters[0]));
-        }
-        else
-        {
+        } else {
             return strtotime($value) < $date;
         }
     }

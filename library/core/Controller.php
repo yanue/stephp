@@ -2,34 +2,54 @@
 namespace Library\Core;
 
 use Library\Util\Session;
-use Library\Core\Request;
 
-if ( ! defined('LIB_PATH')) exit('No direct script access allowed');
+if (!defined('LIB_PATH')) exit('No direct script access allowed');
+
 /**
  * 控制器处理类
  *
- * @author 	 yanue <yanue@outlook.com>
- * @link	 http://stephp.yanue.net/
+ * @author     yanue <yanue@outlook.com>
+ * @link     http://stephp.yanue.net/
  * @package  lib/core
  * @time     2013-07-11
  */
 class Controller
 {
     /**
+     * @var string
+     */
+    public $controller = null;
+
+    /**
+     * @var Request
+     */
+    public $request = null;
+
+    /**
+     * @var string
+     */
+    public $action = null;
+
+    /**
+     * @var string
+     */
+    public $module = null;
+
+    /**
      * 视图
-     *
+     * @var View
      */
     public $view = NULL;
 
     /**
      * url全局处理
-     *
+     * @var Uri
      */
     public $uri = NULL;
 
     /**
      * session处理
-     *
+     * @var Session
      */
     public $session = null;
 
@@ -37,7 +57,8 @@ class Controller
      * 初始化控制器
      *
      */
-    public function __construct () {
+    public function __construct()
+    {
         $this->view = new View();
         $this->uri = $this->view->uri();
         $this->session = new Session();
@@ -48,80 +69,88 @@ class Controller
     }
 
     /**
-     * load file
      *
-     */
-    public function loadFile($name) {
-        $path = LIB_PATH.$name;
-        if (file_exists($path)) {
-            include_once $path;
-            return true;
-        }
-        return false;
-    }
-
-	/**
-	 * load configs file
-	 *
-	 */
-	public function loadConfig ($file){
-        $file = $this->uri->getModulePath().'/config/'.$file.'.php';
-		if(file_exists($file)){
-			include_once $file;
-		}
-	}
-
-    /**
-     * baseUrl快捷使用方式
-     * -- controller上使用
-     *
-     * @param string $uri
+     * @param array $add_arr
+     * @param array $rm_arr
+     * @param bool $getQueryString
      * @return string
      */
-    public function baseUrl($uri=''){
-        return $this->uri->baseUrl($uri);
+    public function setUrl($add_arr = array(), $rm_arr = array(), $getQueryString = false)
+    {
+        return $this->uri->setUrl($add_arr, $rm_arr, $getQueryString);
     }
 
     /**
-     * 跨module引用模型
-     * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
-     * //TODO
-     * @param $model 模型名称(不包含'Model',如'UserModel'则输入'user').
-     * @param $module 模块名称(需要跨的模块)
-     * @return void.
-     */
-    public function loadModel($model,$module=''){
-        $modelClass = ucfirst($model).'Model';
-        if($module){
-            $file = $this->uri->getAppPath().'/'.$module.'/model/'.$modelClass.'.php';
-            if(file_exists($file)){
-                require_once $file;
-            }else{
-                echo $modelClass.'.php 文件不存在';
-            }
-        }
-    }
-
-    /**
-    * 跨module引用模型
-    * --说明: 主要目的是跨模块引用,当前模块下的请直接 new 进行使用
-    *
-    * @param $model 模型名称(不包含'Model',如'UserModel'则输入'user').
-    * @param $module 模块名称(需要跨的模块)
-    * @return void.
-    */
-    public function loadHelper($helper,$module=''){
-        //TODO
-    }
-
-    /**
-     * load plugins
+     * baseUrl映射到controller上
      *
      */
-    public function loadPlugin($name) {
-        $path = WEB_ROOT.'plugins/'.$name.'.fdfs.php';
-        if (file_exists($path)) {
-            require_once $path;
-        }
+    public function baseUrl($uri = '', $setSuffix = true)
+    {
+        return $this->uri->baseUrl($uri, $setSuffix);
+    }
+
+    /**
+     * ControllerUrl映射到controller上
+     *
+     */
+    public function moduleUrl($uri = '', $setSuffix = true)
+    {
+        return $this->uri->getModuleUrl($uri, $setSuffix);
+    }
+
+
+    /**
+     * ControllerUrl映射到controller上
+     *
+     */
+    public function controllerUrl($uri = '', $setSuffix = true)
+    {
+        return $this->uri->getControllerUrl($uri, $setSuffix);
+    }
+
+    /**
+     * actionUrl映射到controller上
+     *
+     */
+    public function actionUrl($uri = '', $setSuffix = true)
+    {
+        return $this->uri->getActionUrl($uri, $setSuffix);
+    }
+
+    /**
+     * http get 方法
+     * @param $_name
+     * @param null $default
+     * @param null $filter
+     * @return mixed|null|string
+     */
+    public function get($_name, $default = null, $filter = NULL)
+    {
+        return $this->view->get($_name, $default, $filter);
+    }
+
+    /**
+     * http post 方法
+     * @param $_name
+     * @param null $default
+     * @param null $filter
+     * @return mixed|null|string
+     */
+    public function post($_name, $default = null, $filter = NULL)
+    {
+        return $this->view->post($_name, $default, $filter);
+    }
+
+    /**
+     * http request 方法
+     *
+     * @param $_name
+     * @param null $default
+     * @param null $filter
+     * @return mixed|null|string
+     */
+    public function request($_name, $default = null, $filter = NULL)
+    {
+        return $this->view->request($_name, $default, $filter);
     }
 }
