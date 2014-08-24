@@ -6,6 +6,8 @@ class FluentStructure
 
     private $primaryKey, $foreignKey;
 
+    private $attributes = array();
+
     function __construct($primaryKey = 'id', $foreignKey = '%s_id')
     {
         if ($foreignKey === null) {
@@ -31,5 +33,34 @@ class FluentStructure
             return $key($table);
         }
         return sprintf($key, $table);
+    }
+
+    /**
+     * set a attribute
+     * @param string $key
+     * @param mixed $val
+     * @return boolean
+     */
+    public function setAttribute($key, $val)
+    {
+        $this->attributes[$key] = $val;
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        if (isset($this->attributes[$key])) {
+            return $this->attributes[$key];
+        }
+        return null;
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 }

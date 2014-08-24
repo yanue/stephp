@@ -144,9 +144,9 @@ class Request
         $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
         $baseUrl .= isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : getenv('HTTP_HOST');
         $dirname = isset($_SERVER['SCRIPT_NAME']) ? dirname($_SERVER['SCRIPT_NAME']) : dirname(getenv('SCRIPT_NAME'));
-        $dir = $dirname=='/'? '' : $dirname; // 避免根目录情况下多一个'/'
-        $dir = str_replace($dir,'\\','/');
-        $this->_baseUrl = rtrim($baseUrl.$dir,'/');
+        $dir = $dirname == '/' ? '' : $dirname; // 避免根目录情况下多一个'/'
+        $dir = str_replace($dir, '\\', '/');
+        $this->_baseUrl = rtrim($baseUrl . $dir, '/');
     }
 
 

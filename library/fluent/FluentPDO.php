@@ -5,24 +5,29 @@ namespace Library\Fluent;
 class FluentPDO
 {
 
-    private $pdo, $structure;
+    public static $pdo;
+    private $structure;
+    public $primaryKey = 'id';
+    public $foreignKey = null;
 
     /** @var boolean|callback */
     public $debug;
 
-    function __construct($pdo, $structure = null)
+    function __construct()
     {
-        $this->pdo = $pdo;
-        if (!$structure) {
-            $structure = new FluentStructure;
+        if (method_exists($this, 'init')) {
+            $this->init();
+        } else {
+            throw new \Exception('Your Model did not impements a init method yet.');
         }
-        $this->structure = $structure;
+
+        $this->structure = new FluentStructure($this->primaryKey, $this->foreignKey);
     }
 
     /** Create SELECT query from $table
      * @param string $table db table name
      * @param integer $id return one row by primary key
-     * @return \SelectQuery
+     * @return SelectQuery
      */
     public function from($table, $id = null)
     {
@@ -40,7 +45,7 @@ class FluentPDO
      *
      * @param string $table
      * @param array $values you can add one or multi rows array @see docs
-     * @return \InsertQuery
+     * @return InsertQuery
      */
     public function insertInto($table, $values = array())
     {
@@ -55,7 +60,7 @@ class FluentPDO
      * @param string $where
      * @param string $whereParams one or more params for where
      *
-     * @return \UpdateQuery
+     * @return UpdateQuery
      */
     public function update($table, $set = array(), $where = '', $whereParams = '')
     {
@@ -78,7 +83,7 @@ class FluentPDO
      * @param string $tables
      * @param string $where
      * @param string $whereParams one or more params for where
-     * @return \DeleteQuery
+     * @return DeleteQuery
      */
     public function delete($tables, $where = '', $whereParams = '')
     {
@@ -99,7 +104,7 @@ class FluentPDO
      * @param string $table
      * @param string $where
      * @param string $whereParams one or more params for where
-     * @return \DeleteQuery
+     * @return DeleteQuery
      */
     public function deleteFrom($table, $where = '', $whereParams = '')
     {
@@ -111,10 +116,10 @@ class FluentPDO
      */
     public function getPdo()
     {
-        return $this->pdo;
+        return self::$pdo;
     }
 
-    /** @return \FluentStructure
+    /** @return FluentStructure
      */
     public function getStructure()
     {

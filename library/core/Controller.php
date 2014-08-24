@@ -61,8 +61,7 @@ class Controller
     {
         $this->view = new View();
         $this->uri = $this->view->uri();
-        $this->session = new Session();
-        $this->request = new Request();
+
         $this->controller = $this->view->controller = $this->uri->getController();
         $this->action = $this->view->action = $this->uri->getAction();
         $this->module = $this->view->module = $this->uri->getModule();

@@ -100,7 +100,6 @@ abstract class BaseQuery implements IteratorAggregate
         $parameters = $this->buildParameters();
 
         $result = $this->fpdo->getPdo()->prepare($query);
-
         // At this point, $result is a PDOStatement instance, or false.
         // PDO::prepare() does not reliably return errors. Some database drivers
         // do not support prepared statements, and PHP emulates them.  Postgres
@@ -118,7 +117,6 @@ abstract class BaseQuery implements IteratorAggregate
         } elseif ($this->fpdo->getPdo()->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE) == PDO::FETCH_BOTH) {
             $result->setFetchMode(PDO::FETCH_ASSOC);
         }
-
         $time = microtime(true);
         if ($result && $result->execute($parameters)) {
             $this->time = microtime(true) - $time;
@@ -228,7 +226,7 @@ abstract class BaseQuery implements IteratorAggregate
                 } elseif (is_callable($separator)) {
                     $query .= call_user_func($separator);
                 } else {
-                    throw new Exception("Clause '$clause' is incorrectly set to '$separator'.");
+                    throw new \Exception("Clause '$clause' is incorrectly set to '$separator'.");
                 }
             }
         }
@@ -287,7 +285,7 @@ abstract class BaseQuery implements IteratorAggregate
 
     private function formatValue($val)
     {
-        if ($val instanceof DateTime) {
+        if ($val instanceof \DateTime) {
             return $val->format("Y-m-d H:i:s"); //! may be driver specific
         }
         return $val;

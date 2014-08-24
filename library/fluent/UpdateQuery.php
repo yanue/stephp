@@ -46,7 +46,7 @@ class UpdateQuery extends CommonQuery
             $this->statements['SET'][$fieldOrArray] = $value;
         } else {
             if (!is_array($fieldOrArray)) {
-                throw new Exception('You must pass a value, or provide the SET list as an associative array. column => value');
+                throw new \Exception('You must pass a value, or provide the SET list as an associative array. column => value');
             } else {
                 foreach ($fieldOrArray as $field => $value) {
                     $this->statements['SET'][$field] = $value;

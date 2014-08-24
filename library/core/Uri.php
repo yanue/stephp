@@ -73,6 +73,12 @@ final class Uri extends Dispatcher
         return $len % 2 == 1 ? $params[$len - 1] : null;
     }
 
+    public function getMvcUri()
+    {
+        $moduleUri = $this->getModule() ? $this->getModule() . '/' : '';
+        return $moduleUri . $this->getController() . '/' . $this->getAction();
+    }
+
     /**
      * 获取url中?后面query部分(a=b&c=d)的值
      * --说明:当怕怕path部分的数量为单数,则以key=val匹配后剩下的最后一个path参数key

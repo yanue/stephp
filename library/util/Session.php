@@ -85,7 +85,7 @@ class Session
      * @return sring|int|array
      */
 
-    public function get($name, $default = '')
+    public static function get($name, $default = '')
     {
         return (isset($_SESSION[$name]) ? $_SESSION[$name] : $default);
     }

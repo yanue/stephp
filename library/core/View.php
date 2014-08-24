@@ -200,7 +200,7 @@ class View
      */
     public function get($_name, $default = null, $filter = NULL)
     {
-        $data = isset($_GET[$_name]) ? trim($_GET[$_name]) : $default;
+        $data = isset($_GET[$_name]) ? $_GET[$_name] : $default;
         if (!is_null($data) && is_int($filter) && $filter > 0) {
             return filter_var($data, $filter);
         } else {
@@ -218,7 +218,7 @@ class View
      */
     public function post($_name, $default = null, $filter = NULL)
     {
-        $data = isset($_POST[$_name]) ? trim($_POST[$_name]) : $default;
+        $data = isset($_POST[$_name]) ? $_POST[$_name] : $default;
         if (!is_null($data) && is_int($filter) && $filter > 0) {
             return filter_var($data, $filter);
         } else {
@@ -235,7 +235,7 @@ class View
      */
     public function request($_name, $default = null, $filter = NULL)
     {
-        $data = isset($_REQUEST[$_name]) ? trim($_REQUEST[$_name]) : $default;
+        $data = isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
         if (!is_null($data) && is_int($filter) && $filter > 0) {
             return filter_var($data, $filter);
         } else {

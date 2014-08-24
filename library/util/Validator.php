@@ -35,7 +35,7 @@ class Validator
      * @param $username
      * @return array|int
      */
-    public function validUsername($username)
+    public static function validUsername($username)
     {
         if (strlen($username) > 16 || strlen($username) < 5) {
             return ERROR_USER_IS_INVALID;
@@ -52,7 +52,7 @@ class Validator
      * @param $username
      * @return array|int
      */
-    public function validPassword($passwd)
+    public static function validPassword($passwd)
     {
         if (strlen($passwd) > 16 || strlen($passwd) < 6) {
             return ERROR_PASSWD_IS_INVALID;
@@ -67,7 +67,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateNumeric($value)
+    public static function validateNumeric($value)
     {
         return is_numeric($value);
     }
@@ -80,7 +80,7 @@ class Validator
      * @param  array $parameters
      * @return bool
      */
-    public function validateIn($value, $parameters)
+    public static function validateIn($value, $parameters)
     {
         return in_array($value, $parameters);
     }
@@ -93,7 +93,7 @@ class Validator
      * @param  array $parameters
      * @return bool
      */
-    public function validateNotIn($value, $parameters)
+    public static function validateNotIn($value, $parameters)
     {
         return !in_array($value, $parameters);
     }
@@ -106,7 +106,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateIp($value)
+    public static function validateIp($value)
     {
         return filter_var($value, FILTER_VALIDATE_IP) !== false;
     }
@@ -118,7 +118,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validEmail($value)
+    public static function validEmail($value)
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
@@ -130,7 +130,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateUrl($value)
+    public static function validateUrl($value)
     {
         return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
@@ -142,7 +142,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateActiveUrl($value)
+    public static function validateActiveUrl($value)
     {
         $url = str_replace(array('http://', 'https://', 'ftp://'), '', strtolower($value));
 
@@ -188,7 +188,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateAlpha($value)
+    public static function validateAlpha($value)
     {
         return preg_match('/^([a-z])+$/i', $value);
     }
@@ -200,7 +200,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateAlphaNum($value)
+    public static function validateAlphaNum($value)
     {
         return preg_match('/^([a-z0-9])+$/i', $value);
     }
@@ -212,7 +212,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateAlphaDash($value)
+    public static function validateAlphaDash($value)
     {
         return preg_match('/^([a-z0-9_-])+$/i', $value);
     }
@@ -225,7 +225,7 @@ class Validator
      * @param  array $parameters
      * @return bool
      */
-    public function validateRegex($value, $parameters)
+    public static function validateRegex($value, $parameters)
     {
         return preg_match($parameters[0], $value);
     }
@@ -237,7 +237,7 @@ class Validator
      * @param  mixed $value
      * @return bool
      */
-    public function validateDate($value)
+    public static function validateDate($value)
     {
         if ($value instanceof DateTime) return true;
 
@@ -256,7 +256,7 @@ class Validator
      * @param  array $parameters
      * @return bool
      */
-    public function validateDateFormat($value, $parameters)
+    public static function validateDateFormat($value, $parameters)
     {
         $parsed = date_parse_from_format($parameters[0], $value);
 
@@ -278,5 +278,16 @@ class Validator
         } else {
             return strtotime($value) < $date;
         }
+    }
+
+    public static function validateAliasName($name)
+    {
+        if (strlen($name) > 20 || strlen($name) < 1) {
+            return false;
+        }
+        if (preg_match('/^([a-z]+)([0-9a-zA-Z_-]+)$/i', $name) == 0) {
+            return false;
+        };
+        return true;
     }
 }

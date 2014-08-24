@@ -2,11 +2,11 @@
 namespace Library;
 
 use Library\Core\Config;
+use Library\Core\Debug;
 use Library\Core\Dispatcher;
 use Library\Core\Exception;
 use Library\Core\Loader;
 use Library\Core\Router;
-use Library\Core\Debug;
 
 define('VERSION', '2.1.0');
 
@@ -132,12 +132,12 @@ class Bootstrap
             } else {
                 Debug::log("Action does not exists:" . $_namespaceClass . '->' . $actionName . '()');
                 # 方法是否存在404处理
-                $this->_error(' : action is not exists');
+                $this->_error(' : action is not exists', $module);
             }
         } else {
             Debug::log("Controller does not exists:" . $_namespaceClass);
             // 控制器不存在404错误处理
-            $this->_error(' : controller is not exists');
+            $this->_error(' : controller is not exists', $module);
         }
     }
 
@@ -148,7 +148,7 @@ class Bootstrap
      * --判断默认module下ErrorController->indexAction是否存在
      *
      */
-    private function _error($msg = '')
+    private function _error($msg = '', $module)
     {
         // if ajax
         $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'XMLHttpRequest';
@@ -161,7 +161,7 @@ class Bootstrap
             $GLOBALS['_error_404'] = true; // set error for tpl
         } else {
             // 默认以当前默认module下的ErrorController作为错误显示页面
-            $module = Config::getBase('module');
+            $module = $module ? $module : Config::getBase('module');
             $_namespaceClass = '\App\\' . ucfirst($module) . '\Controller\\' . 'ErrorController';
             $action = 'indexAction';
             // 模块方式输出,还是直接输出错误信息

@@ -105,12 +105,11 @@ class Cookie
     static public function del($name, $path = '/', $domain = false, $remove_from_global = true)
     {
         $retval = false;
-        if (!headers_sent())
-        {
+        if (!headers_sent()) {
             if ($domain === false) {
-                $domain = $_SERVER['HTTP_HOST']!='localhost' ? $_SERVER['HTTP_HOST'] : '';
+                $domain = $_SERVER['HTTP_HOST'] != 'localhost' ? $_SERVER['HTTP_HOST'] : '';
             }
-            if(!empty($domain)) {
+            if (!empty($domain)) {
                 $domain = explode('.', $domain);
                 $domain = array_reverse($domain);
                 $ext = current($domain);

@@ -106,6 +106,27 @@ class Config
     }
 
     /**
+     * 获取site->config配置文件信息
+     *
+     * @param
+     *            $file
+     * @param
+     *            $key
+     * @return null string
+     */
+    public static function getSite($file, $key = null)
+    {
+        $full_file = WEB_ROOT . '/config/' . $file . '.php';
+        if (!isset(self::$settings ['config'] [$file])) {
+            self::$settings ['config'] [$file] = include($full_file);
+        }
+        if (!$key) {
+            return self::$settings ['config'] [$file];
+        }
+        return isset (self::$settings ['config'] [$file] [$key]) ? self::$settings ['config'] [$file] [$key] : null;
+    }
+
+    /**
      * 获取app->router路由信息
      *
      * @return string

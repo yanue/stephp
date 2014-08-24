@@ -20,6 +20,8 @@ class Router
      */
     private $routes = null;
 
+    public static $originalSegment = null;
+
     /**
      *
      */
@@ -45,7 +47,7 @@ class Router
     function _parse_routes()
     {
         // Turn the segment array into a URI string
-        $uri = $this->request->getPath();
+        self::$originalSegment = $uri = $this->request->getPath();
 
         // 直接匹配
         // Is there a literal match?  If so we're done

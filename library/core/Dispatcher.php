@@ -1,8 +1,6 @@
 <?php
 namespace Library\Core;
 
-use Library\Core\Debug;
-
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
