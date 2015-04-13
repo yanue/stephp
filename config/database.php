@@ -3,7 +3,7 @@
 return array(
     'db.defaultSqlDriver' => 'mysql',
     'db.drivers.mysql' => array(
-        'host' => '74.207.233.207', //host address
+        'host' => '115.29.224.30', //host address
         'port' => 3306, // db server port
         'user' => 'yanue', // user name for dbms
         'pass' => 'Typo@123', // pass word for dbms
