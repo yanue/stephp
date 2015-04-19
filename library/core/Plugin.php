@@ -9,7 +9,9 @@
 namespace Library\Core;
 
 
-class Plugin
+use Library\Di\Injectable;
+
+class Plugin extends Injectable
 {
 
 } 

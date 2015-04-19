@@ -9,6 +9,7 @@
 namespace Library\Core;
 
 
-class Response {
+class Response
+{
 
 } 

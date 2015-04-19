@@ -1,13 +1,11 @@
 <?php
 namespace Library\Core;
 
-use Library\Fluent\FluentPDO;
-use Library\Fluent\SelectQuery;
+use Library\Db\FluentPDO;
 
 
 class PDOModel extends FluentPDO
 {
-
     public $table = '';
     public $tableQuantity = 1;
     public $lastInsertId = -1;
@@ -242,39 +240,9 @@ class PDOModel extends FluentPDO
         return $this->isExists;
     }
 
-
-    /**
-     * @param SelectQuery $query
-     * @param array $field
-     * @param Page $page
-     * @return NULL|unknown
-     */
-    function executeQueryByPage(SelectQuery $query, $field, Page $page = null)
-    {
-
-        $totalCount = $query->select(null)->select('count(*) as ct')->fetch('ct');
-        $page->setTotalCount($totalCount);
-        $res = array('page' => $page);
-        if ($totalCount <= 0) {
-            return $res;
-        }
-
-        $query = $query->offset($page->getFirstResult())->limit($page->getPageSize())->select(null);
-
-        foreach ($field as $fi) {
-            $query = $query->select($fi);
-        }
-
-
-        $res = $query->fetchAll();
-        $res['page'] = $page;
-
-        return $res;
-    }
-
     /**
      * 根据hash获取分表表名
-     * @param string|int $primaryKeyVal
+     * @param string|int $splitVal
      * @return string
      */
     public function getHashedTableName($splitVal)
@@ -286,7 +254,7 @@ class PDOModel extends FluentPDO
 
     /**
      * 获取表明
-     * @return string
+     * return string
      */
     public function getTable()
     {

@@ -1,6 +1,8 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\Injectable;
+
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -11,7 +13,7 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/util
  * @time     2013-07-11
  */
-class Debug
+class Debug extends Injectable
 {
 
     private static $isInitCss = false;

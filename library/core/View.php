@@ -29,25 +29,10 @@ class View extends Injectable
     private $_content = '';
 
     /**
-     * uri全局处理
-     *
-     */
-    public $uri = null;
-
-    /**
      * 初始化
      */
     public function __construct()
     {
-        $this->uri = new Uri();
-    }
-
-    /**
-     * 获取uri对象
-     */
-    public function uri()
-    {
-        return $this->uri;
     }
 
     /**
@@ -191,58 +176,4 @@ class View extends Injectable
     {
         return $this->uri->getActionUrl($uri, $setSuffix);
     }
-
-    /**
-     * http get 方法
-     *
-     * @param $_name
-     * @param null $default
-     * @param null $filter
-     * @return mixed|null|string
-     */
-    public function get($_name, $default = null, $filter = NULL)
-    {
-        $data = isset($_GET[$_name]) ? $_GET[$_name] : $default;
-        if (!is_null($data) && is_int($filter) && $filter > 0) {
-            return filter_var($data, $filter);
-        } else {
-            return $data;
-        }
-    }
-
-    /**
-     * http post 方法
-     *
-     * @param $_name
-     * @param null $default
-     * @param null $filter
-     * @return mixed|null|string
-     */
-    public function post($_name, $default = null, $filter = NULL)
-    {
-        $data = isset($_POST[$_name]) ? $_POST[$_name] : $default;
-        if (!is_null($data) && is_int($filter) && $filter > 0) {
-            return filter_var($data, $filter);
-        } else {
-            return $data;
-        }
-    }
-
-    /**
-     * http request 方法
-     * @param $_name
-     * @param null $default
-     * @param null $filter
-     * @return mixed|null|string
-     */
-    public function request($_name, $default = null, $filter = NULL)
-    {
-        $data = isset($_REQUEST[$_name]) ? $_REQUEST[$_name] : $default;
-        if (!is_null($data) && is_int($filter) && $filter > 0) {
-            return filter_var($data, $filter);
-        } else {
-            return $data;
-        }
-    }
-
 }

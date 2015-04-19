@@ -1,6 +1,8 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\Singleton;
+
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -11,7 +13,7 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Request
+class Request extends Singleton
 {
 
     /**
@@ -44,7 +46,7 @@ class Request
     private static $_requestQuery = null;
 
     /**
-     * uri中path部分
+     * @var string uri中path部分
      */
     private static $_requestPath = null;
 

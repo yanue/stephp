@@ -3,9 +3,8 @@
 namespace Model;
 
 
-use Library\Core\PDOModel;
+use Library\Core\Model;
 
-class User extends PDOModel
+class User extends Model
 {
-
-} 
+}

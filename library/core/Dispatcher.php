@@ -1,6 +1,8 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\Singleton;
+
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -11,9 +13,9 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Dispatcher
+class Dispatcher extends Singleton
 {
-    public $request = null;
+    protected $request = null;
     private $_moduleName = 'home'; // 模块
     private $_controllerName = 'index'; // 控制器
     private $_actionName = 'index'; // 方法

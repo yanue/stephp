@@ -13,7 +13,7 @@ namespace Library\Core;
  * Class Exception
  * @package Library\Core
  */
-class Exception
+class Exception extends \Exception
 {
     private static $isInitErrinfo = false;
 

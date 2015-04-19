@@ -2,9 +2,7 @@
 
 namespace Library\Core;
 
-use Library\Fluent\FluentPDO;
-use PDO;
-use PDOException;
+use Library\Db\FluentPDO;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -16,108 +14,117 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Model
+abstract class Model extends FluentPDO
 {
-    public $errmsg = null;
-    public $errcode = null;
-    public $db = null;
-    public $_pdo = null;
+    private static $pdo = null;
 
-    /**
-     * 初始化模型
-     *
-     * @param string $db_type
-     * @param string $db_host
-     * @param string $db_port
-     * @param string $db_name
-     * @param string $db_user
-     * @param string $db_pass
-     */
-    public function __construct($db_type = '', $db_host = '', $db_port = '', $db_name = '', $db_user = '', $db_pass = '')
+    public function __construct()
     {
-        // replace default settings
-        $this->db_type = $db_type;
-        $this->db_host = $db_host;
-        $this->db_port = $db_port;
-        $this->db_name = $db_name;
-        $this->db_user = $db_user;
-        $this->db_pass = $db_pass;
-        $this->init();
-        $this->conn();
-        $this->db = new FluentPDO($this->_pdo);
-    }
+        if (!self::$pdo instanceof \PDO) {
+            $dbType = Config::getSite('database', 'db.defaultSqlDriver');
+            if (empty($dbType)) {
+                $dbType = 'mysql';
+            }
+            $config = Config::getSite('database', 'db.drivers.' . $dbType);
 
-    public function conn()
-    {
-        // Set DSN
-        // Set options
-        $options = array(
-            PDO::MYSQL_ATTR_INIT_COMMAND => 'set names \'utf8\'',
-            PDO::ATTR_PERSISTENT => true, # ?
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
-        );
-        // Create a new PDO instanace
-        try {
-            $dsn = $this->db_type . ':dbname=' . $this->db_name . ';host=' . $this->db_host . ';port=' . $this->db_port;
-            $this->_pdo = new PDO($dsn, $this->db_user, $this->db_pass, $options);
-        } catch (PDOException $e) { // Catch any errors
-            echo $this->errmsg = $e->getMessage();
-            echo $this->errcode = $e->getCode();
+            $db_port = isset($config['port']) ? $config['port'] : '3306';
+            $db_host = $config['host'];
+            $db_name = isset($this->database) && !empty($this->database) ? $this->database : $config['name'];
+            $db_user = $config['user'];
+            $db_pass = $config['pass'];
+
+            $options = array(
+// 	            \PDO::MYSQL_ATTR_INIT_COMMAND    => 'set names \'utf8\'',
+                \PDO::ATTR_PERSISTENT => false, # ?
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
+            );
+            // Create a new PDO instanace
+            try {
+                $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
+                self::$pdo = new \PDO($dsn, $db_user, $db_pass, $options);
+                self::$pdo->exec('set names \'utf8\'');
+            } catch (\PDOException $e) { // Catch any errors
+                self::$pdo = null;
+                $this->errmsg = $e->getMessage();
+                $this->errcode = $e->getCode();
+                Debug::log($e->getFile() . ' line ' . $e->getLine() . ":" . $e->getMessage() . "\n\t\tTrace:" . $e->getTraceAsString(), 'ERROR');
+            }
         }
-    }
 
-    /**
-     *
-     */
-    public function init()
-    {
-        $type = Config::getBase('db.type');
-        $port = Config::getBase('db.port');
-        $this->db_type = isset($type) ? $type : 'mysql';
-        $this->db_port = isset($port) ? $port : '3306';
-        $this->db_host = Config::getBase('db.host');
-        $this->db_name = Config::getBase('db.name');
-        $this->db_user = Config::getBase('db.user');
-        $this->db_pass = Config::getBase('db.pass');
-    }
-
-    // load configs file
-    public function loadConfig($file)
-    {
-        $file = LIB_PATH . 'configs/' . $file . '.php';
-        if (file_exists($file)) {
-            include_once $file;
+        if (empty($this->table)) {
+            $reflection = new \ReflectionClass($this);
+            $className = $reflection->getShortName();
+            $reflection = new \ReflectionClass($this);
+            $modelName = $reflection->getShortName();
+            $table = substr($modelName, 0, -5);
+            preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
+            $this->table = strtolower(implode('_', $matches[0]));
+            if ($this->tableQuantity <= 1) {
+                $this->trueTable = $this->table;
+            }
+            unset($modelName);
+            unset($reflection);
+            unset($table);
+            unset($matches);
         }
-    }
 
-    // load configs file
-    public function loadModel($file)
-    {
-        $file = LIB_PATH . 'model/' . ucfirst($file) . 'Model.php';
-        if (file_exists($file)) {
-            include_once $file;
+        if ($this->tableQuantity > 0 && empty($this->splitColumn)) {
+            $this->splitColumn = $this->primaryKey;
         }
+        print_r(self::$pdo);
+        return self::$pdo;
     }
 
-    public function outError($code)
+
+    public static function findFirst($parameters = null)
     {
+        echo 222;
+        print_r($parameters);
 
-        $result = array(
-            'error' => array('code' => $code, 'msg' => urlencode(getErrorMsg($code))),
-            'data' => ''
-        );
-        echo urldecode(json_encode($result));
-        exit;
     }
 
-    public function sqlError()
+    public static function find($parameters = null)
     {
-        $msg = Db::$errmsg;
-        $result = array(
-            'error' => array('code' => Db::$errcode, 'msg' => $msg),
-            'data' => ''
-        );
-        echo urldecode(json_encode($result));
-        exit;
     }
+
+    public static function fetchOne($parameters = null)
+    {
+    }
+
+    public static function fetchAll($parameters = null)
+    {
+    }
+
+    public static function query($dependencyInjector = null)
+    {
+    }
+
+    public static function count($parameters = null)
+    {
+    }
+
+    public static function sum($parameters = null)
+    {
+    }
+
+    public static function maximum($parameters = null)
+    {
+    }
+
+    public static function minimum($parameters = null)
+    {
+    }
+
+    public static function average($parameters = null)
+    {
+    }
+
+    final  public function save($data = null, $whiteList = null)
+    {
+    }
+
+    final public function create($data = null, $whiteList = null)
+    {
+    }
+
 }

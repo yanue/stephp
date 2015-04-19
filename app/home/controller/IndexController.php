@@ -8,10 +8,8 @@
  */
 namespace App\Home\Controller;
 
-use Library\Core\Application;
 use Library\Core\Controller;
-use Library\Core\Request;
-use Library\Di\DI;
+use Model\User;
 
 
 class IndexController extends Controller
@@ -19,44 +17,9 @@ class IndexController extends Controller
 
     public function indexAction()
     {
-        $di = new DI();
-        $di->request = new Request();
-        $app = new Application($di);
-        print_r($app->request->getSegments());
-        print_r($app);
-
-// ----
-        $c = new DI();
-        echo $c->bar = 'Bar';
-        $c->foo = function ($c) {
-            return new Foo($c->bar);
-        };
-
-// 从容器中取得Foo
-        $foo = $c->foo;
-        $foo->doSomething(); // Bim::doSomething|Bar::doSomething|Foo::doSomething
-
-// ----
-        $di = new DI();
-
-        $di->foo = 'Foo';
-
-        /** @var Foo $foo */
-        $foo = $di->foo;
-
-        var_dump($foo);
-        /*
-        Foo#10 (1) {
-          private $bar =>
-          class Bar#14 (1) {
-            private $bim =>
-            class Bim#16 (0) {
-            }
-          }
-        }
-        */
-
-        $foo->doSomething(); // Bim::doSomething|Bar::doSomething|Foo::doSomething
+        //
+        User::findFirst();
+        $user = new User();
     }
 
     public function testAction()
@@ -80,46 +43,5 @@ class IndexController extends Controller
     {
         echo 'regx action';
         echo $this->uri->getParam('id');
-    }
-}
-
-
-class Bim
-{
-    public function doSomething()
-    {
-        echo __METHOD__, '|';
-    }
-}
-
-class Bar
-{
-    private $bim;
-
-    public function __construct(Bim $bim)
-    {
-        $this->bim = $bim;
-    }
-
-    public function doSomething()
-    {
-        $this->bim->doSomething();
-        echo __METHOD__, '|';
-    }
-}
-
-class Foo
-{
-    private $bar;
-
-    public function __construct(Bar $bar)
-    {
-        $this->bar = $bar;
-    }
-
-    public function doSomething()
-    {
-        $this->bar->doSomething();
-        echo __METHOD__;
     }
 }
