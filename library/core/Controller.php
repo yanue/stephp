@@ -36,8 +36,5 @@ class Controller extends Injectable
      */
     public function __construct()
     {
-//        $this->controller = $this->dispatcher->getController();
-//        $this->getAction = $this->dispatcher->getAction();
-//        $this->module = $this->dispatcher->getModule();
     }
 }

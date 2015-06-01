@@ -1,7 +1,7 @@
 <?php
 namespace Library\Core;
 
-use Library\Di\Singleton;
+use Library\Di\Injectable;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -13,9 +13,8 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Dispatcher extends Singleton
+class Dispatcher extends Injectable
 {
-    protected $request = null;
     private $_moduleName = 'home'; // 模块
     private $_controllerName = 'index'; // 控制器
     private $_actionName = 'index'; // 方法
@@ -28,10 +27,10 @@ class Dispatcher extends Singleton
      * 初始化请求
      *
      */
-    public function __construct()
+    public function __construct($di)
     {
+        $this->setDI($di);
         $this->_appPath = WEB_ROOT . '/app';
-        $this->request = new Request();
         $this->parseMvc(); // url解析mvc
 
         $this->requestParam(); // 合并请求进行组合

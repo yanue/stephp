@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>hello world - stephp</title>
 </head>
-<sc</scropt>http://map.yanue.net/gpsApi.php?lat=22.502412986242&lng=113.93832783228
 <body>
 <?php
     $this->render('header');
@@ -13,6 +12,5 @@
     echo '<hr>';
     $this->render('footer');
 ?>
-aaaa
 </body>
 </html>

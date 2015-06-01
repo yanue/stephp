@@ -15,15 +15,6 @@ final class Uri extends Dispatcher
 {
 
     /**
-     * 初始化
-     *
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * 获取url中匹配key的值
      * --说明: 可以通过key获取包含path部分和?后面的query部分以key=>val结构的val
      *  -例http://localhost/mvc/index/index/te/ed/test/a/p/2/a.html?c=d 通过te可以获取ed,c获取d

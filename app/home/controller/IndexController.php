@@ -17,9 +17,7 @@ class IndexController extends Controller
 
     public function indexAction()
     {
-        //
-        User::findFirst();
-        $user = new User();
+        $this->view->setLayout('layout');
     }
 
     public function testAction()

@@ -31,8 +31,9 @@ class View extends Injectable
     /**
      * 初始化
      */
-    public function __construct()
+    public function __construct($di)
     {
+        $this->setDI($di);
     }
 
     /**
