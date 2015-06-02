@@ -1,6 +1,7 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\DI;
 use Library\Di\Injectable;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
@@ -27,9 +28,9 @@ class Dispatcher extends Injectable
      * 初始化请求
      *
      */
-    public function __construct($di)
+    public function __construct()
     {
-        $this->setDI($di);
+        $this->setDI(new DI());
         $this->_appPath = WEB_ROOT . '/app';
         $this->parseMvc(); // url解析mvc
 

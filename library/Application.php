@@ -125,7 +125,7 @@ class Application extends Injectable
         }
 
         // 执行分发过程,获取mvc结构
-        $disp = new Dispatcher($this->di);
+        $disp = new Dispatcher();
 
         $controller = $disp->getController();
         $action = $disp->getAction();
@@ -139,7 +139,7 @@ class Application extends Injectable
         if (class_exists($_namespaceClass, true)) {
             $controllerObj = new $_namespaceClass();
             if (method_exists($controllerObj, $actionName)) {
-                $controllerObj->setDI($this->di);
+                $controllerObj->setDI(new DI());
                 //执行action预处理方法
                 if (method_exists($controllerObj, 'actionBefore')) {
                     $controllerObj->actionBefore();

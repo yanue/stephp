@@ -10,27 +10,31 @@ namespace App\Home\Controller;
 
 use Library\Core\Controller;
 use Model\UserModel;
+use service\UserManager;
 
 
 class IndexController extends Controller
 {
     public function indexAction()
     {
-        $aa = $this->db->from('user')->where('id', 2);
-        $this->view->setLayout('layout');
+//        $aa = $this->db->from('user')->where('id', 2);
+//        $this->view->setLayout('layout');
+        UserManager::init()->get();
 //
 //        print_r($aa->fetch());
 //        $a = ;
 //        print_r();
-        $u = new UserModel();
-//        $b = $u->from('user')->fetch();
-//        print_r($b);
-        $a = UserModel::findFirst('', 'name');
-        print_r($a);
+//        $u = new UserModel();
+////        $b = $u->from('user')->fetch();
+////        print_r($b);
+//        $a = UserModel::findFirst('', 'name');
+//        print_r($a);
     }
 
     public function testAction()
     {
+
+        UserManager::init()->get();
 
     }
 

@@ -1,6 +1,9 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\DI;
+use Library\Di\Injectable;
+
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -11,7 +14,7 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-08-26
  */
-class Router
+class Router extends Injectable
 {
 
     /**
@@ -23,18 +26,13 @@ class Router
     public static $originalSegment = null;
 
     /**
-     *
-     */
-    private $request = null;
-
-    /**
      * 初始化
      */
     public function __construct($rules)
     {
+        $this->setDI(new DI());
         if ($rules) {
             $this->routes = $rules;
-            $this->request = new Request();
             // 解析路由
             $this->_parse_routes();
         }

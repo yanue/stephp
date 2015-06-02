@@ -60,6 +60,7 @@ class Request
      */
     public function __construct()
     {
+        echo 'request';
         # 解析url
         if (!self::$_requestUri)
             $this->parseUrl();
