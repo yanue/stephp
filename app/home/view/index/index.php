@@ -1,3 +1,4 @@
+<?php print_r($this->aa); ?>
 <p>
     hello world!  this is '<?php echo $this->uri->getController(); ?>' template view ;
 </p>

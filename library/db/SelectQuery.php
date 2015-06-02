@@ -143,7 +143,7 @@ class SelectQuery extends CommonQuery implements Countable
 
     /** Countable interface
      * doesn't break current fluentpdo select query
-     * @return
+     * @return int
      */
     public function count()
     {

@@ -63,6 +63,7 @@ class Application extends Injectable
             date_default_timezone_set(Config::getBase('timezone'));
         }
 
+        // 初始化基础服务
         $this->initService();
 
         // 最终运行控制器的方法

@@ -14,88 +14,196 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Model
+class Model extends FluentPDO
 {
-    private static $instance = null;
     /**
      * @var FluentPDO
      */
     private static $db = null;
 
-    public static function connect()
+    /**
+     * @var \PDO
+     */
+    private static $pdo = null;
+
+    /**
+     * 初始化
+     */
+    final public function __construct()
     {
-        $dbType = Config::getSite('database', 'db.defaultSqlDriver');
-        if (empty($dbType)) {
-            $dbType = 'mysql';
+        $this->connect();
+        $this->setPdo(self::$pdo);
+    }
+
+    /**
+     * 连接数据库
+     *
+     * @param null $dbType
+     * @return FluentPDO
+     */
+    final public static function connect($dbType = null)
+    {
+        if (!self::$pdo) {
+            if (empty($dbType)) {
+                $dbType = Config::getSite('database', 'db.defaultSqlDriver');
+                $dbType = $dbType ? $dbType : "mysql";
+            }
+
+            $config = Config::getSite('database', 'db.drivers.' . $dbType);
+            if (!is_array($config)) {
+                die("数据库配置错误");
+            }
+
+            $db_port = isset($config['port']) ? $config['port'] : '3306';
+            $db_host = $config['host'];
+            $db_name = $config['name'];
+            $db_user = $config['user'];
+            $db_pass = $config['pass'];
+
+            $options = array(
+                \PDO::ATTR_PERSISTENT => false, # ?
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
+            );
+
+            $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
+            $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
+            $pdo->exec('set names \'utf8\'');
+
+            $fpdo = new FluentPDO($pdo);
+
+            self::$db = $fpdo;
+            self::$pdo = $pdo;
         }
-        $config = Config::getSite('database', 'db.drivers.' . $dbType);
 
-        $db_port = isset($config['port']) ? $config['port'] : '3306';
-        $db_host = $config['host'];
-        $db_name = $config['name'];
-        $db_user = $config['user'];
-        $db_pass = $config['pass'];
-
-        $options = array(
-            \PDO::ATTR_PERSISTENT => false, # ?
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
-        );
-
-        $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
-        $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
-        $pdo->exec('set names \'utf8\'');
-        $fpdo = new FluentPDO($pdo);
-        self::$db = $fpdo;
-        return $fpdo;
+        return self::$db;
     }
 
-    public function __construct()
+    /**
+     * 获取表名
+     *
+     * @return string
+     */
+    final  protected static function table()
     {
-
+        $reflection = new \ReflectionClass(get_called_class());
+        $modelName = $reflection->getShortName();
+        $table = substr($modelName, 0, -5);
+        preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
+        $table = strtolower(implode('_', $matches[0]));
+        unset($modelName);
+        unset($reflection);
+        unset($matches);
+        return $table;
     }
 
-    public static function findFirst($parameters = null)
-    {
-        return self::$db->from('user')->fetch();
-    }
 
-    public static function getInstance()
+    /**
+     * 获取一条数据
+     *
+     * @param null $where
+     * @param null $columns
+     * @param null $sort
+     * @return mixed
+     */
+    final public static function findFirst($where = null, $columns = null, $sort = null)
     {
-        if (!self::$instance) {
-
+        $query = self::$db->from(self::table());
+        if ($where) {
+            $query = $query->where($where);
+        }
+        if ($columns) {
+            $query->select(null)->select($columns);
+        }
+        if ($sort) {
+            $query = $query->orderBy($sort);
         }
 
-        return self::$instance;
+        return $query->fetch();
     }
 
-    public static function find($parameters = null)
+    /**
+     * 获取所有数据
+     *
+     * @param null $where
+     * @param null $columns
+     * @param null $sort
+     * @return array
+     */
+    final public static function all($where = null, $columns = null, $sort = null)
     {
+        $query = self::$db->from(self::table());
+        if ($where) {
+            $query = $query->where($where);
+        }
+        if ($columns) {
+            $query->select(null)->select($columns);
+        }
+        if ($sort) {
+            $query = $query->orderBy($sort);
+        }
 
+        return $query->fetchAll();
     }
 
-    public static function model()
+    /**
+     * 获取所有数据
+     *
+     * @param null $where
+     * @param null $sort
+     * @param int $page
+     * @param int $limit
+     * @return array
+     */
+    final public static function find($where = null, $sort = null, $page = 0, $limit = 10)
     {
+        $query = self::$db->from(self::table());
+        if ($where) {
+            $query = $query->where($where);
+        }
+        if ($sort) {
+            $query = $query->orderBy($sort);
+        }
 
+        if (is_numeric($page) && is_numeric($limit)) {
+            $_where_page = $page <= 0 ? 0 : $page;
+            $where_limit = sprintf("%s, %s", $_where_page * $limit, $limit);
+            $query = $query->limit($where_limit);
+        }
+
+        return $query->fetchAll();
     }
 
-    public static function fetchOne($parameters = null)
+    /**
+     * sql查询
+     *
+     * @param $sql
+     * @return mixed
+     */
+    final public static function fetchOne($sql)
     {
+        return self::$db->getPdo()->query($sql)->fetch();
     }
 
-    public static function fetchAll($parameters = null)
+    /**
+     * sql批量查询
+     *
+     * @param $sql
+     * @return array
+     */
+    final public static function fetchAll($sql)
     {
+        return self::$db->getPdo()->query($sql)->fetchAll();
     }
 
-    public static function query($dependencyInjector = null)
+    /**
+     * 统计数量
+     *
+     * @param $where
+     * @return int
+     */
+    final public static function count($where)
     {
-    }
-
-    public static function count($parameters = null)
-    {
-    }
-
-    public static function sum($parameters = null)
-    {
+        return self::$db->from(self::table())->where($where)->count();
     }
 
     public static function maximum($parameters = null)
@@ -110,19 +218,52 @@ class Model
     {
     }
 
-    /**  PHP 5.3.0之后版本  */
-    public static function __callStatic($name, $arguments)
-    {
-        // 注意: $name 的值区分大小写
-        echo "Calling static method '$name' "
-            . implode(', ', $arguments) . "\n";
-    }
-
-    final  public function save($data = null, $whiteList = null)
+    final public function save($data = null, $whiteList = null)
     {
     }
 
-    final public function create($data = null, $whiteList = null)
+    /**
+     * 删除数据
+     *
+     * @param $where
+     * @return bool|\PDOStatement
+     */
+    final public static function del($where)
     {
+        if ($where) {
+            return self::$db->deleteFrom(self::table())->where($where)->execute();
+        }
+        return false;
+    }
+
+    /**
+     * 更新数据
+     *
+     * @param $data
+     * @param $where
+     * @return bool|\PDOStatement
+     * @throws Exception
+     */
+    final public static function update($data, $where)
+    {
+        if ($where) {
+            return self::$db->updateFrom(self::table())->set($data)->where($where)->execute();
+        }
+        return false;
+    }
+
+    /**
+     * 插入新数据
+     *
+     * @param $data
+     * @return bool|int
+     */
+    final public static function create($data)
+    {
+        if ($data) {
+            $lastId = self::$db->insertInto(self::table(), $data)->execute();
+            return $lastId;
+        }
+        return false;
     }
 }

@@ -6,11 +6,12 @@
 </head>
 <body>
 <?php
-    $this->render('header');
-    echo '<hr>';
-    $this->content();
-    echo '<hr>';
-    $this->render('footer');
+$this->aa = 'ss';
+$this->render('header');
+echo '<hr>';
+$this->content();
+echo '<hr>';
+$this->render('footer');
 ?>
 </body>
 </html>

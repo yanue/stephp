@@ -9,7 +9,7 @@
 namespace App\Home\Controller;
 
 use Library\Core\Controller;
-use Model\User;
+use Model\UserModel;
 
 
 class IndexController extends Controller
@@ -17,11 +17,16 @@ class IndexController extends Controller
     public function indexAction()
     {
         $aa = $this->db->from('user')->where('id', 2);
-
-        print_r($aa->fetch());
-        $a = User::findFirst();
+        $this->view->setLayout('layout');
+//
+//        print_r($aa->fetch());
+//        $a = ;
+//        print_r();
+        $u = new UserModel();
+//        $b = $u->from('user')->fetch();
+//        print_r($b);
+        $a = UserModel::findFirst('', 'name');
         print_r($a);
-
     }
 
     public function testAction()

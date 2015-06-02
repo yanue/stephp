@@ -52,7 +52,7 @@ class FluentPDO
      *
      * @param string $table
      * @param array $values you can add one or multi rows array @see docs
-     * @return \InsertQuery
+     * @return InsertQuery
      */
     public function insertInto($table, $values = array())
     {
@@ -66,28 +66,12 @@ class FluentPDO
      * @param array|string $set
      * @param string $primaryKey
      *
-     * @return \UpdateQuery
+     * @return UpdateQuery
      */
-    public function update($table, $set = array(), $primaryKey = null)
+    public function updateFrom($table, $set = array(), $primaryKey = null)
     {
         $query = new UpdateQuery($this, $table);
         $query->set($set);
-        if ($primaryKey) {
-            $primaryKeyName = $this->getStructure()->getPrimaryKey($table);
-            $query = $query->where($primaryKeyName, $primaryKey);
-        }
-        return $query;
-    }
-
-    /** Create DELETE query
-     *
-     * @param string $table
-     * @param string $primaryKey delete only row by primary key
-     * @return \DeleteQuery
-     */
-    public function delete($table, $primaryKey = null)
-    {
-        $query = new DeleteQuery($this, $table);
         if ($primaryKey) {
             $primaryKeyName = $this->getStructure()->getPrimaryKey($table);
             $query = $query->where($primaryKeyName, $primaryKey);
@@ -99,12 +83,16 @@ class FluentPDO
      *
      * @param string $table
      * @param string $primaryKey
-     * @return \DeleteQuery
+     * @return DeleteQuery
      */
     public function deleteFrom($table, $primaryKey = null)
     {
-        $args = func_get_args();
-        return call_user_func_array(array($this, 'delete'), $args);
+        $query = new DeleteQuery($this, $table);
+        if ($primaryKey) {
+            $primaryKeyName = $this->getStructure()->getPrimaryKey($table);
+            $query = $query->where($primaryKeyName, $primaryKey);
+        }
+        return $query;
     }
 
     /** @return \PDO
@@ -114,7 +102,14 @@ class FluentPDO
         return $this->pdo;
     }
 
-    /** @return \FluentStructure
+    /** @return \PDO
+     */
+    public function setPdo($pdo)
+    {
+        return $this->pdo = $pdo;
+    }
+
+    /** @return FluentStructure
      */
     public function getStructure()
     {
