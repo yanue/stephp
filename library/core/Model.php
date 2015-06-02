@@ -14,77 +14,68 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-abstract class Model extends FluentPDO
+class Model
 {
-    private static $pdo = null;
+    private static $instance = null;
+    /**
+     * @var FluentPDO
+     */
+    private static $db = null;
+
+    public static function connect()
+    {
+        $dbType = Config::getSite('database', 'db.defaultSqlDriver');
+        if (empty($dbType)) {
+            $dbType = 'mysql';
+        }
+        $config = Config::getSite('database', 'db.drivers.' . $dbType);
+
+        $db_port = isset($config['port']) ? $config['port'] : '3306';
+        $db_host = $config['host'];
+        $db_name = $config['name'];
+        $db_user = $config['user'];
+        $db_pass = $config['pass'];
+
+        $options = array(
+            \PDO::ATTR_PERSISTENT => false, # ?
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
+        );
+
+        $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
+        $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
+        $pdo->exec('set names \'utf8\'');
+        $fpdo = new FluentPDO($pdo);
+        self::$db = $fpdo;
+        return $fpdo;
+    }
 
     public function __construct()
     {
-        if (!self::$pdo instanceof \PDO) {
-            $dbType = Config::getSite('database', 'db.defaultSqlDriver');
-            if (empty($dbType)) {
-                $dbType = 'mysql';
-            }
-            $config = Config::getSite('database', 'db.drivers.' . $dbType);
 
-            $db_port = isset($config['port']) ? $config['port'] : '3306';
-            $db_host = $config['host'];
-            $db_name = isset($this->database) && !empty($this->database) ? $this->database : $config['name'];
-            $db_user = $config['user'];
-            $db_pass = $config['pass'];
-
-            $options = array(
-// 	            \PDO::MYSQL_ATTR_INIT_COMMAND    => 'set names \'utf8\'',
-                \PDO::ATTR_PERSISTENT => false, # ?
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
-            );
-            // Create a new PDO instanace
-            try {
-                $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
-                self::$pdo = new \PDO($dsn, $db_user, $db_pass, $options);
-                self::$pdo->exec('set names \'utf8\'');
-            } catch (\PDOException $e) { // Catch any errors
-                self::$pdo = null;
-                $this->errmsg = $e->getMessage();
-                $this->errcode = $e->getCode();
-                Debug::log($e->getFile() . ' line ' . $e->getLine() . ":" . $e->getMessage() . "\n\t\tTrace:" . $e->getTraceAsString(), 'ERROR');
-            }
-        }
-
-        if (empty($this->table)) {
-            $reflection = new \ReflectionClass($this);
-            $className = $reflection->getShortName();
-            $reflection = new \ReflectionClass($this);
-            $modelName = $reflection->getShortName();
-            $table = substr($modelName, 0, -5);
-            preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
-            $this->table = strtolower(implode('_', $matches[0]));
-            if ($this->tableQuantity <= 1) {
-                $this->trueTable = $this->table;
-            }
-            unset($modelName);
-            unset($reflection);
-            unset($table);
-            unset($matches);
-        }
-
-        if ($this->tableQuantity > 0 && empty($this->splitColumn)) {
-            $this->splitColumn = $this->primaryKey;
-        }
-        print_r(self::$pdo);
-        return self::$pdo;
     }
-
 
     public static function findFirst($parameters = null)
     {
-        echo 222;
-        print_r($parameters);
+        return self::$db->from('user')->fetch();
+    }
 
+    public static function getInstance()
+    {
+        if (!self::$instance) {
+
+        }
+
+        return self::$instance;
     }
 
     public static function find($parameters = null)
     {
+
+    }
+
+    public static function model()
+    {
+
     }
 
     public static function fetchOne($parameters = null)
@@ -119,6 +110,14 @@ abstract class Model extends FluentPDO
     {
     }
 
+    /**  PHP 5.3.0之后版本  */
+    public static function __callStatic($name, $arguments)
+    {
+        // 注意: $name 的值区分大小写
+        echo "Calling static method '$name' "
+            . implode(', ', $arguments) . "\n";
+    }
+
     final  public function save($data = null, $whiteList = null)
     {
     }
@@ -126,5 +125,4 @@ abstract class Model extends FluentPDO
     final public function create($data = null, $whiteList = null)
     {
     }
-
 }

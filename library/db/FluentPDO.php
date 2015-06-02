@@ -34,7 +34,7 @@ class FluentPDO
     /** Create SELECT query from $table
      * @param string $table db table name
      * @param integer $primaryKey return one row by primary key
-     * @return \SelectQuery
+     * @return SelectQuery
      */
     public function from($table, $primaryKey = null)
     {

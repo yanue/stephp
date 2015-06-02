@@ -1,8 +1,8 @@
 <?php
 namespace Library\Core;
 
-use Library\Db\FluentPDO;
 
+use Library\Fluent\FluentPDO;
 
 class PDOModel extends FluentPDO
 {

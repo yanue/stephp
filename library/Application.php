@@ -6,6 +6,7 @@ use Library\Core\Debug;
 use Library\Core\Dispatcher;
 use Library\Core\Exception;
 use Library\Core\Loader;
+use Library\Core\Model;
 use Library\Core\Request;
 use Library\Core\Router;
 use Library\Core\Uri;
@@ -13,10 +14,11 @@ use Library\Core\View;
 use Library\Di\DI;
 use Library\Di\Injectable;
 
-define('VERSION', '2.1.0');
+define('VERSION', '2.2.0');
 
 defined('LIB_PATH') || define('LIB_PATH', dirname(__FILE__));
 defined('WEB_ROOT') || define('WEB_ROOT', dirname(__FILE__) . '/..');
+
 require_once LIB_PATH . '/di/Injectable.php';
 
 /**
@@ -74,6 +76,7 @@ class Application extends Injectable
         $di->bind('uri', new Uri($di));
         $di->bind('view', new View($di));
         $this->view = $di->get('view');
+        $di->bind('db', Model::connect());
         $this->di = $di;
     }
 

@@ -23,17 +23,12 @@ abstract class Injectable
     protected $view;
 
     /**
-     * @var \Library\Core\Response
-     */
-    protected $response;
-
-    /**
      * @var \Library\Util\Session
      */
     protected $session;
 
     /**
-     * @var \Library\Core\Model
+     * @var \Library\Db\FluentPDO
      */
     protected $db;
 
@@ -44,6 +39,7 @@ abstract class Injectable
         $this->request = $dependencyInjector->get('request');
         $this->uri = $dependencyInjector->get('uri');
         $this->view = $dependencyInjector->get('view');
+        $this->db = $dependencyInjector->get('db');
     }
 
     public function getDI()

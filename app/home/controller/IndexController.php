@@ -14,10 +14,14 @@ use Model\User;
 
 class IndexController extends Controller
 {
-
     public function indexAction()
     {
-        $this->view->setLayout('layout');
+        $aa = $this->db->from('user')->where('id', 2);
+
+        print_r($aa->fetch());
+        $a = User::findFirst();
+        print_r($a);
+
     }
 
     public function testAction()
