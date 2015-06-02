@@ -1,20 +1,8 @@
-<?php print_r($this->aa); ?>
-<p>
-    hello world!  this is '<?php echo $this->uri->getController(); ?>' template view ;
-</p>
-<p>
-    <?php
-    ?>
-</p>
-<p>
+<?php
+$a = array(1, 2, 3);
+foreach ($a as $_a) {
+    $this->_a = $_a;
 
-</p>
-<dl>
-    <dt>see the docs:</dt>
-    <dd>
-        <a href="http://yanue.github.io/stephp" target="_blank">http://yanue.github.io/stephp</a>
-    </dd>
-    <dd>
-        <a href="http://stephp.yanue.net/" target="_blank">http://stephp.yanue.net/docs/</a>
-    </dd>
-</dl>
+    $this->render('index/row/row');
+    ?>
+<?php } ?>

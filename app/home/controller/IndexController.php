@@ -17,9 +17,10 @@ class IndexController extends Controller
 {
     public function indexAction()
     {
+        echo $this->module;
 //        $aa = $this->db->from('user')->where('id', 2);
-//        $this->view->setLayout('layout');
-        UserManager::init()->get();
+        $this->view->setLayout('layout');
+//        UserManager::init()->get();
 //
 //        print_r($aa->fetch());
 //        $a = ;

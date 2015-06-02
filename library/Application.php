@@ -75,7 +75,7 @@ class Application extends Injectable
         $di = new DI();
         $di->bind('request', new Request());
         $di->bind('uri', new Uri($di));
-        $di->bind('view', new View($di));
+        $di->bind('view', new View());
         $this->view = $di->get('view');
         $di->bind('db', Model::connect());
         $this->di = $di;
@@ -146,7 +146,6 @@ class Application extends Injectable
                 }
                 // 执行action方法
                 try {
-                    $this->setDI($this->di);
                     $controllerObj->$actionName();
 
                     $this->view->display();

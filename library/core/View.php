@@ -1,6 +1,7 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\DI;
 use Library\Di\Injectable;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
@@ -31,9 +32,9 @@ class View extends Injectable
     /**
      * 初始化
      */
-    public function __construct($di)
+    public function __construct()
     {
-        $this->setDI($di);
+        $this->setDI(new DI());
     }
 
     /**
@@ -44,6 +45,7 @@ class View extends Injectable
      */
     public function render($name)
     {
+
         $file = $this->uri->getModulePath() . '/view/' . $name . '.php';
         if (file_exists($file)) {
             include $file;
@@ -127,54 +129,5 @@ class View extends Injectable
                 }
             }
         }
-    }
-
-    /**
-     *
-     * @param array $add_arr
-     * @param array $rm_arr
-     * @param bool $getQueryString
-     * @return string
-     */
-    public function setUrl($add_arr = array(), $rm_arr = array(), $getQueryString = false)
-    {
-        return $this->uri->setUrl($add_arr, $rm_arr, $getQueryString);
-    }
-
-    /**
-     * baseUrl映射到view上
-     *
-     */
-    public function baseUrl($uri = '', $setSuffix = true)
-    {
-        return $this->uri->baseUrl($uri, $setSuffix);
-    }
-
-    /**
-     * ControllerUrl映射到controller上
-     *
-     */
-    public function moduleUrl($uri = '', $setSuffix = true)
-    {
-        return $this->uri->getModuleUrl($uri, $setSuffix);
-    }
-
-
-    /**
-     * ControllerUrl映射到controller上
-     *
-     */
-    public function controllerUrl($uri = '', $setSuffix = true)
-    {
-        return $this->uri->getControllerUrl($uri, $setSuffix);
-    }
-
-    /**
-     * actionUrl映射到controller上
-     *
-     */
-    public function actionUrl($uri = '', $setSuffix = true)
-    {
-        return $this->uri->getActionUrl($uri, $setSuffix);
     }
 }

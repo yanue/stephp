@@ -1,6 +1,7 @@
 <?php
 namespace Library\Core;
 
+use Library\Di\DI;
 use Library\Di\Injectable;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
@@ -36,5 +37,9 @@ class Controller extends Injectable
      */
     public function __construct()
     {
+        $this->setDI(new DI());
+        $this->module = $this->uri->getModule();
+        $this->controller = $this->uri->getController();
+        $this->action = $this->uri->getAction();
     }
 }
