@@ -16,7 +16,6 @@ use PDO;
  */
 class FluentPDO
 {
-
     private $pdo, $structure;
 
     /** @var boolean|callback */

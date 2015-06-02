@@ -9,7 +9,7 @@
 namespace App\Home\Controller;
 
 use Library\Core\Controller;
-use Model\UserModel;
+use model\test\UserModel;
 use service\UserManager;
 
 
@@ -17,19 +17,20 @@ class IndexController extends Controller
 {
     public function indexAction()
     {
-        echo $this->module;
-//        $aa = $this->db->from('user')->where('id', 2);
-        $this->view->setLayout('layout');
+        $aa = $this->db->from('user')->where('id', 2)->fetch();
+        print_r($aa);
+//        $this->view->setLayout('layout');
 //        UserManager::init()->get();
 //
 //        print_r($aa->fetch());
 //        $a = ;
 //        print_r();
-//        $u = new UserModel();
-////        $b = $u->from('user')->fetch();
-////        print_r($b);
-//        $a = UserModel::findFirst('', 'name');
-//        print_r($a);
+        $u = new UserModel();
+        $b = $u->from('user')->fetch();
+        \Model\UserModel::create(array('name' => 'ss'));
+        \Model\UserModel::del(array('id' => '20'));
+        UserModel::del('id=2');
+        print_r($b);
     }
 
     public function testAction()

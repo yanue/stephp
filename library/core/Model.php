@@ -26,30 +26,32 @@ class Model extends FluentPDO
      */
     private static $pdo = null;
 
+    private static $database = null;
+
     /**
      * 初始化
      */
     final public function __construct()
     {
-        $this->connect();
-        $this->setPdo(self::$pdo);
+        self::table();
+        $this->setPdo(self::$pdo[self::$database]);
     }
 
     /**
      * 连接数据库
      *
-     * @param null $dbType
      * @return FluentPDO
      */
-    final public static function connect($dbType = null)
+    final public static function connect($database = null)
     {
-        if (!self::$pdo) {
-            if (empty($dbType)) {
-                $dbType = Config::getSite('database', 'db.defaultSqlDriver');
-                $dbType = $dbType ? $dbType : "mysql";
-            }
+        if (empty($database)) {
+            $database = Config::getSite('database', 'db.defaultSqlDriver');
+            $database = $database ? $database : "mysql";
+        }
 
-            $config = Config::getSite('database', 'db.drivers.' . $dbType);
+
+        if (empty(self::$pdo[$database])) {
+            $config = Config::getSite('database', $database);
             if (!is_array($config)) {
                 die("数据库配置错误");
             }
@@ -59,35 +61,43 @@ class Model extends FluentPDO
             $db_name = $config['name'];
             $db_user = $config['user'];
             $db_pass = $config['pass'];
+            $driver = !empty($config['driver']) ? $config['driver'] : "mysql";
 
             $options = array(
                 \PDO::ATTR_PERSISTENT => false, # ?
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
             );
 
-            $dsn = $dbType . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
+            $dsn = $driver . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
             $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
             $pdo->exec('set names \'utf8\'');
 
             $fpdo = new FluentPDO($pdo);
 
             self::$db = $fpdo;
-            self::$pdo = $pdo;
+            self::$pdo[$database] = $pdo;
+        } else {
+            self::$db = new FluentPDO(self::$pdo[$database]);
         }
 
+        self::$database = $database;
         return self::$db;
     }
 
     /**
      * 获取表名
+     * -- 根据表切换数据库
      *
      * @return string
      */
-    final  protected static function table()
+    final protected static function table()
     {
         $reflection = new \ReflectionClass(get_called_class());
-        $modelName = $reflection->getShortName();
-        $table = substr($modelName, 0, -5);
+        $defaultProp = $reflection->getDefaultProperties();
+
+        self::connect(empty($defaultProp['database']) ? '' : $defaultProp['database']);
+
+        $table = substr($reflection->getShortName(), 0, -5);
         preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
         $table = strtolower(implode('_', $matches[0]));
         unset($modelName);
@@ -107,7 +117,9 @@ class Model extends FluentPDO
      */
     final public static function findFirst($where = null, $columns = null, $sort = null)
     {
-        $query = self::$db->from(self::table());
+        // 根据表切换数据库,单独一行
+        $table = self::table();
+        $query = self::$db->from($table);
         if ($where) {
             $query = $query->where($where);
         }
@@ -131,7 +143,9 @@ class Model extends FluentPDO
      */
     final public static function all($where = null, $columns = null, $sort = null)
     {
-        $query = self::$db->from(self::table());
+        // 根据表切换数据库,单独一行
+        $table = self::table();
+        $query = self::$db->from($table);
         if ($where) {
             $query = $query->where($where);
         }
@@ -156,7 +170,9 @@ class Model extends FluentPDO
      */
     final public static function find($where = null, $sort = null, $page = 0, $limit = 10)
     {
-        $query = self::$db->from(self::table());
+        // 根据表切换数据库,单独一行
+        $table = self::table();
+        $query = self::$db->from($table);
         if ($where) {
             $query = $query->where($where);
         }
@@ -203,7 +219,9 @@ class Model extends FluentPDO
      */
     final public static function count($where)
     {
-        return self::$db->from(self::table())->where($where)->count();
+        // 根据表切换数据库,单独一行
+        $table = self::table();
+        return self::$db->from($table)->where($where)->count();
     }
 
     public static function maximum($parameters = null)
@@ -231,7 +249,9 @@ class Model extends FluentPDO
     final public static function del($where)
     {
         if ($where) {
-            return self::$db->deleteFrom(self::table())->where($where)->execute();
+            // 根据表切换数据库,单独一行
+            $table = self::table();
+            return self::$db->deleteFrom($table)->where($where)->execute();
         }
         return false;
     }
@@ -247,7 +267,9 @@ class Model extends FluentPDO
     final public static function update($data, $where)
     {
         if ($where) {
-            return self::$db->updateFrom(self::table())->set($data)->where($where)->execute();
+            // 根据表切换数据库,单独一行
+            $table = self::table();
+            return self::$db->updateFrom($table)->set($data)->where($where)->execute();
         }
         return false;
     }
@@ -261,7 +283,9 @@ class Model extends FluentPDO
     final public static function create($data)
     {
         if ($data) {
-            $lastId = self::$db->insertInto(self::table(), $data)->execute();
+            // 根据表切换数据库,单独一行
+            $table = self::table();
+            $lastId = self::$db->insertInto($table, $data)->execute();
             return $lastId;
         }
         return false;

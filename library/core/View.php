@@ -37,6 +37,11 @@ class View extends Injectable
         $this->setDI(new DI());
     }
 
+    public function setVar($key, $data)
+    {
+        $this->view->$key = $data;
+    }
+
     /**
      * render  -- to include template
      *
@@ -45,7 +50,6 @@ class View extends Injectable
      */
     public function render($name)
     {
-
         $file = $this->uri->getModulePath() . '/view/' . $name . '.php';
         if (file_exists($file)) {
             include $file;
