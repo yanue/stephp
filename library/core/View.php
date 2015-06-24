@@ -16,10 +16,15 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  */
 class View extends Injectable
 {
+    /**
+     *模板文件后缀
+     * @var string
+     */
+    private $suffix = '.phtml';
 
     /**
      * layout布局
-     *
+     * @var string
      */
     private $_layout = '';
 
@@ -29,17 +34,38 @@ class View extends Injectable
      */
     private $_content = '';
 
+
+    /**
+     * 模板变量
+     *
+     * @var array
+     */
+    private $var = array();
+    /**
+     * @var string
+     */
+    public $controller = null;
+
+    /**
+     * @var string
+     */
+    public $action = null;
+
+    /**
+     * @var string
+     */
+    public $module = null;
+
     /**
      * 初始化
      */
     public function __construct()
     {
         $this->setDI(new DI());
-    }
-
-    public function setVar($key, $data)
-    {
-        $this->view->$key = $data;
+        $this->module = $this->uri->getModule();
+        $this->controller = $this->uri->getController();
+        $this->action = $this->uri->getAction();
+        $this->view = $this;
     }
 
     /**
@@ -50,8 +76,20 @@ class View extends Injectable
      */
     public function render($name)
     {
-        $file = $this->uri->getModulePath() . '/view/' . $name . '.php';
+        $file = $this->uri->getModulePath() . '/view/' . $name . $this->suffix;
         if (file_exists($file)) {
+            extract($this->var);
+
+            include $file;
+        }
+    }
+
+    public function partial($name)
+    {
+        $file = $this->uri->getModulePath() . '/view/' . $name . $this->suffix;
+        if (file_exists($file)) {
+            extract($this->var);
+
             include $file;
         }
     }
@@ -65,7 +103,7 @@ class View extends Injectable
      */
     public function setLayout($layout = 'layout', $content = '')
     {
-        $this->_layout = $layout;
+        $this->_layout = $layout ? $layout : 'layout';
         if ($content) {
             $this->_content = $content;
         }
@@ -102,6 +140,15 @@ class View extends Injectable
         return $this->_layout;
     }
 
+    /**设置变量
+     * @param $key
+     * @param $value
+     */
+    public function setVar($key, $value)
+    {
+        $this->var[$key] = $value;
+    }
+
     /**
      * include layout content
      *
@@ -109,10 +156,13 @@ class View extends Injectable
      */
     public function content()
     {
+        extract($this->var);
+
         if ($this->_content) {
-            include_once $this->uri->getModulePath() . '/view/' . $this->_content . '.php';
+            include_once $this->uri->getModulePath() . '/view/' . $this->_content . $this->suffix;
+
         } else {
-            include_once $this->uri->getModulePath() . '/view/' . $this->uri->getController() . '/' . $this->uri->getAction() . '.php';
+            include_once $this->uri->getModulePath() . '/view/' . $this->uri->getController() . '/' . $this->uri->getAction() . $this->suffix;
         }
     }
 
@@ -124,13 +174,33 @@ class View extends Injectable
     {
         // 直接载入PHP模板
         if ($this->_layout) {
-            $layout = $this->uri->getModulePath() . '/view/' . $this->_layout . '.php';
+            $layout = $this->uri->getModulePath() . '/view/' . $this->_layout . $this->suffix;
             if (file_exists($layout)) {
+                /*解析变量*/
+                extract($this->var);
                 include_once $layout;
             } else {
                 if (Config::getBase('debug')) {
                     echo 'layout文件不存在：' . $layout;
                 }
+            }
+        }
+    }
+
+    public function assignCss()
+    {
+        if (!empty($this->css) && is_array($this->css)) {
+            foreach ($this->css as $css) {
+                echo ' <link rel="stylesheet" href="' . $css . '"/>' . "\n";
+            }
+        }
+    }
+
+    public function assignJs()
+    {
+        if (!empty($this->js) && is_array($this->js)) {
+            foreach ($this->js as $js) {
+                echo '<script src="' . $js . '"></script>' . "\n";
             }
         }
     }

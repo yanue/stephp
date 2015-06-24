@@ -36,18 +36,20 @@ final class Uri extends Dispatcher
      *  -例/home/index/index/c/d 默认module为home,那么mvc结构部分为/home/index/index,其他同上
      *  -例/admin/index/index/e/f/g/h 默认module为home,那么mvc结构部分为/admin/index/index,其他同上
      *
-     * @param int $n 除去mvc结构的第n个参数
+     * @param int $n 除去mvc结构的第n个参数(以0开始)
      * @return string
      */
-    public function getUri($n)
+    public function getUriSegment($n)
     {
         $params = $this->getPathArray();
-        return isset($params[$n - 1]) ? $params[$n - 1] : false;
+        return isset($params[$n]) ? $params[$n] : false;
     }
 
     public function getMvcString()
     {
         $moduleUri = $this->getModule() != Config::getBase('module') ? $this->getModule() . '/' : '';
+        $moduleUri = $this->getApi() == 'api' ? $moduleUri . 'api/' : $moduleUri;
+
         return $moduleUri . $this->getController() . '/' . $this->getAction();
     }
 
@@ -67,6 +69,8 @@ final class Uri extends Dispatcher
     public function getMvcUri()
     {
         $moduleUri = $this->getModule() ? $this->getModule() . '/' : '';
+        $moduleUri = $this->getApi() == 'api' ? $moduleUri . 'api/' : $moduleUri;
+
         return $moduleUri . $this->getController() . '/' . $this->getAction();
     }
 
@@ -147,21 +151,30 @@ final class Uri extends Dispatcher
         if (($len = count($params)) > 0) {
             for ($i = 0; $i < ceil(($len) / 2); $i++) {
                 if (isset($params[$i * 2 + 1]) && $params[$i * 2 + 1]) { #去掉空值的部分
-                    $paramPath[$params[$i * 2]] = $params[$i * 2 + 1];
+                    if ($params[$i * 2]) {
+                        $paramPath[$params[$i * 2]] = $params[$i * 2 + 1];
+                    }
                 }
             }
         }
         # 添加新的参数
-        $params = array_merge($paramPath, (array)$add_arr);
+        if ($add_arr) {
+            $params = array_merge($paramPath, (array)$add_arr);
+        } else {
+            $params = $paramPath;
+        }
         # 移除匹配参数
-        $params = array_diff_key($params, array_flip((array)$rm_arr));
+        if ($rm_arr) {
+            $params = array_diff_key($params, array_flip((array)$rm_arr));
+        }
         $moduleUri = $this->getModule() != Config::getBase('module') ? '/' . $this->getModule() : '';
-        $mvcUri = $moduleUri . '/' . $this->getController() . '/' . $this->getAction();
+        $moduleUri = $this->getApi() == 'api' ? $moduleUri . '/api' : $moduleUri;
 
+        $mvcUri = $moduleUri . '/' . $this->getController() . '/' . $this->getAction();
         foreach ($params as $k => $v) {
             $mvcUri .= '/' . $k . '/' . $v;
         }
-
+        $mvcUri = rtrim($mvcUri, '/');
         # 添加最后一个path参数和后缀
         $uriPath = $mvcUri . $lastParam . $this->getSuffix();
         # 返回后面的query参数
@@ -174,6 +187,9 @@ final class Uri extends Dispatcher
     /**
      * baseUrl
      *
+     * @param string $uri
+     * @param bool $setSuffix
+     * @return string
      */
     public function baseUrl($uri = '', $setSuffix = true)
     {

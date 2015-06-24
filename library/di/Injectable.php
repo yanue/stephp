@@ -4,9 +4,6 @@ namespace Library\Di;
 
 abstract class Injectable
 {
-
-    protected $_dependencyInjector;
-
     /**
      * @var \Library\Core\Uri
      */
@@ -28,6 +25,11 @@ abstract class Injectable
     protected $session;
 
     /**
+     * @var \Library\Core\Response
+     */
+    protected $response;
+
+    /**
      * @var \Library\Db\FluentPDO
      */
     protected $db;
@@ -40,6 +42,8 @@ abstract class Injectable
         $this->uri = $dependencyInjector->get('uri');
         $this->view = $dependencyInjector->get('view');
         $this->db = $dependencyInjector->get('db');
+        $this->session = $dependencyInjector->get('session');
+        $this->response = $dependencyInjector->get('response');
     }
 
     public function getDI()

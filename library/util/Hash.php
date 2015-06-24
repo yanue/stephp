@@ -13,23 +13,21 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  */
 class Hash
 {
+    const ALGO = 'sha1';
+    const SALT = '!@:\"#$%^&*<>?{}$^$@*^&*I@!';
 
     /**
      * 创建hash算法
      *
-     * @param string $algo The algorithm (md5, sha1, whirlpool, etc)
      * @param string $data The data to encode
-     * @param string $salt The salt (This should be the same throughout the system probably)
      * @return string The hashed/salted data
      */
-    public static function create($algo, $data, $salt = '!@:\"#$%^&*<>?{}$^$@*^&*I@!')
+    public static function create($data)
     {
-
-        $context = hash_init($algo, HASH_HMAC, $salt);
+        $context = hash_init(self::ALGO, HASH_HMAC, self::SALT);
         hash_update($context, $data);
 
         return hash_final($context);
-
     }
 
 }

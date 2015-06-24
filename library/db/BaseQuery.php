@@ -3,6 +3,7 @@ namespace Library\Db;
 
 use DateTime;
 use IteratorAggregate;
+use Library\Core\Debug;
 use Library\Core\Exception;
 use PDO;
 
@@ -17,7 +18,7 @@ abstract class BaseQuery implements IteratorAggregate
     /** @var array of definition clauses */
     protected $clauses = array();
 
-    /** @var PDOStatement */
+    /** @var \PDOStatement */
     private $result;
 
     /** @var float */
@@ -53,7 +54,7 @@ abstract class BaseQuery implements IteratorAggregate
      * @param $clause
      * @param $statement
      * @param array $parameters
-     * @return $this|\SelectQuery
+     * @return $this|SelectQuery
      */
     protected function addStatement($clause, $statement, $parameters = array())
     {
@@ -105,9 +106,7 @@ abstract class BaseQuery implements IteratorAggregate
     {
         $query = $this->buildQuery();
         $parameters = $this->buildParameters();
-
         $result = $this->fpdo->getPdo()->prepare($query);
-
         // At this point, $result is a PDOStatement instance, or false.
         // PDO::prepare() does not reliably return errors. Some database drivers
         // do not support prepared statements, and PHP emulates them.  Postgres
@@ -125,7 +124,6 @@ abstract class BaseQuery implements IteratorAggregate
         } elseif ($this->fpdo->getPdo()->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE) == PDO::FETCH_BOTH) {
             $result->setFetchMode(PDO::FETCH_ASSOC);
         }
-
         $time = microtime(true);
         if ($result && $result->execute($parameters)) {
             $this->time = microtime(true) - $time;
@@ -160,7 +158,7 @@ abstract class BaseQuery implements IteratorAggregate
                 }
                 $time = sprintf('%0.3f', $this->time * 1000) . ' ms';
                 $rows = ($this->result) ? $this->result->rowCount() : 0;
-                fwrite(STDERR, "# $backtrace[file]:$backtrace[line] ($time; rows = $rows)\n$debug\n\n");
+                Debug::log("# $backtrace[file]:$backtrace[line] ($time; rows = $rows)\n$debug\n\n");
             } else {
                 call_user_func($this->fpdo->debug, $this);
             }
@@ -176,7 +174,7 @@ abstract class BaseQuery implements IteratorAggregate
     }
 
     /**
-     * @return \FluentStructure
+     * @return FluentStructure
      */
     protected function getStructure()
     {
@@ -305,7 +303,7 @@ abstract class BaseQuery implements IteratorAggregate
      * @param  boolean|object $object If set to true, items are returned as stdClass, otherwise a class
      *                                name can be passed and a new instance of this class is return.
      *                                Can be set to false to return items as an associative array.
-     * @return \BaseQuery
+     * @return BaseQuery
      */
     public function asObject($object = true)
     {

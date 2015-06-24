@@ -3,6 +3,7 @@ namespace Library\Core;
 
 use Library\Di\DI;
 use Library\Di\Injectable;
+use library\Util\Asset;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -19,17 +20,22 @@ class Controller extends Injectable
     /**
      * @var string
      */
-    public $controller = null;
+    protected $controller = null;
 
     /**
      * @var string
      */
-    public $action = null;
+    protected $action = null;
 
     /**
      * @var string
      */
-    public $module = null;
+    protected $module = null;
+
+    /**
+     * @var Asset
+     */
+    protected $asset = null;
 
     /**
      * 初始化控制器
@@ -41,5 +47,6 @@ class Controller extends Injectable
         $this->module = $this->uri->getModule();
         $this->controller = $this->uri->getController();
         $this->action = $this->uri->getAction();
+        $this->asset = new Asset();
     }
 }

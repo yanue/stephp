@@ -8,13 +8,15 @@ use Library\Core\Exception;
 use Library\Core\Loader;
 use Library\Core\Model;
 use Library\Core\Request;
+use Library\Core\Response;
 use Library\Core\Router;
 use Library\Core\Uri;
 use Library\Core\View;
 use Library\Di\DI;
 use Library\Di\Injectable;
+use Library\Util\Session;
 
-define('VERSION', '2.2.0');
+define('VERSION', '2.4.0');
 
 defined('LIB_PATH') || define('LIB_PATH', dirname(__FILE__));
 defined('WEB_ROOT') || define('WEB_ROOT', dirname(__FILE__) . '/..');
@@ -76,8 +78,10 @@ class Application extends Injectable
         $di->bind('request', new Request());
         $di->bind('uri', new Uri($di));
         $di->bind('view', new View());
-        $this->view = $di->get('view');
         $di->bind('db', Model::connect());
+        $di->bind('session', new Session());
+        $di->bind('response', new Response());
+
         $this->di = $di;
     }
 
@@ -127,12 +131,17 @@ class Application extends Injectable
         // 执行分发过程,获取mvc结构
         $disp = new Dispatcher();
 
+        $module = $disp->getModule();
         $controller = $disp->getController();
         $action = $disp->getAction();
-        $module = $disp->getModule();
+        $api = $disp->getApi();
         $module_path = $module ? ucfirst($module) . '\\' : '';
 
-        $_namespaceClass = '\App\\' . ucfirst($module_path) . 'Controller\\' . ucfirst($controller) . 'Controller';
+        if ($api) {
+            $_namespaceClass = '\App\\' . ucfirst($module_path) . 'Api\\' . ucfirst($controller) . 'Controller';
+        } else {
+            $_namespaceClass = '\App\\' . ucfirst($module_path) . 'Controller\\' . ucfirst($controller) . 'Controller';
+        }
         $actionName = $action . 'Action';
 
         // 判断当前请求的控制器,存在则自动加载
@@ -148,7 +157,7 @@ class Application extends Injectable
                 try {
                     $controllerObj->$actionName();
 
-                    $this->view->display();
+                    $this->di->get('view')->display();
 
                 } catch (\Exception $e) {
                     Debug::log($e->getFile() . ':' . $e->getMessage());

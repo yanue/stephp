@@ -1,8 +1,6 @@
 <?php
 namespace Library\Util;
 
-if (!defined('LIB_PATH')) exit('No direct script access allowed');
-
 /**
  * cookie 处理类
  *
@@ -15,6 +13,8 @@ class Cookie
 {
 
     const OneHour = 3600;
+    const OneDay = 86400;
+    const oneWeek = 604800;
 
     /**
      * Returns true if there is a cookie with this name.
@@ -49,7 +49,12 @@ class Cookie
      */
     static public function get($name, $default = '')
     {
-        return isset($_COOKIE[$name]) ? $_COOKIE[$name] : $default;
+        if (self::exists($name)) {
+            $value = $_COOKIE[$name];
+            return $value;
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -65,30 +70,32 @@ class Cookie
     /**
      * Set a cookie. Silently does nothing if headers have already been sent.
      *
-     * @param string $name
-     * @param string $value
-     * @param mixed $expiry
+     * @param $name
+     * @param $value
+     * @param int $expiry
      * @param string $path
-     * @param string $domain
+     * @param bool $domain
      * @return bool
      */
-    static public function set($name, $value, $expiry = self::OneHour, $path = '/', $domain = false)
+    static public function set($name, $value, $expiry = self::OneDay, $path = '/', $domain = false)
     {
         $retval = false;
         if (!headers_sent()) {
-            if ($domain === false)
-                $domain = $_SERVER['HTTP_HOST'] != 'localhost' ? $_SERVER['HTTP_HOST'] : '';
-
-            if ($expiry === -1)
+            if ($domain === false) {
+                // 子域名跨域问题
+                $domain = COOKIE_DOMAIN;
+            }
+            if ($expiry === -1) {
                 $expiry = 1893456000; // Lifetime = 2030-01-01 00:00:00
-            elseif (is_numeric($expiry))
+            } elseif (is_numeric($expiry)) {
                 $expiry += time();
-            else
+            } else {
                 $expiry = strtotime($expiry);
-
+            }
             $retval = setcookie($name, $value, $expiry, $path, $domain);
-            if ($retval)
+            if ($retval) {
                 $_COOKIE[$name] = $value;
+            }
         }
         return $retval;
     }
@@ -96,9 +103,9 @@ class Cookie
     /**
      * Delete a cookie.
      *
-     * @param string $name
+     * @param $name
      * @param string $path
-     * @param string $domain
+     * @param bool $domain
      * @param bool $remove_from_global Set to true to remove this cookie from this request.
      * @return bool
      */
@@ -107,16 +114,13 @@ class Cookie
         $retval = false;
         if (!headers_sent()) {
             if ($domain === false) {
-                $domain = $_SERVER['HTTP_HOST'] != 'localhost' ? $_SERVER['HTTP_HOST'] : '';
+                $domain = COOKIE_DOMAIN;
             }
-            if (!empty($domain)) {
-                $domain = explode('.', $domain);
-                $domain = array_reverse($domain);
-                $ext = current($domain);
-                $main = next($domain);
-                $domain = $main . "." . $ext;
-            }
-            $retval = setcookie($name, '', time() - 3600, $path, $domain);
+
+            // 无法删除？
+            setcookie($name, false, time() - 3600, $path, $domain);
+            // 能删
+            $retval = setcookie($name, false, time() - 3600, $path);
 
             if ($remove_from_global) {
                 unset($_COOKIE[$name]);

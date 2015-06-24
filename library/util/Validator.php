@@ -1,29 +1,18 @@
 <?php
 namespace Library\Util;
 
-    /**
-     * errorCode.php
-     *
-     * @copyright    http://yanue.net/
-     * @author        yanue <yanue@outlook.com>
-     * @version        1.0.0 - 2013-07-19
-     */
-
 /**
- * Class Validator
+ * Validator
  *
+ * @copyright    http://yanue.net/
+ * @author        yanue <yanue@outlook.com>
+ * @version        1.0.0 - 2013-07-19
  */
+use DateTime;
+
+
 class Validator
 {
-
-    /**
-     * Create a new Validator instance.
-     *
-     * @param  array $data
-     * @param  array $rules
-     * @param  array $messages
-     * @return void
-     */
     public function __construct()
     {
 
@@ -38,32 +27,28 @@ class Validator
     public static function validUsername($username)
     {
         if (strlen($username) > 16 || strlen($username) < 5) {
-            return ERROR_USER_IS_INVALID;
+            return false;
         }
         if (preg_match('/^([a-z]+)([a-z0-9]+)$/i', $username) == 0) {
-            return ERROR_USER_IS_INVALID;
+            return false;
         };
         return true;
     }
 
     /**
-     * 验证用户名
-     * --说明:长度为5-16位字符长度,只能包含字母数字(开始必须字母).
-     * @param $username
+     * 验证密码
+     * --说明:长度为6-16位字符长度
+     * @param $passwd
      * @return array|int
      */
     public static function validPassword($passwd)
     {
-        if (strlen($passwd) > 16 || strlen($passwd) < 6) {
-            return ERROR_PASSWD_IS_INVALID;
-        }
-        return true;
+        return (strlen($passwd) <= 16 && strlen($passwd) >= 6);
     }
 
     /**
      * Validate that an attribute is numeric.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -75,7 +60,6 @@ class Validator
     /**
      * Validate an attribute is contained within a list of values.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @return bool
@@ -88,7 +72,6 @@ class Validator
     /**
      * Validate an attribute is not contained within a list of values.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @return bool
@@ -102,7 +85,6 @@ class Validator
     /**
      * Validate that an attribute is a valid IP.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -114,7 +96,6 @@ class Validator
     /**
      * Validate that an attribute is a valid e-mail address.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -126,7 +107,6 @@ class Validator
     /**
      * Validate that an attribute is a valid URL.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -138,7 +118,6 @@ class Validator
     /**
      * Validate that an attribute is an active URL.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -152,7 +131,6 @@ class Validator
     /**
      * Validate the MIME type of a file is an image MIME type.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -164,7 +142,6 @@ class Validator
     /**
      * Validate the MIME type of a file upload attribute is in a set of MIME types.
      *
-     * @param  string $attribute
      * @param  array $value
      * @param  array $parameters
      * @return bool
@@ -184,7 +161,6 @@ class Validator
     /**
      * Validate that an attribute contains only alphabetic characters.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -196,7 +172,6 @@ class Validator
     /**
      * Validate that an attribute contains only alpha-numeric characters.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -208,7 +183,6 @@ class Validator
     /**
      * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -220,7 +194,6 @@ class Validator
     /**
      * Validate that an attribute passes a regular expression check.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @return bool
@@ -233,7 +206,6 @@ class Validator
     /**
      * Validate that an attribute is a valid date.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @return bool
      */
@@ -251,7 +223,6 @@ class Validator
     /**
      * Validate that an attribute matches a date format.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @return bool
@@ -266,7 +237,6 @@ class Validator
     /**
      * Validate the date is before a given date.
      *
-     * @param  string $attribute
      * @param  mixed $value
      * @param  array $parameters
      * @return bool

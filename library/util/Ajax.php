@@ -116,10 +116,10 @@ class Ajax
     /**
      * echo right json data
      *
-     * @param string $msg
      * @param string $data
+     * @param string $msg
      */
-    public static function outRight($msg = '', $data = '')
+    public static function outRight($data = '', $msg = '')
     {
         self::setHead();
         $result = array(
@@ -147,7 +147,7 @@ class Ajax
     {
         self::setHead();
         $result = array(
-            'error' => array('code' => $code, 'msg' => self::getErrorMsg($code), 'more' => $msg),
+            'error' => array('code' => $code, 'msg' => self::getErrorMsg($code) ? self::getErrorMsg($code) : $msg, 'more' => $msg),
             'result' => 0,
         );
         if (isset($_REQUEST['callback']) && $_REQUEST['callback']) {

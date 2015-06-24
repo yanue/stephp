@@ -244,7 +244,6 @@ class Request
 
     public function getIP()
     {
-        static $realip;
         if (isset($_SERVER)) {
             if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
                 $realip = $_SERVER["HTTP_X_FORWARDED_FOR"];
@@ -263,5 +262,78 @@ class Request
             }
         }
         return $realip;
+    }
+
+
+    /**
+     * get key data
+     *
+     * @param $key
+     * @param string $type
+     * @param null $default
+     * @return bool|float|int|null
+     */
+    public function get($key, $type = '', $default = null)
+    {
+        if (!$key) return false;
+        if (in_array($type, ['int', 'float', 'string'])) {
+            $res = isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
+
+            switch ($type) {
+                case 'int':
+                    $res = intval($res);
+                    break;
+                case 'float':
+                    $res = floatval($res);
+                    break;
+                case 'string':
+                    break;
+            }
+
+            return $res;
+        } else {
+            return isset($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
+        }
+    }
+
+    /**
+     * post key data
+     *
+     * @param $key
+     * @param string $type
+     * @param null $default
+     * @return bool|float|int|null
+     */
+    public function getPost($key, $type = '', $default = null)
+    {
+        if (!$key) return false;
+        if (in_array($type, ['int', 'float', 'string'])) {
+            $res = isset($_POST[$key]) ? $_POST[$key] : $default;
+
+            switch ($type) {
+                case 'int':
+                    $res = intval($res);
+                    break;
+                case 'float':
+                    $res = floatval($res);
+                    break;
+                case 'string':
+                    $res = mysql_real_escape_string($res);
+                    break;
+            }
+
+            return $res;
+        } else {
+            return isset($_POST[$key]) ? $_POST[$key] : $default;
+        }
+    }
+
+    /**server info
+     * @param $key
+     * @return mixed
+     */
+    public function getServer($key)
+    {
+        return $_SERVER[$key];
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Library\Util;
 
+use Library\Core\Plugin;
 use Library\Core\Router;
 use Library\Core\View;
 
@@ -24,20 +25,12 @@ use Library\Core\View;
  * in view xxx.php file
  * <?php \App\Admin\Lib\Paged::display($this);?>
  */
-class Pagination
+class Pagination extends Plugin
 {
-    protected static $view = null;
-
-
-    public function __construct(View $view)
-    {
-        self::$view = $view;
-    }
-
-    public static function instance(View $view)
+    public static function instance()
     {
         static $obj;
-        if (!$obj) $obj = new self($view);
+        if (!$obj) $obj = new self();
         return $obj;
     }
 
@@ -52,15 +45,15 @@ class Pagination
         $page = $page <= 0 ? 1 : $page;
         // 上一页
         if ($page > 1) {
-            self::$view->previous = $page - 1;
-            self::$view->first = 1;
+            $this->view->previous = $page - 1;
+            $this->view->first = 1;
         }
         // 下一页
         if ($total > $page) {
-            self::$view->next = $page + 1;
-            self::$view->last = $total;
+            $this->view->next = $page + 1;
+            $this->view->last = $total;
         }
-        self::$view->current = $page;
+        $this->view->current = $page;
         // $range表示显示条数的一半-1
         if ($page <= $range) {
             if ($total > $range * 2) {
@@ -75,11 +68,11 @@ class Pagination
             $pagesInRange = $this->getPagesInRange($page - $range, $page + $range);
         }
 
-        self::$view->pagesInRange = $pagesInRange;
-        self::$view->total = $total;
-        self::$view->page = $page;
-        self::$view->perpage = $limit;
-        self::$view->pageCount = $count;
+        $this->view->pagesInRange = $pagesInRange;
+        $this->view->total = $total;
+        $this->view->page = $page;
+        $this->view->perpage = $limit;
+        $this->view->pageCount = $count;
     }
 
     // page range
@@ -94,38 +87,38 @@ class Pagination
 
     // display
 
-    public static final function display(View $view)
+    public final function display()
     {
 
         $str = '';
-        if (isset($view->total)) {
+        if (isset($this->view->total)) {
 
-            if ($view->total) {
-                $str .= '<span style="float: right;">总' . $view->pageCount . '条记录,总' . $view->total . '页,
-        每页' . $view->perpage . '条,当前' . $view->total . '/' . $view->page . '页</span>';
+            if ($this->view->total) {
+                $str .= '<span style="float: right;">总' . $this->view->pageCount . '条记录,总' . $this->view->total . '页,
+        每页' . $this->view->perpage . '条,当前' . $this->view->total . '/' . $this->view->page . '页</span>';
             }
 
             // first
-            if (isset($view->previous)) {
-                $str .= ' <a href="' . $view->uri->setUrl(array('p' => $view->first), '', true) . '"> 首页 </a> ';
+            if (isset($this->view->previous)) {
+                $str .= ' <a href="' . $this->uri->setUrl(array('p' => $this->view->first), '', true) . '"> 首页 </a> ';
             } else {
                 $str .= ' <span class="disabled">首页</span> ';
             }
 
             // previous
-            if (isset($view->previous)) {
-                $str .= ' <a href="' . $view->uri->setUrl(array('p' => $view->previous), '', true) . '"> &lt; 上一页  </a> | ';
+            if (isset($this->view->previous)) {
+                $str .= ' <a href="' . $this->uri->setUrl(array('p' => $this->view->previous), '', true) . '"> &lt; 上一页  </a> | ';
             } else {
                 $str .= ' <span class="disabled">&lt; 上一页</span> ';
             }
 
             // Numbered p links
-            foreach ($view->pagesInRange as $page) {
+            foreach ($this->view->pagesInRange as $page) {
                 if ($page > 0) {
-                    if ($page != $view->current) {
-                        $str .= ' <a href="' . $view->uri->setUrl(array('p' => $page), '', true) . '"> ' . $page . ' </a> | ';
+                    if ($page != $this->view->current) {
+                        $str .= ' <a href="' . $this->uri->setUrl(array('p' => $page), '', true) . '"> ' . $page . ' </a> | ';
                     } else {
-                        $str .= $view->current . ' | ';
+                        $str .= $this->view->current . ' | ';
                     }
                 };
             }
@@ -134,15 +127,15 @@ class Pagination
 
 
             // next
-            if (isset($view->next)) {
-                $str .= ' <a href="' . $view->uri->setUrl(array('p' => $view->next), '', true) . '"> 下一页 &gt;  </a> ';
+            if (isset($this->view->next)) {
+                $str .= ' <a href="' . $this->uri->setUrl(array('p' => $this->view->next), '', true) . '"> 下一页 &gt;  </a> ';
             } else {
                 $str .= ' <span class="disabled">下一页 &gt; </span> ';
             }
 
             // last
-            if (isset($view->next)) {
-                $str .= ' <a href="' . $view->uri->setUrl(array('p' => $view->last), '', true) . '"> 尾页 </a> ';
+            if (isset($this->view->next)) {
+                $str .= ' <a href="' . $this->uri->setUrl(array('p' => $this->view->last), '', true) . '"> 尾页 </a> ';
             } else {
                 $str .= ' <span class="disabled">尾页</span> ';
             }
@@ -152,54 +145,54 @@ class Pagination
         }
     }
 
-    public static final function displayByRouter(View $view)
+    public final function displayByRouter()
     {
         $path = Router::$originalSegment; // 获取路由前path部分
 
         $str = '';
-        if (isset($view->total)) {
+        if (isset($this->view->total)) {
 
-            if ($view->total) {
-                $str .= '<span style="float: right;">总' . $view->pageCount . '条记录,总' . $view->total . '页,
-        每页' . $view->perpage . '条,当前' . $view->total . '/' . $view->page . '页</span>';
+            if ($this->view->total) {
+                $str .= '<span style="float: right;">总' . $this->view->pageCount . '条记录,总' . $this->view->total . '页,
+        每页' . $this->view->perpage . '条,当前' . $this->view->total . '/' . $this->view->page . '页</span>';
             }
 
-            // first
-            if (isset($view->previous)) {
-                $str .= ' <a href="' . $view->baseUrl($path) . '?p=' . $view->first . '"> 首页 </a> ';
+// first
+            if (isset($this->view->previous)) {
+                $str .= ' <a href="' . $this->uri->baseUrl($path) . '?p=' . $this->view->first . '"> 首页 </a> ';
             } else {
                 $str .= ' <span class="disabled">首页</span> ';
             }
 
-            // previous
-            if (isset($view->previous)) {
-                $str .= ' <a href="' . $view->baseUrl($path) . '?p=' . $view->previous . '"> &lt; 上一页  </a> | ';
+// previous
+            if (isset($this->view->previous)) {
+                $str .= ' <a href="' . $this->uri->baseUrl($path) . '?p=' . $this->view->previous . '"> &lt; 上一页  </a> | ';
             } else {
                 $str .= ' <span class="disabled">&lt; 上一页</span> ';
             }
 
-            // Numbered p links
-            foreach ($view->pagesInRange as $page) {
+// Numbered p links
+            foreach ($this->view->pagesInRange as $page) {
                 if ($page > 0) {
-                    if ($page != $view->current) {
-                        $str .= ' <a href="' . $view->baseUrl($path) . '?p=' . $page . '"> ' . $page . ' </a> | ';
+                    if ($page != $this->view->current) {
+                        $str .= ' <a href="' . $this->uri->baseUrl($path) . '?p=' . $page . '"> ' . $page . ' </a> | ';
                     } else {
-                        $str .= $view->current . ' | ';
+                        $str .= $this->view->current . ' | ';
                     }
                 };
             }
 
 
             // next
-            if (isset($view->next)) {
-                $str .= ' <a href="' . $view->baseUrl($path) . '?p=' . $view->next . '"> 下一页 &gt;  </a> ';
+            if (isset($this->view->next)) {
+                $str .= ' <a href="' . $this->uri->baseUrl($path) . '?p=' . $this->view->next . '"> 下一页 &gt;  </a> ';
             } else {
                 $str .= ' <span class="disabled">下一页 &gt; </span> ';
             }
 
             // last
-            if (isset($view->next)) {
-                $str .= ' <a href="' . $view->baseUrl($path) . '?p=' . $view->last . '"> 尾页 </a> ';
+            if (isset($this->view->next)) {
+                $str .= ' <a href="' . $this->uri->baseUrl($path) . '?p=' . $this->view->last . '"> 尾页 </a> ';
             } else {
                 $str .= ' <span class="disabled">尾页</span> ';
             }

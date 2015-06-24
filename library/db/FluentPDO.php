@@ -19,7 +19,7 @@ class FluentPDO
     private $pdo, $structure;
 
     /** @var boolean|callback */
-    public $debug;
+    public $debug = false;
 
     function __construct(PDO $pdo, FluentStructure $structure = null)
     {
@@ -94,16 +94,19 @@ class FluentPDO
         return $query;
     }
 
-    /** @return \PDO
+    /**
+     * @return \PDO
      */
     public function getPdo()
     {
         return $this->pdo;
     }
 
-    /** @return \PDO
+    /**
+     * @param PDO $pdo
+     * @return PDO
      */
-    public function setPdo($pdo)
+    public function setPdo(PDO $pdo)
     {
         return $this->pdo = $pdo;
     }
@@ -113,5 +116,15 @@ class FluentPDO
     public function getStructure()
     {
         return $this->structure;
+    }
+
+    /**
+     * set primaryKey
+     * @param $pri
+     * @param $table
+     */
+    public function setStructure($pri, $table)
+    {
+        $this->structure->setPrimaryKey($pri, $table);
     }
 }

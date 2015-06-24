@@ -23,6 +23,7 @@ class Dispatcher extends Injectable
     private $_requestPath = array(); # path部分后面
     private $_urlSuffix = '.html';
     private $_appPath = null;
+    private $_apiName = null;
 
     /**
      * 初始化请求
@@ -41,7 +42,8 @@ class Dispatcher extends Injectable
 
     /**
      * 解析mvc结构
-     *
+     * 新增api直接解析
+     * -- home/api/controller/action
      */
     private function parseMvc()
     {
@@ -51,19 +53,34 @@ class Dispatcher extends Injectable
         $module = isset($_GET['m']) && $_GET['m'] ? $_GET['m'] : Config::getBase('module');
         $controller = isset($_GET['c']) && $_GET['c'] ? $_GET['c'] : Config::getBase('controller');
         $action = isset($_GET['a']) && $_GET['a'] ? $_GET['a'] : Config::getBase('action');
+        $api = isset($_GET['api']) && $_GET['api'] ? $_GET['api'] : "";
 
         # 第一个参数与默认的module名相同
         if (isset($requestPath[0]) && Config::getBase('module') == $requestPath[0]) {
             $module = isset($requestPath[0]) && $requestPath[0] != '' ? $requestPath[0] : $module;
-            $controller = isset($requestPath[1]) && $requestPath[1] != '' ? $requestPath[1] : $controller;
-            $action = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $action;
+            $api = isset($requestPath[1]) && $requestPath[1] == 'api' ? 'api' : '';
+            # 形如admin/api
+            if ($api) {
+                $controller = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $controller;
+                $action = isset($requestPath[3]) && $requestPath[3] != '' ? $requestPath[3] : $action;
+            } else {
+                $controller = isset($requestPath[1]) && $requestPath[1] != '' ? $requestPath[1] : $controller;
+                $action = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $action;
+            }
         } else {
             # 第一个参数与默认的module名不相同,则判断以它为module是否存在,
             if (isset($requestPath[0]) && file_exists($this->_appPath . '/' . $requestPath[0])) {
                 # 模块文件夹存在
                 $module = isset($requestPath[0]) && $requestPath[0] != '' ? $requestPath[0] : $module;
-                $controller = isset($requestPath[1]) && $requestPath[1] != '' ? $requestPath[1] : $controller;
-                $action = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $action;
+                $api = isset($requestPath[1]) && $requestPath[1] == 'api' ? 'api' : '';
+                # 形如admin/api
+                if ($api) {
+                    $controller = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $controller;
+                    $action = isset($requestPath[3]) && $requestPath[3] != '' ? $requestPath[3] : $action;
+                } else {
+                    $controller = isset($requestPath[1]) && $requestPath[1] != '' ? $requestPath[1] : $controller;
+                    $action = isset($requestPath[2]) && $requestPath[2] != '' ? $requestPath[2] : $action;
+                }
             } else {
                 # 模块不存在,调用默认模块
                 $controller = isset($requestPath[0]) && $requestPath[0] != '' ? $requestPath[0] : $controller;
@@ -74,8 +91,9 @@ class Dispatcher extends Injectable
         # mvc
         $paramMvc = array(
             'module' => $module,
+            'api' => $api,
             'controller' => $controller,
-            'action' => $action
+            'action' => $action,
         );
 
         # 去除 mvc 结构后面的目录结构数组
@@ -85,6 +103,8 @@ class Dispatcher extends Injectable
         $this->_moduleName = $module;
         $this->_controllerName = $controller;
         $this->_actionName = $action;
+        $this->_apiName = $api;
+
         $this->_requestPath = $_requestPath;
     }
 
@@ -142,6 +162,16 @@ class Dispatcher extends Injectable
     }
 
     /**
+     * 获取api
+     *
+     * @return string
+     */
+    public function getApi()
+    {
+        return $this->_apiName;
+    }
+
+    /**
      * 获取方法名称
      *
      * @return string
@@ -194,6 +224,9 @@ class Dispatcher extends Injectable
     /**
      * 获取当前模块的url
      *
+     * @param string $uri
+     * @param bool $setSuffix
+     * @return string
      */
     public function getModuleUrl($uri = '', $setSuffix = true)
     {
@@ -206,10 +239,15 @@ class Dispatcher extends Injectable
 
     /**
      * 获取当前控制器的url
+     *
+     * @param string $uri
+     * @param bool $setSuffix
+     * @return string
      */
     public function getControllerUrl($uri = '', $setSuffix = true)
     {
         $moduleUri = $this->_moduleName != Config::getBase('module') ? '/' . $this->_moduleName : '';
+        $moduleUri = $this->_apiName == 'api' ? $moduleUri . '/api' : $moduleUri;
         $controllerUrl = $this->request->getBaseUrl() . $moduleUri . '/' . $this->_controllerName;
 
         // add uri to url
@@ -219,10 +257,14 @@ class Dispatcher extends Injectable
     /**
      * 获取当前方法的url
      *
+     * @param string $uri
+     * @param bool $setSuffix
+     * @return string
      */
     public function getActionUrl($uri = '', $setSuffix = true)
     {
         $moduleUri = $this->_moduleName != Config::getBase('module') ? '/' . $this->_moduleName : '';
+        $moduleUri = $this->_apiName == 'api' ? $moduleUri . '/api' : $moduleUri;
         $actionUrl = $this->request->getBaseUrl() . $moduleUri . '/' . $this->_controllerName . '/' . $this->_actionName;
 
         // add uri to url
@@ -239,8 +281,14 @@ class Dispatcher extends Injectable
         return $this->_urlSuffix;
     }
 
-
-    // add uri to current url
+    /**
+     * add uri to current url
+     *
+     * @param $curUrl
+     * @param $uri
+     * @param bool $setSuffix
+     * @return string
+     */
     protected function addUri($curUrl, $uri, $setSuffix = true)
     {
         // parse uri

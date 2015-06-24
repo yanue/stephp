@@ -1,6 +1,8 @@
 <?php
 namespace Library\Db;
 
+use Library\Core\Exception;
+
 /** INSERT query builder
  */
 class InsertQuery extends BaseQuery
@@ -40,7 +42,7 @@ class InsertQuery extends BaseQuery
 
     /** Add ON DUPLICATE KEY UPDATE
      * @param array $values
-     * @return \InsertQuery
+     * @return InsertQuery
      */
     public function onDuplicateKeyUpdate($values)
     {
@@ -53,7 +55,7 @@ class InsertQuery extends BaseQuery
     /**
      * Add VALUES
      * @param $values
-     * @return \InsertQuery
+     * @return InsertQuery
      * @throws Exception
      */
     public function values($values)
@@ -75,7 +77,7 @@ class InsertQuery extends BaseQuery
     }
 
     /** INSERT IGNORE - insert operation fails silently
-     * @return \InsertQuery
+     * @return InsertQuery
      */
     public function ignore()
     {
@@ -84,7 +86,7 @@ class InsertQuery extends BaseQuery
     }
 
     /** INSERT DELAYED - insert operation delay support
-     * @return \InsertQuery
+     * @return InsertQuery
      */
     public function delayed()
     {
