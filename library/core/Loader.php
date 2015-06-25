@@ -114,18 +114,9 @@ class Loader
             $file = $fileClass . $this->_fileExtension;
 
             // 处于核心类库则加载核心类库
-            // LIB_PATH为类库的根,目录名称为library(不能改变)
-            if (in_array($file_path, array('library/core/', 'library/util/', 'library/db/'))) {
-                $lib_file = realpath(LIB_PATH . '/../' . $file);
-                if (file_exists($lib_file)) {
-                    require_once $lib_file;
-                }
-            } else {
-                // 这里加载其他类(如数据操作模型等)
-                $class = realpath(WEB_ROOT . '/' . $file);
-                if (file_exists($class)) {
-                    include_once $class;
-                }
+            $class = realpath(WEB_ROOT . '/' . $file);
+            if (file_exists($class)) {
+                require_once $class;
             }
         }
     }

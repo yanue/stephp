@@ -34,6 +34,14 @@ abstract class Injectable
      */
     protected $db;
 
+    /**
+     * @var \Library\Cache\Cache
+     */
+    protected $cache;
+
+    /**
+     * @var \Library\Di\Injectable
+     */
     protected $di;
 
     public function setDI($dependencyInjector)
@@ -44,6 +52,7 @@ abstract class Injectable
         $this->db = $dependencyInjector->get('db');
         $this->session = $dependencyInjector->get('session');
         $this->response = $dependencyInjector->get('response');
+        $this->cache = $dependencyInjector->get('cache');
     }
 
     public function getDI()

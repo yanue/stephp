@@ -151,7 +151,7 @@ class Debug extends Injectable
     {
         $level = strtoupper($level);
 
-        $filepath = WEB_ROOT . '/log/' . date('Y-m') . '/log-' . date('m-d') . '.log';
+        $filepath = WEB_ROOT . '/cache/log/' . date('Y-m') . '/log-' . date('m-d') . '.log';
         $message = '';
         $base = dirname($filepath);
         if (!is_dir($base)) {

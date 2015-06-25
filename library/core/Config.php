@@ -15,14 +15,19 @@ class Config
     /**
      * 获取任意配置，如果是非config文件的配置，需要先load
      *
-     * @param string $key
-     * @return Ambigous <string, NULL>|Ambigous <>|NULL
+     * @param $key
+     * @param null $file
+     * @return null|string
      */
     public static function getItem($key, $file = null)
     {
         if (empty ($key)) {
             return null;
         }
+        if ($file) {
+            return self::getSite($file, $key);
+        }
+
         $val = self::getBase($key);
         if (!is_null($val)) {
             return $val;

@@ -110,8 +110,13 @@ class Model extends FluentPDO
         $defaultProp = $reflection->getDefaultProperties();
         self::connect(empty($defaultProp['database']) ? '' : $defaultProp['database']);
         $table = substr($reflection->getShortName(), 0, -5);
-        preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
-        $table = strtolower(implode('_', $matches[0]));
+        if (!isset($defaultProp['tableName'])) {
+            preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
+            $table = strtolower(implode('_', $matches[0]));
+        } else {
+            $table = $defaultProp['tableName'];
+        }
+
         unset($modelName);
         unset($reflection);
         unset($matches);
@@ -201,7 +206,6 @@ class Model extends FluentPDO
         if ($sort) {
             $query = $query->orderBy($sort);
         }
-
         if (is_numeric($page) && is_numeric($limit)) {
             $_where_page = $page <= 0 ? 0 : $page;
             $where_limit = sprintf("%s, %s", $_where_page * $limit, $limit);
@@ -218,6 +222,7 @@ class Model extends FluentPDO
      */
     final public static function fetchOne($sql)
     {
+        self::table();
         return self::$db->getPdo()->query($sql)->fetch();
     }
 
@@ -229,6 +234,7 @@ class Model extends FluentPDO
      */
     final public static function fetchAll($sql)
     {
+        self::table();
         return self::$db->getPdo()->query($sql)->fetchAll();
     }
 

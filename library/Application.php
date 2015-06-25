@@ -1,6 +1,7 @@
 <?php
 namespace Library;
 
+use library\cache\Cache;
 use Library\Core\Config;
 use Library\Core\Debug;
 use Library\Core\Dispatcher;
@@ -16,7 +17,7 @@ use Library\Di\DI;
 use Library\Di\Injectable;
 use Library\Util\Session;
 
-define('VERSION', '2.4.0');
+define('VERSION', '2.2.0');
 
 defined('LIB_PATH') || define('LIB_PATH', dirname(__FILE__));
 defined('WEB_ROOT') || define('WEB_ROOT', dirname(__FILE__) . '/..');
@@ -81,6 +82,7 @@ class Application extends Injectable
         $di->bind('db', Model::connect());
         $di->bind('session', new Session());
         $di->bind('response', new Response());
+        $di->bind('cache', new Cache());
 
         $this->di = $di;
     }
