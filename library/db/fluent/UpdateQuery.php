@@ -1,5 +1,5 @@
 <?php
-namespace Library\Db;
+namespace Library\Db\Fluent;
 
 use Library\Core\Exception;
 

@@ -1,6 +1,7 @@
 <?php
-namespace Library\Db;
+namespace Library\Db\Fluent;
 
+use Library\Core\Config;
 use PDO;
 
 /**
@@ -19,13 +20,15 @@ class FluentPDO
     private $pdo, $structure;
 
     /** @var boolean|callback */
-    public $debug = false;
+    public $debug = true;
 
     function __construct(PDO $pdo, FluentStructure $structure = null)
     {
         $this->pdo = $pdo;
         if (!$structure) {
             $structure = new FluentStructure;
+        }
+        if (Config::getBase('debug')) {
         }
         $this->structure = $structure;
     }
@@ -126,5 +129,20 @@ class FluentPDO
     public function setStructure($pri, $table)
     {
         $this->structure->setPrimaryKey($pri, $table);
+    }
+
+    public function begin()
+    {
+        $this->getPdo()->beginTransaction();
+    }
+
+    public function commit()
+    {
+        $this->getPdo()->commit();
+    }
+
+    public function rollback()
+    {
+        $this->getPdo()->rollback();
     }
 }

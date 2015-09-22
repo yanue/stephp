@@ -1,7 +1,9 @@
 <?php
 namespace Library\Util;
 
+use Library\Core\Config;
 use Library\Core\Plugin;
+use Service\UserStatus;
 
 /**
  * 上传基础类(获取文件流)
@@ -25,7 +27,9 @@ class Upload extends Plugin
 
     public function __construct()
     {
+        parent::__construct();
         $this->attachDir = 'uploads/';
+        Config::load('upload');
     }
 
     public function setAttachDir($dir)
@@ -70,38 +74,38 @@ class Upload extends Plugin
             }
             $this->md5 = md5($buff);
 
-            // 返回信息 todo size
+            // 返回信息
             return array('buff' => $buff, 'ext' => $ext, 'size' => $size, 'name' => $name, 'md5' => $this->md5);
         } else if (isset($_FILES[$this->inputField])) {
             //2. 普通方式上传
             $upfile = isset($_FILES[$this->inputField]) ? $_FILES[$this->inputField] : null;
             if (!$upfile) {
-                $this->_error(UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, '表单文件域' . $this->inputField . '未接收到数据');
+                $this->_error(Ajax::UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, '表单文件域' . $this->inputField . '未接收到数据');
             }
 
             // 上传出错
             $errno = isset($upfile['error']) ? $upfile['error'] : 0;
             if ($errno > 0) {
                 if (is_array($errno)) {
-                    $this->_error(UPLOAD_ERR_BATCH_IS_NOT_ALLOWED, '请确认filedata文件域参数');
+                    $this->_error(Ajax::UPLOAD_ERR_BATCH_IS_NOT_ALLOWED, '请确认filedata文件域参数');
                 } else {
                     $this->_error(2000 + $errno);
                 }
             }
 
             if (empty($upfile['tmp_name']) || $upfile['tmp_name'] == null) {
-                $this->_error(UPLOAD_ERR_TMP_NAME_NOT_EXIST, '无文件上传');
+                $this->_error(Ajax::UPLOAD_ERR_TMP_NAME_NOT_EXIST, '无文件上传');
             }
 
             // 匹配格式
             $pattern = '/\.(' . $this->upExt . ')$/i';
             if (!preg_match($pattern, $upfile['name'], $sExt)) {
-                $this->_error(UPLOAD_ERR_FILE_EXT_ONLY_ALLOWED, $this->upExt);
+                $this->_error(Ajax::UPLOAD_ERR_FILE_EXT_ONLY_ALLOWED, $this->upExt);
             };
 
             // 文件太大
             if ($this->maxAttachSize < $upfile['size']) {
-                $this->_error(UPLOAD_ERR_UPLOAD_FILE_IS_TOO_LARGE, '最大不能超过：' . (round($this->maxAttachSize / 1024, 2)) . 'K');
+                $this->_error(Ajax::UPLOAD_ERR_UPLOAD_FILE_IS_TOO_LARGE, '最大不能超过：' . (round($this->maxAttachSize / 1024, 2)) . 'K');
             };
 
             # 缓存文件及后缀
@@ -114,11 +118,11 @@ class Upload extends Plugin
 //             Debug::log($stream);
             $stream = array_key_exists($this->inputField, $_POST) ? $_POST[$this->inputField] : $stream;
             if (empty($stream)) {
-                $this->_error(UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, '没有上传任何数据');
+                $this->_error(Ajax::UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, '没有上传任何数据');
             }
             $result = $this->saveRemoteImg($stream);
             if (false === $result) {
-                $this->_error(UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, 'base64文件流不正确');
+                $this->_error(Ajax::UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED, 'base64文件流不正确');
             }
             return $result;
         }
@@ -141,6 +145,28 @@ class Upload extends Plugin
         return array('url' => $filename['url'], 'full_path' => $filename['full_path'], 'path' => $filename['full_path']);
     }
 
+    /**
+     * 保存头像
+     *
+     * @param $buff
+     * @return string
+     */
+    public function saveAvatar($buff)
+    {
+        $path = UserStatus::getAvatar();
+        $fullpath = (UPLOAD_DIR . '/' . ltrim($path, '/'));
+        $fullPath = pathinfo($fullpath, PATHINFO_DIRNAME);
+        if (!is_dir($fullPath)) {
+            @mkdir($fullPath, 0777, true);
+        }
+
+        // 每次替换
+        file_put_contents($fullpath, $buff);
+
+        unset($buff);
+        return UserStatus::getAvatar();
+
+    }
 
     /**
      * 根据文件md5获取文件存放路径 保证文件唯一性
@@ -199,6 +225,13 @@ class Upload extends Plugin
         }
         return false;
 
+    }
+
+    public function saveBase64Bin($base64)
+    {
+        $imgContent = base64_decode($base64);
+        $this->md5 = md5($imgContent);
+        return array('buff' => $imgContent, 'ext' => 'png');
     }
 
     // get file content from url

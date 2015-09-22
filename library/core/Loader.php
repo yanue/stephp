@@ -121,4 +121,16 @@ class Loader
         }
     }
 
+
+    /**
+     * @param $file
+     * @return mixed
+     */
+    public static function loadFile($file)
+    {
+        if (file_exists($file)) {
+            return require_once rtrim($file, '.php') . '.php';
+        }
+        return false;
+    }
 }

@@ -1,9 +1,8 @@
 <?php
-namespace Library\Db;
+namespace Library\Db\Fluent;
 
 use DateTime;
 use IteratorAggregate;
-use Library\Core\Debug;
 use Library\Core\Exception;
 use PDO;
 
@@ -158,7 +157,7 @@ abstract class BaseQuery implements IteratorAggregate
                 }
                 $time = sprintf('%0.3f', $this->time * 1000) . ' ms';
                 $rows = ($this->result) ? $this->result->rowCount() : 0;
-                Debug::log("# $backtrace[file]:$backtrace[line] ($time; rows = $rows)\n$debug\n\n");
+//                Debug::log("# $backtrace[file]:$backtrace[line] ($time; rows = $rows)\n$debug\n\n");
             } else {
                 call_user_func($this->fpdo->debug, $this);
             }

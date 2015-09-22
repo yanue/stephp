@@ -1,8 +1,6 @@
 <?php
 namespace Library\Core;
 
-use Library\Di\Singleton;
-
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
 /**
@@ -270,10 +268,10 @@ class Request
      *
      * @param $key
      * @param string $type
-     * @param null $default
+     * @param string $default
      * @return bool|float|int|null
      */
-    public function get($key, $type = '', $default = null)
+    public function get($key, $type = '', $default = '')
     {
         if (!$key) return false;
         if (in_array($type, ['int', 'float', 'string'])) {

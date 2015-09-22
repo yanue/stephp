@@ -11,83 +11,123 @@ namespace Library\Util;
  */
 class Ajax
 {
-    const ERROR_USER_IS_NOT_EXISTS = 1001;
-    const ERROR_USER_HAS_NOT_LOGIN = 1002;
-    const ERROR_USER_HAS_NO_PERMISSION = 1003;
-    const ERROR_USER_HAS_BEING_USED = 1004;
-    const ERROR_USER_IS_INVALID = 1005;
-    const ERROR_USER_BIND_FAILED = 1006;
-    const ERROR_PASSWD_IS_INVALID = 1007;
-    const ERROR_PASSWD_IS_NOT_CORRECT = 1008;
-    const ERROR_EMAIL_IS_INVALID = 1009;
-    const ERROR_EMAIL_HAS_BEING_USED = 1010;
-    const ERROR_INVALID_REQUEST_PARAM = 1011;
-    const ERROR_ILLEGAL_API_SIGNATURE = 1012;
-    const ERROR_NOTHING_HAS_CHANGED = 1013;
-    const ERROR_RUN_TIME_ERROR_OCCURRED = 1014;
-    const ERROR_PHONE_IS_INVALID = 1015;
-    const ERROR_PHONE_HAS_BEING_USED = 1016;
-    const ERROR_USER_IS_NOT_ACTIVE = 1017;
-    const ERROR_TOKEN_INVALID = 1018;
-    const ERROR_TOKEN_EXPIRES = 1019;
-    const ERROR_USER_NOT_BINDED = 1020;
-    const ERROR_REFRESH_TOKEN_INVALID = 1021;
-    const ERROR_SIGN_EXPIRES = 1022;
-    const ERROR_DATA_NOT_EXISTS = 1023;
-    const ERROR_DATA_HAS_EXISTS = 1024;
-    const ERROR_POINTS_NOT_ENOUGH = 1025;
-    const ERROR_EXP_NOT_ENOUGH = 1026;
-    const ERROR_USER_PROFILE_IMCOMPLETE = 1027;
-    const ERROR_TOKEN_HAS_REFRESHED = 1028;
-    const ERROR_USER_HAS_BEING_LOCKED = 1029;
-    const ERROR_TITLE_IS_NOT_EXISTS = 1030;
-    const ERROR_TITLE_IS_EXISTS = 1031;
+    #1 无效信息
+    const INVALID_DATA = 1001;
+    const INVALID_USER = 1002;
+    const INVALID_USERNAME = 1003;
+    const INVALID_PHONE = 1004;
+    const INVALID_EMAIL = 1005;
+    const INVALID_IMG = 1006;
+    const INVALID_PASSWORD = 1007;
+    const INVALID_PARAM = 1007;
+    const INVALID_SIGNATURE = 1008; // 无效签名
+    const INVALID_ACCOUNT = 1009; // 无效签名
 
-    #2 文件上传相关
-    const UPLOAD_ERR_TMP_NAME_NOT_EXIST = 2011;
-    const UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED = 2012;
-    const UPLOAD_ERR_FILE_EXT_ONLY_ALLOWED = 2013;
-    const UPLOAD_ERR_UPLOAD_FILE_IS_TOO_LARGE = 2014;
-    const UPLOAD_ERR_BATCH_IS_NOT_ALLOWED = 2015;
-    const UPLOAD_ERR_ONLY_SUPPORT_BATCH_UPLOAD = 2016;
-    const UPLOAD_ERR_FASTDFS_SAVE_ERROR_OCCURRED = 2017;
-    const UPLOAD_ERR_MASTER_FILE_NOT_EXIST = 2018;
+    #2 不存在
+    const NOT_EXISTS_DATA = 2001;
+    const NOT_EXISTS_USER = 2002;
+    const NOT_EXISTS_PHONE = 2003;
+    const NOT_EXISTS_EMAIL = 2004;
+    const NOT_EXISTS_IMG = 2005;
+    const NOT_EXISTS_PARAM = 2006;
+    const NOT_EXISTS_ACCOUNT = 2007;
 
+    #3 被使用过的
+    const USED_PHONE = 3001;
+    const USED_EMAIL = 3002;
+    const USED_USER = 3003;
+    const USED_USERNAME = 3004;
+    const USED_ACCOUNT = 2005;
+
+    #4 用户相关
+    const USER_NOT_BIND = 4001;
+    const USER_LOCKED = 4002;
+    const USER_NO_PERMISSION = 4003;
+    const USER_NOT_LOGIN = 4004;
+    const USER_NOT_ACTIVE = 4005;
+    const USER_BIND_FAILED = 4006;
+
+    #5 文件上传相关
+    const UPLOAD_ERR_TMP_NAME_NOT_EXIST = 5011;
+    const UPLOAD_ERR_FILE_FIELD_NOT_RECEIVED = 5012;
+    const UPLOAD_ERR_FILE_EXT_ONLY_ALLOWED = 5013;
+    const UPLOAD_ERR_UPLOAD_FILE_IS_TOO_LARGE = 5014;
+    const UPLOAD_ERR_BATCH_IS_NOT_ALLOWED = 5015;
+    const UPLOAD_ERR_ONLY_SUPPORT_BATCH_UPLOAD = 5016;
+    const UPLOAD_ERR_FASTDFS_SAVE_ERROR_OCCURRED = 5017;
+    const UPLOAD_ERR_MASTER_FILE_NOT_EXIST = 5018;
+
+    #6 其他
+    const ERROR_SIGN_EXPIRES = 6001;
+    const ERROR_REFRESH_TOKEN_INVALID = 6002;
+    const ERROR_TOKEN_INVALID = 6003;
+    const ERROR_TOKEN_EXPIRES = 6004;
+    const ERROR_RUN_TIME_ERROR_OCCURRED = 6005;
+    const ERROR_NOTHING_HAS_CHANGED = 6007;
+    const ERROR_TOKEN_HAS_REFRESHED = 6008;
     # custom error msg
-    const CUSTOM_ERROR_MSG = 3001;
+    const CUSTOM_ERROR_MSG = 7001;
+
+    # 任务相关
+    const TASK_CONTAINER_ORDER_NOT_EXIST = 8001; // 集装箱订单不存在
+    const TASK_NOT_EXIST = 8002; // 任务不存在
+    const TASK_HAS_FINISHED = 8003; // 任务已经完成了
+    const TASK_FRONT_UNFINISHED = 8004; // 前置任务尚未完成
+    const TASK_STATUS_CAN_NOT_FINISHED = 8005; // 状态不能为：[S02,SEA,SED,SER]
+    const TASK_HAS_REPORTED_CHECK = 8006; // 已经汇报过了
+    const TASK_NOT_NEED_CHECK = 8007; // 无需查验
+    const TASK_APPLY_EXCHANGE_EXIST = 8008; // 已经申请过换人了
+    const TASK_APPLY_EXCHANGE_NOT_EXIST = 8009; // 已经申请过换人了
+    const TASK_APPLY_EXCHANGE_REJECT = 8010; //申请换人被拒绝
+    const TASK_APPLY_EXCHANGE_WAIT = 8011; //申请换人被拒绝
+    const TASK_APPLY_EXCHANGE_NOT_SUPPORT = 8012; //申请换人被拒绝
+    const TASK_HAS_STARTED = 8013; // 任务已经开始过了
 
     public static $errmsg = array(
-        self::ERROR_USER_IS_NOT_EXISTS => '用户不存在',
-        self::ERROR_USER_HAS_NOT_LOGIN => '用户尚未登陆',
-        self::ERROR_USER_HAS_NO_PERMISSION => '用户没有权限',
-        self::ERROR_USER_HAS_BEING_USED => '用户已被使用了',
-        self::ERROR_USER_IS_INVALID => '用户名格式不正确',
-        self::ERROR_USER_BIND_FAILED => '用户绑定失败',
-        self::ERROR_PASSWD_IS_INVALID => '密码长度为6-16位字符',
-        self::ERROR_PASSWD_IS_NOT_CORRECT => '密码不正确',
-        self::ERROR_EMAIL_IS_INVALID => '邮箱格式不正确',
-        self::ERROR_EMAIL_HAS_BEING_USED => '邮箱已被使用了',
-        self::ERROR_INVALID_REQUEST_PARAM => '缺少请求参数',
-        self::ERROR_ILLEGAL_API_SIGNATURE => '非法的API签名',
+        #1 无效信息
+        self::INVALID_DATA => "无效的数据",
+        self::INVALID_USER => "无效的用户",
+        self::INVALID_USERNAME => "无效的用户名",
+        self::INVALID_PHONE => "无效的手机号",
+        self::INVALID_EMAIL => "无效的邮箱",
+        self::INVALID_IMG => "无效的图片",
+        self::INVALID_PASSWORD => "无效的密码",
+        self::INVALID_PARAM => "无效的参数",
+        self::INVALID_SIGNATURE => "无效的签名",
+        self::INVALID_ACCOUNT => "无效的账号",
+
+        #2 不存在
+        self::NOT_EXISTS_DATA => "数据不存在",
+        self::NOT_EXISTS_USER => "用户不存在",
+        self::NOT_EXISTS_PHONE => "手机号不存在",
+        self::NOT_EXISTS_EMAIL => "邮箱不存在",
+        self::NOT_EXISTS_IMG => "图片不存在",
+        self::NOT_EXISTS_PARAM => "参数不存在",
+        self::NOT_EXISTS_ACCOUNT => "账号不存在",
+
+        #3 使用过的
+        self::USED_PHONE => "手机已被使用了",
+        self::USED_EMAIL => "邮箱已被使用了",
+        self::USED_USER => "用户已被使用了",
+        self::USED_USERNAME => "用户名已被使用了",
+        self::USED_ACCOUNT => "账号已被使用了",
+        self::USER_NOT_ACTIVE => "账号已被禁用了",
+        self::USER_BIND_FAILED => "账号绑定失败了",
+
+        #4 用户相关
+        self:: USER_NOT_BIND => "用户尚未绑定",
+        self:: USER_LOCKED => "用户已被锁定",
+        self:: USER_NO_PERMISSION => '用户没有权限',
+        self:: USER_NOT_LOGIN => '用户尚未登录',
+        self:: USER_NOT_ACTIVE => '用户尚未激活',
+        self:: USER_BIND_FAILED => '用户绑定失败',
+
         self::ERROR_NOTHING_HAS_CHANGED => '修改或插入不成功',
         self::ERROR_RUN_TIME_ERROR_OCCURRED => '服务器错误',
-        self::ERROR_PHONE_IS_INVALID => '非法的手机号',
-        self::ERROR_PHONE_HAS_BEING_USED => '手机已经被使用',
-        self::ERROR_USER_IS_NOT_ACTIVE => '用户未激活',
         self::ERROR_TOKEN_INVALID => '非法的token（令牌）',
         self::ERROR_TOKEN_EXPIRES => 'token（令牌）已经过期',
-        self::ERROR_USER_NOT_BINDED => '用户未做本地化绑定',
         self::ERROR_REFRESH_TOKEN_INVALID => 'refresh_token非法',
         self::ERROR_SIGN_EXPIRES => '签名已经过期',
-        self::ERROR_DATA_NOT_EXISTS => '数据不存在',
-        self::ERROR_DATA_HAS_EXISTS => '数据已经存在',
-        self::ERROR_POINTS_NOT_ENOUGH => '用户可用积分不够',
-        self::ERROR_EXP_NOT_ENOUGH => '用户可用经验值不够',
-        self::ERROR_USER_PROFILE_IMCOMPLETE => '用户基本资料不完整',
-        self::ERROR_TOKEN_HAS_REFRESHED => 'token（令牌）已经被刷新过',
-        self::ERROR_USER_HAS_BEING_LOCKED => '用户已被锁定',
-        self::ERROR_TITLE_IS_NOT_EXISTS => '标题不存在',
-        self::ERROR_TITLE_IS_EXISTS => '标题已经存在',
 
         UPLOAD_ERR_INI_SIZE => '文件大小超过了php.ini定义的upload_max_filesize值',
         UPLOAD_ERR_FORM_SIZE => '文件大小超过了HTML定义的MAX_FILE_SIZE值',
@@ -103,6 +143,19 @@ class Ajax
         self::UPLOAD_ERR_BATCH_IS_NOT_ALLOWED => '不允许批量上传',
         self::UPLOAD_ERR_ONLY_SUPPORT_BATCH_UPLOAD => '仅支持批量上传',
         self::UPLOAD_ERR_FASTDFS_SAVE_ERROR_OCCURRED => '文件保存失败',
+
+        self::TASK_CONTAINER_ORDER_NOT_EXIST => '集装箱订单不存在',
+        self::TASK_NOT_EXIST => '该任务不存在',
+        self::TASK_STATUS_CAN_NOT_FINISHED => '该任务已经申请换人',
+        self::TASK_HAS_FINISHED => '该任务已经做过了',
+        self::TASK_FRONT_UNFINISHED => '前置任务尚未完成',
+        self::TASK_HAS_REPORTED_CHECK => '已经汇报过查验情况了',
+        self::TASK_NOT_NEED_CHECK => '该订单已无需查验',
+        self::TASK_APPLY_EXCHANGE_EXIST => '已经申请过换人了',
+        self::TASK_APPLY_EXCHANGE_NOT_EXIST => '换单记录未找到',
+        self::TASK_APPLY_EXCHANGE_REJECT => '申请换人被拒绝',
+        self::TASK_APPLY_EXCHANGE_WAIT => '申请换人等待审核',
+        self::TASK_APPLY_EXCHANGE_NOT_SUPPORT => '换单任务不能执行',
     );
 
     /**
@@ -123,8 +176,8 @@ class Ajax
     {
         self::setHead();
         $result = array(
-            'error' => array('code' => 0, 'msg' => $msg, 'more' => $msg),
             'result' => 1,
+//            'error' => array('code' => 0, 'msg' => $msg, 'more' => $msg),
             'data' => $data
         );
 
@@ -146,9 +199,10 @@ class Ajax
     public static function outError($code, $msg = '')
     {
         self::setHead();
+        $code_msg = self::getErrorMsg($code) ? self::getErrorMsg($code) : $msg;
         $result = array(
-            'error' => array('code' => $code, 'msg' => self::getErrorMsg($code) ? self::getErrorMsg($code) : $msg, 'more' => $msg),
             'result' => 0,
+            'error' => array('code' => $code, 'msg' => $code_msg, 'more' => ($code_msg == $msg ? '' : $msg)),
         );
         if (isset($_REQUEST['callback']) && $_REQUEST['callback']) {
             echo $_REQUEST["callback"] . '(' . json_encode($result, JSON_UNESCAPED_UNICODE) . ')'; // php 5.4

@@ -19,9 +19,7 @@ abstract class CacheAbstract
      * @param int|string $keyName
      * @return mixed
      */
-    public function get($keyName)
-    {
-    }
+    abstract public function get($keyName);
 
 
     /**
@@ -32,9 +30,7 @@ abstract class CacheAbstract
      * @param $lifetime
      * @return boolean
      */
-    public function save($keyName = null, $content = null, $lifetime = 86400)
-    {
-    }
+    abstract public function save($keyName = null, $content = null, $lifetime = 86400);
 
 
     /**
@@ -43,20 +39,16 @@ abstract class CacheAbstract
      * @param int|string $keyName
      * @return boolean
      */
-    public function delete($keyName)
-    {
+    abstract public function delete($keyName);
 
-    }
 
     /**
-     * Checks if cache exists and it hasn't expired
+     * Checks if cache  and it hasn't expired
      *
      * @param  string $keyName
      * @return boolean
      */
-    public function exists($keyName = null)
-    {
-    }
+    abstract public function exists($keyName);
 
 
     /**
@@ -64,10 +56,8 @@ abstract class CacheAbstract
      *
      * @return boolean
      */
-    public function flush()
-    {
+    abstract public function flush();
 
-    }
 
     /**
      * Array of drivers that are available to use with the driver class
@@ -105,7 +95,6 @@ abstract class CacheAbstract
      *
      * @param $driver
      * @return object
-     * @throws CacheException
      * @throws Exception
      */
     public function loadDriver($driver)

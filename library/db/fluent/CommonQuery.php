@@ -1,5 +1,5 @@
 <?php
-namespace Library\Db;
+namespace Library\Db\Fluent;
 
 /** CommonQuery add JOIN and WHERE clauses for (SELECT, UPDATE, DELETE)
  */

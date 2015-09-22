@@ -45,16 +45,8 @@ final class Uri extends Dispatcher
         return isset($params[$n]) ? $params[$n] : false;
     }
 
-    public function getMvcString()
-    {
-        $moduleUri = $this->getModule() != Config::getBase('module') ? $this->getModule() . '/' : '';
-        $moduleUri = $this->getApi() == 'api' ? $moduleUri . 'api/' : $moduleUri;
-
-        return $moduleUri . $this->getController() . '/' . $this->getAction();
-    }
-
     /**
-     * 获取url中最后一个path部分的参数key
+     * 获取url中最后一个path部分最后一个参数
      * --说明:当path部分的数量为单数,则以key=val匹配后剩下的最后一个path参数key
      *
      * @return string
@@ -63,15 +55,12 @@ final class Uri extends Dispatcher
     {
         $params = $this->getPathArray();
         $len = count($params);
-        return $len % 2 == 1 ? $params[$len - 1] : null;
+        return $len > 0 ? $params[$len - 1] : '';
     }
 
     public function getMvcUri()
     {
-        $moduleUri = $this->getModule() ? $this->getModule() . '/' : '';
-        $moduleUri = $this->getApi() == 'api' ? $moduleUri . 'api/' : $moduleUri;
-
-        return $moduleUri . $this->getController() . '/' . $this->getAction();
+        return $this->getMvcString();
     }
 
     /**
@@ -129,60 +118,97 @@ final class Uri extends Dispatcher
     }
 
     /**
-     * url构造(用于分页地址构造等)
+     * 当前页面url构造(用于分页地址构造等)
      *
-     * @param array $url_arr array(key=>val) 更新或添加到url中目录结构path部分
-     * @param array $rm_arr array(key) 删除原有path中的匹配key部分
-     * @param bool $getQueryString true/false 是否返回url中?后query部分
+     * @param string $uri array(key=>val)或者/a/b?a=b 更新或添加到url中目录结构path部分
+     * @param array $del_arr array(key) 删除原有path中的匹配key部分
      * @return string 新构造url
      */
-    /**
-     *
-     * @param array $add_arr array(key=>val) 更新或添加到url中目录结构path部分
-     * @param array $rm_arr array(key) 删除原有path中的匹配key部分(querystring)
-     * @param bool $getQueryString
-     * @return string
-     */
-    public function setUrl($add_arr = array(), $rm_arr = array(), $getQueryString = false)
+    public function setUrl($uri = '', $del_arr = array())
     {
-        $params = $this->getPathArray();
+        $ori_params = $this->getParams();
         $paramPath = array();
-        $lastParam = $this->getLastParam();
-        if (($len = count($params)) > 0) {
-            for ($i = 0; $i < ceil(($len) / 2); $i++) {
-                if (isset($params[$i * 2 + 1]) && $params[$i * 2 + 1]) { #去掉空值的部分
-                    if ($params[$i * 2]) {
-                        $paramPath[$params[$i * 2]] = $params[$i * 2 + 1];
+
+        # 输入参数
+        if (is_string($uri)) {
+            // 输入的query部分
+            $replace_uri = parse_url($uri);
+            $replace_path = isset($replace_uri['path']) ? trim($replace_uri['path'], '/') : '';
+            if ($replace_path) {
+                $uri_params = explode('/', $replace_path);
+                $len = count($uri_params);
+                for ($i = 0; $i < ceil(($len) / 2); $i++) {
+                    if (isset($uri_params[$i * 2 + 1]) && $uri_params[$i * 2 + 1]) {
+                        $paramPath[$uri_params[$i * 2]] = $uri_params[$i * 2 + 1];
                     }
                 }
+                # 追加最后一个参数
+                if ($len % 2 == 1) {
+                    $paramPath['__last_var'] = $uri_params[$len - 1];
+                }
             }
-        }
-        # 添加新的参数
-        if ($add_arr) {
-            $params = array_merge($paramPath, (array)$add_arr);
+        } else if (is_array($uri)) {
+            $paramPath = $uri;
         } else {
-            $params = $paramPath;
+            $paramPath = [];
+        }
+
+        # 添加新的参数
+        if ($paramPath) {
+            $params = array_merge($ori_params, (array)$paramPath);
+        } else {
+            $params = $ori_params;
         }
         # 移除匹配参数
-        if ($rm_arr) {
-            $params = array_diff_key($params, array_flip((array)$rm_arr));
+        if ($del_arr) {
+            $del_arr = is_array($del_arr) ? $del_arr : [$del_arr];
+            $params = array_diff_key($params, array_flip((array)$del_arr));
         }
-        $moduleUri = $this->getModule() != Config::getBase('module') ? '/' . $this->getModule() : '';
-        $moduleUri = $this->getApi() == 'api' ? $moduleUri . '/api' : $moduleUri;
 
-        $mvcUri = $moduleUri . '/' . $this->getController() . '/' . $this->getAction();
+        $mvcUri = $this->getMvcString();
+        $last_param = $params['__last_var'] != '' ? '/' . $params['__last_var'] : '';
+        unset($params['module']);
+        unset($params['controller']);
+        unset($params['action']);
+        unset($params['api']);
+        unset($params['__last_var']);
+
         foreach ($params as $k => $v) {
+            if ($k == "__last_var") {
+                continue;
+            }
             $mvcUri .= '/' . $k . '/' . $v;
+            # 全局到 $_REQUEST
+            $_REQUEST[$k] = $v;
+            $del_arr[] = $k;
         }
         $mvcUri = rtrim($mvcUri, '/');
+
         # 添加最后一个path参数和后缀
-        $uriPath = $mvcUri . $lastParam . $this->getSuffix();
+        $uriPath = $mvcUri . $last_param . $this->getSuffix();
+
         # 返回后面的query参数
-        $request_uri = $getQueryString == true && $this->request->getQuery() ? $uriPath . '?' . $this->request->getQuery() : $uriPath;
-        $url = $this->request->getBaseUrl() . '/' . ltrim($request_uri, '/');
+        // 获取原始query部分
+        $request_uri_query = $this->request->getQuery();
+        parse_str($request_uri_query, $request_arr);
+        // 输入的query部分
+        $replace_uri_query = isset($replace_uri['query']) ? $replace_uri['query'] : '';
+        parse_str($replace_uri_query, $replace_arr);
+        // 最终query部分
+        $queryParams = array_merge($request_arr, $replace_arr);
+        $query_str = '';
+        foreach ($queryParams as $key => $val) {
+            # 需要删除或path部分已经存在
+            if (in_array($key, $del_arr)) {
+                continue;
+            }
+            $query_str .= $key . '=' . $val . '&';
+        }
+        $query_str = trim($query_str, '&');
+        $queryStr = $query_str ? '?' . $query_str : '';
+        $url = $this->request->getBaseUrl() . '/' . $uriPath . $queryStr;
         return $url;
     }
-
 
     /**
      * baseUrl

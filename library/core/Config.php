@@ -65,20 +65,12 @@ class Config
     {
         if (!isset (self::$settings [$file])) {
             $appSettings = array();
-            $siteSettings = array();
             $configFile = WEB_ROOT . '/config/' . $file . '.php';
             if (file_exists($configFile)) {
-                $appSettings = include($configFile);
+                $appSettings = include_once($configFile);
             }
             unset ($configFile);
-
-            $configFile = WEB_ROOT . '/config/' . $file . '.php';
-            if (file_exists($configFile)) {
-                $siteSettings = include($configFile);
-            }
-            unset ($configFile);
-            self::$settings [$file] = array_merge($siteSettings, $appSettings);
-            unset ($siteSettings);
+            self::$settings [$file] = $appSettings;
             unset ($appSettings);
         }
         return self::$settings [$file];

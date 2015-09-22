@@ -2,7 +2,8 @@
 
 namespace Library\Core;
 
-use Library\Db\FluentPDO;
+use Library\Db\Fluent\FluentPDO;
+use PDO;
 
 if (!defined('LIB_PATH')) exit('No direct script access allowed');
 
@@ -14,7 +15,7 @@ if (!defined('LIB_PATH')) exit('No direct script access allowed');
  * @package  lib/core
  * @time     2013-07-11
  */
-class Model extends FluentPDO
+abstract class Model extends FluentPDO
 {
     /**
      * @var FluentPDO
@@ -22,7 +23,7 @@ class Model extends FluentPDO
     private static $db = null;
 
     /**
-     * @var \PDO
+     * @var PDO
      */
     private static $pdo = null;
 
@@ -64,8 +65,8 @@ class Model extends FluentPDO
             $driver = !empty($config['driver']) ? $config['driver'] : "mysql";
 
             $options = array(
-                \PDO::ATTR_PERSISTENT => false, # ?
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
+                PDO::ATTR_PERSISTENT => false, # ?
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, #err model, ERRMODE_SILENT 0,ERRMODE_EXCEPTION 2
             );
 
             $pdo = null;
@@ -73,16 +74,16 @@ class Model extends FluentPDO
             // mysql
             if ($driver == 'mysql') {
                 $dsn = $driver . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
-                $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
+                $pdo = new PDO($dsn, $db_user, $db_pass, $options);
                 $pdo->exec('set names \'utf8\'');
             }
 
             // sqlsrv
             if ($driver == 'sqlsrv') {
                 $dsn = "sqlsrv:server=$db_host;database=$db_name;";
-                $pdo = new \PDO($dsn, $db_user, $db_pass, $options);
+                $pdo = new PDO($dsn, $db_user, $db_pass, $options);
             }
-            if (!$pdo) {
+            if (!$pdo || !($pdo instanceof PDO)) {
                 die("数据库驱动类型为找到");
             }
 
@@ -109,7 +110,7 @@ class Model extends FluentPDO
         $reflection = new \ReflectionClass(get_called_class());
         $defaultProp = $reflection->getDefaultProperties();
         self::connect(empty($defaultProp['database']) ? '' : $defaultProp['database']);
-        $table = substr($reflection->getShortName(), 0, -5);
+        $table = str_replace('Model', '', $reflection->getShortName());
         if (!isset($defaultProp['tableName'])) {
             preg_match_all('/((?:^|[A-Z])[a-z]+)/', $table, $matches);
             $table = strtolower(implode('_', $matches[0]));
@@ -192,7 +193,7 @@ class Model extends FluentPDO
      * @param int $limit
      * @return array
      */
-    final public static function find($where = null, $columns = null, $sort = null, $page = 0, $limit = 10)
+    final public static function find($where = null, $columns = null, $sort = null, $page = null, $limit = null)
     {
         // 根据表切换数据库,单独一行
         $table = self::table();
@@ -317,6 +318,7 @@ class Model extends FluentPDO
 
     final public function save($data = null, $whiteList = null)
     {
+        return self::create($data);
     }
 
     /**
@@ -342,9 +344,10 @@ class Model extends FluentPDO
      * @param $column
      * @param string $index_key
      * @param null $group
+     * @param null $sort
      * @return array
      */
-    public static function getByColumnArr($where, $column, $index_key = '', $group = null)
+    public static function getByColumnArr($where, $column, $index_key = '', $group = null, $sort = null)
     {
         // 根据表切换数据库,单独一行
         $table = self::table();
@@ -352,6 +355,9 @@ class Model extends FluentPDO
         $query = self::$db->from($table)->where($where)->select(null)->select($columns);
         if ($group) {
             $query->groupBy($group);
+        }
+        if ($sort) {
+            $query->orderBy($sort);
         }
         $res = $query->fetchAll();
         if ($res) {
@@ -369,7 +375,7 @@ class Model extends FluentPDO
      * 删除数据
      *
      * @param $where
-     * @return bool|\PDOStatement
+     * @return bool|PDOStatement
      */
     final public static function del($where)
     {
@@ -386,7 +392,7 @@ class Model extends FluentPDO
      *
      * @param $data
      * @param $where
-     * @return bool|\PDOStatement
+     * @return bool|PDOStatement
      * @throws Exception
      */
     final public static function update($data, $where)

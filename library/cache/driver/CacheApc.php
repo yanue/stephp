@@ -31,7 +31,22 @@ class CacheApc extends CacheAbstract
         $data = apc_fetch($id, $success);
 
         return ($success === TRUE && is_array($data))
-            ? unserialize($data[0]) : FALSE;
+            ? $data[0] : FALSE;
+    }
+
+    /**
+     * Checks if cache exists and it hasn't expired
+     *
+     * @param  string $keyName
+     * @return boolean
+     */
+    public function exists($keyName)
+    {
+        $success = FALSE;
+        $data = apc_fetch($keyName, $success);
+
+        return ($success === TRUE && is_array($data))
+            ? true : FALSE;
     }
 
     /**
@@ -67,7 +82,7 @@ class CacheApc extends CacheAbstract
      *
      * @return    bool    false on failure/true on success
      */
-    public function clean()
+    public function flush()
     {
         return apc_clear_cache('user');
     }

@@ -17,7 +17,7 @@ use Library\Di\DI;
 use Library\Di\Injectable;
 use Library\Util\Session;
 
-define('VERSION', '2.2.0');
+define('VERSION', '2.2.4');
 
 defined('LIB_PATH') || define('LIB_PATH', dirname(__FILE__));
 defined('WEB_ROOT') || define('WEB_ROOT', dirname(__FILE__) . '/..');
@@ -94,11 +94,12 @@ class Application extends Injectable
     private function _errorSetting()
     {
         # set display_errors
-        ini_set('display_errors', intval(Config::getBase('display_errors')));
+        ini_set('display_errors', Config::getBase('display_errors') ? 'On' : 'Off');
 
-        if (Config::getBase('display_errors')) {
+        if (Config::getBase('debug')) {
             error_reporting(E_ALL);
         }
+
         $exception = new Exception();
         // 监听内部错误 500 错误
         register_shutdown_function(array($exception, 'shutdown_handle'));
@@ -125,6 +126,8 @@ class Application extends Injectable
      */
     private function _run()
     {
+        header("X-Powered-By:stephp " . VERSION);
+
         // 执行路由
         if ($conig = Config::getRouter()) {
             new Router($conig);
@@ -150,7 +153,6 @@ class Application extends Injectable
         if (class_exists($_namespaceClass, true)) {
             $controllerObj = new $_namespaceClass();
             if (method_exists($controllerObj, $actionName)) {
-                $controllerObj->setDI(new DI());
                 //执行action预处理方法
                 if (method_exists($controllerObj, 'actionBefore')) {
                     $controllerObj->actionBefore();
@@ -158,10 +160,9 @@ class Application extends Injectable
                 // 执行action方法
                 try {
                     $controllerObj->$actionName();
-
                     $this->di->get('view')->display();
 
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Debug::log($e->getFile() . ':' . $e->getMessage());
                     Debug::log('Trace:' . $e->getTraceAsString());
                 }

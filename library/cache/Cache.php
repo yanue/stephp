@@ -137,6 +137,17 @@ class Cache extends CacheAbstract
     }
 
     /**
+     * Checks if cache exists and it hasn't expired
+     *
+     * @param  string $keyName
+     * @return boolean
+     */
+    public function exists($keyName)
+    {
+        return $this->{$this->_adapter}->exists($this->keyPrefix . md5($keyName));
+    }
+
+    /**
      * Stores cached content into the file backend and stops the frontend
      *
      * @param int|string $keyName
@@ -144,7 +155,7 @@ class Cache extends CacheAbstract
      * @param $lifetime
      * @return boolean
      */
-    public function save($keyName = null, $content = null, $lifetime = 86400)
+    public function save($keyName = null, $content = null, $lifetime = null)
     {
         return $this->{$this->_adapter}->save($this->keyPrefix . md5($keyName), serialize($content), $lifetime);
     }
@@ -165,9 +176,9 @@ class Cache extends CacheAbstract
      *
      * @return bool on success, FALSE on failure
      */
-    public function clean()
+    public function flush()
     {
-        return $this->{$this->_adapter}->clean();
+        return $this->{$this->_adapter}->flush();
     }
 
     /**

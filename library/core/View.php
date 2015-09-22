@@ -72,26 +72,34 @@ class View extends Injectable
      * render  -- to include template
      *
      * @param string $name : 当前模块视图下相对路径模块名称.
-     * @return void.
+     * @param string $var 模板变量
+     * @return void
      */
-    public function render($name)
+    public function render($name, $var = null)
     {
         $file = $this->uri->getModulePath() . '/view/' . $name . $this->suffix;
-        if (file_exists($file)) {
-            extract($this->var);
+//        if (file_exists($file)) {
 
-            include $file;
+        extract($this->var);
+
+        if (is_array($var)) {
+            extract($var);
         }
+
+        include $file;
+//        }
     }
 
-    public function partial($name)
+    /**
+     * render  -- the same to render
+     *
+     * @param string $name : 当前模块视图下相对路径模块名称.
+     * @param string $var 模板变量
+     * @return void
+     */
+    public function partial($name, $var = null)
     {
-        $file = $this->uri->getModulePath() . '/view/' . $name . $this->suffix;
-        if (file_exists($file)) {
-            extract($this->var);
-
-            include $file;
-        }
+        $this->render($name, $var);
     }
 
     /**
@@ -146,7 +154,57 @@ class View extends Injectable
      */
     public function setVar($key, $value)
     {
-        $this->var[$key] = $value;
+        if ($key)
+            $this->var[$key] = $value;
+    }
+
+    /**
+     * 获取变量
+     *
+     * @param $key
+     * @return null
+     */
+    public function getVar($key)
+    {
+        return isset($this->var[$key]) ? $this->var[$key] : null;
+    }
+
+    /**删除变量
+     * @param $key
+     */
+    public function delVar($key)
+    {
+        if ($key && isset($this->var[$key]))
+            unset($this->var[$key]);
+        // 及时刷新
+        extract($this->var);
+    }
+
+    /**删除变量
+     * @param $key
+     */
+    public function clearVar($key)
+    {
+        if ($key && isset($this->var[$key]))
+            unset($this->var[$key]);
+        // 及时刷新
+        extract($this->var);
+    }
+
+    /**
+     * 清除原有变量更换为当前
+     *
+     * @param $var
+     */
+    public function resetVar($var)
+    {
+        if (is_array($var)) {
+            $this->var = $var;
+        } else {
+            $this->var = [];
+        }
+        // 及时刷新
+        extract($this->var);
     }
 
     /**
@@ -172,11 +230,11 @@ class View extends Injectable
      */
     public function display()
     {
-        // 直接载入PHP模板
+        # 直接载入PHP模板
         if ($this->_layout) {
             $layout = $this->uri->getModulePath() . '/view/' . $this->_layout . $this->suffix;
             if (file_exists($layout)) {
-                /*解析变量*/
+                # 解析变量
                 extract($this->var);
                 include_once $layout;
             } else {

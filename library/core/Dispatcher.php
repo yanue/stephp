@@ -25,6 +25,8 @@ class Dispatcher extends Injectable
     private $_appPath = null;
     private $_apiName = null;
 
+    const __last_var = '__last_var';
+
     /**
      * 初始化请求
      *
@@ -125,9 +127,16 @@ class Dispatcher extends Injectable
 
         #2. 取出mvc后的path部分
         $paramPath = array();
+        $paramPath['__last_var'] = ''; # 最后一个无key参数
         if (($len = count($this->_requestPath)) > 0) {
             for ($i = 0; $i < ceil(($len) / 2); $i++) {
-                $paramPath[$this->_requestPath[$i * 2]] = isset($this->_requestPath[$i * 2 + 1]) ? $this->_requestPath[$i * 2 + 1] : '';
+                if (isset($this->_requestPath[$i * 2 + 1]) && $this->_requestPath[$i * 2 + 1]) {
+                    $paramPath[$this->_requestPath[$i * 2]] = $this->_requestPath[$i * 2 + 1];
+                }
+            }
+            # 追加最后一个参数
+            if ($len % 2 == 1) {
+                $paramPath['__last_var'] = $this->_requestPath[$len - 1];
             }
         }
 
@@ -310,4 +319,16 @@ class Dispatcher extends Injectable
         return $url;
     }
 
+    /**
+     * 获取mvc段
+     *
+     * @return string
+     */
+    public function getMvcString()
+    {
+        $moduleUri = $this->getModule() != Config::getBase('module') ? $this->getModule() . '/' : '';
+        $moduleUri = $this->getApi() == 'api' ? $moduleUri . 'api/' : $moduleUri;
+
+        return $moduleUri . $this->getController() . '/' . $this->getAction();
+    }
 }

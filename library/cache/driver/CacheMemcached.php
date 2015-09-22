@@ -16,7 +16,7 @@ class CacheMemcached extends CacheAbstract
     /**
      * Holds the memcached object
      *
-     * @var object
+     * @var \Memcached
      */
     protected $_memcached;
 
@@ -42,7 +42,7 @@ class CacheMemcached extends CacheAbstract
     {
         try {
             $data = $this->_memcached->get($keyName);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Debug::log($e->getFile() . ":" . $e->getMessage());
             Debug::log($e->getTraceAsString());
             return false;
@@ -52,13 +52,29 @@ class CacheMemcached extends CacheAbstract
     }
 
     /**
+     * Checks if cache exists and it hasn't expired
+     *
+     * @param  string $keyName
+     * @return boolean
+     */
+    public function exists($keyName)
+    {
+        try {
+            $data = $this->_memcached->get($keyName);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * save
      * @param null $keyName
      * @param null $content
      * @param $lifetime
      * @return bool
      */
-    public function save($keyName = null, $content = null, $lifetime = 86400)
+    public function save($keyName = null, $content = null, $lifetime = 0)
     {
         $data = array($content, time(), $lifetime);
         if (get_class($this->_memcached) === 'Memcached') {
@@ -86,7 +102,7 @@ class CacheMemcached extends CacheAbstract
      *
      * @return bool on failure/true on success
      */
-    public function clean()
+    public function flush()
     {
         return $this->_memcached->flush();
     }

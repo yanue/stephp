@@ -3,7 +3,6 @@ namespace Library\Util;
 
 use Library\Core\Plugin;
 use Library\Core\Router;
-use Library\Core\View;
 
 /**
  * Class Pagination

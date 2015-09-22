@@ -147,11 +147,13 @@ class Debug extends Injectable
         return round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
 
-    public static function log($msg, $level = 'INFO')
+    public static function log($msg, $type = 'log', $level = 'INFO')
     {
+        $msg = is_array($msg) ? var_export($msg, true) : $msg;
+
         $level = strtoupper($level);
 
-        $filepath = WEB_ROOT . '/cache/log/' . date('Y-m') . '/log-' . date('m-d') . '.log';
+        $filepath = WEB_ROOT . '/cache/' . $type . '/' . date('Y-m') . '/log-' . date('m-d') . '.log';
         $message = '';
         $base = dirname($filepath);
         if (!is_dir($base)) {

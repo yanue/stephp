@@ -55,13 +55,28 @@ class CacheFile extends CacheAbstract
     }
 
     /**
+     * Checks if cache exists and it hasn't expired
+     *
+     * @param  string $keyName
+     * @return boolean
+     */
+    public function exists($keyName)
+    {
+        if (file_exists($this->_cache_path . $keyName)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * save
      * @param null $keyName
      * @param null $content
      * @param $lifetime
      * @return bool
      */
-    public function save($keyName = null, $content = null, $lifetime = 86400)
+    public function save($keyName = null, $content = null, $lifetime = 0)
     {
         $contents = array(
             'time' => time(),
@@ -88,19 +103,15 @@ class CacheFile extends CacheAbstract
         return file_exists($this->_cache_path . $keyName) ? unlink($this->_cache_path . $keyName) : FALSE;
     }
 
-    // ------------------------------------------------------------------------
-
     /**
      * Clean the Cache
      *
      * @return    bool    false on failure/true on success
      */
-    public function clean()
+    public function flush()
     {
         return unlink($this->_cache_path, true);
     }
-
-    // ------------------------------------------------------------------------
 
     /**
      * Cache Info

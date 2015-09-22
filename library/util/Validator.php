@@ -29,9 +29,25 @@ class Validator
         if (strlen($username) > 16 || strlen($username) < 5) {
             return false;
         }
-        if (preg_match('/^([a-z]+)([a-z0-9]+)$/i', $username) == 0) {
+        if (preg_match('/^([a-z]+)([a-z0-9]+)/i', $username) == 0) {
             return false;
         };
+        return true;
+    }
+
+    /**
+     * 验证用户姓名
+     * --说明:长度为2-10位中文.
+     * @param $username
+     * @return array|int
+     */
+    public static function validRealName($username)
+    {
+
+        if (!preg_match('/^([\x{4e00}-\x{9fa5}]{2,10})$/', $username)) {
+            return false;
+        };
+
         return true;
     }
 
@@ -116,6 +132,61 @@ class Validator
     }
 
     /**
+     * Validate that an attribute is a valid URL.
+     *
+     * @param  mixed $value
+     * @return bool
+     */
+    public static function validateImgUrl($value)
+    {
+        $isUrl = filter_var($value, FILTER_VALIDATE_URL) !== false;
+        $res = false;
+        if ($isUrl) {
+            $res = preg_match('/.*(?:jpg|gif|png)$/i', $value);
+        }
+        return $res;
+    }
+
+    /**
+     * 验证集装箱号
+     * @param $strCode
+     * @return bool
+     */
+    public static function validateContainerNo($strCode)
+    {
+        $Charcode = "0123456789A?BCDEFGHIJK?LMNOPQRSTU?VWXYZ";
+        if (strlen($strCode) != 11)
+            return false;
+
+        $num = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $idx = strpos($Charcode, $strCode[$i]);
+            if ($idx === -1 || $Charcode[$idx] === '?') {
+                break;
+            }
+            $idx = $idx * pow(2, $i);
+            $num += $idx;
+        }
+
+        $num = ($num % 11) % 10;
+        return intval($strCode[10]) == $num;
+    }
+
+    /**
+     * 验证订单编号
+     *
+     * @param $order
+     * @return bool|int
+     */
+    public static function validateContainerOrder($order)
+    {
+        if (strlen($order) != 10) return false;
+        # IO|IC|EO|EC+8位数字
+        $res = preg_match('/^(IO|IC|EO|EC|RO)([0-9]{8})$/i', $order, $matches);
+        return $res;
+    }
+
+    /**
      * Validate that an attribute is an active URL.
      *
      * @param  mixed $value
@@ -166,7 +237,7 @@ class Validator
      */
     public static function validateAlpha($value)
     {
-        return preg_match('/^([a-z])+$/i', $value);
+        return preg_match('/^([a-z])+$/$i', $value);
     }
 
     /**
@@ -177,7 +248,7 @@ class Validator
      */
     public static function validateAlphaNum($value)
     {
-        return preg_match('/^([a-z0-9])+$/i', $value);
+        return preg_match('/^([a-z0-9])+$/$i', $value);
     }
 
     /**
@@ -188,7 +259,7 @@ class Validator
      */
     public static function validateAlphaDash($value)
     {
-        return preg_match('/^([a-z0-9_-])+$/i', $value);
+        return preg_match('/^([a-z0-9_-])+$/$i', $value);
     }
 
     /**
@@ -255,9 +326,56 @@ class Validator
         if (strlen($name) > 20 || strlen($name) < 1) {
             return false;
         }
-        if (preg_match('/^([a-z]+)([0-9a-zA-Z_-]+)$/i', $name) == 0) {
+        if (preg_match('/^([a-z]+)([0-9a-zA-Z_-]+)$/$i', $name) == 0) {
             return false;
         };
         return true;
+    }
+
+    public static function validateCellPhone($phone)
+    {
+        return self::validateRegex($phone, '/^1[\d]{10}$/');
+    }
+
+    /**
+     * 验证身份证号
+     *
+     * @param $idcard
+     * @return bool
+     */
+    public static function validateIDCard($idcard)
+    {
+        // 只能是18位
+        if (strlen($idcard) != 18) {
+            return false;
+        }
+
+        // 取出本体码
+        $idcard_base = substr($idcard, 0, 17);
+
+        // 取出校验码
+        $verify_code = substr($idcard, 17, 1);
+
+        // 加权因子
+        $factor = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);
+
+        // 校验码对应值
+        $verify_code_list = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
+
+        // 根据前17位计算校验码
+        $total = 0;
+        for ($i = 0; $i < 17; $i++) {
+            $total += substr($idcard_base, $i, 1) * $factor[$i];
+        }
+
+        // 取模
+        $mod = $total % 11;
+
+        // 比较校验码
+        if ($verify_code == $verify_code_list[$mod]) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

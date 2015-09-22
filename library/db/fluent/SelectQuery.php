@@ -1,5 +1,5 @@
 <?php
-namespace Library\Db;
+namespace Library\Db\Fluent;
 
 use Countable;
 use PDO;
@@ -85,7 +85,7 @@ class SelectQuery extends CommonQuery implements Countable
     {
         $return = $this->execute();
         if ($return === false) {
-            return false;
+            return '';
         }
         $return = $return->fetch();
         if ($return && $column != '') {

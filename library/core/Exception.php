@@ -17,6 +17,11 @@ class Exception extends \Exception
 {
     private static $isInitErrinfo = false;
 
+    // 自定义字符串输出的样式 */
+    public function __toString() {
+        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+    }
+
     /**
      * 自定义错误处理
      *

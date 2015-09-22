@@ -40,6 +40,18 @@ class CacheRedis extends CacheAbstract
     }
 
     /**
+     * Checks if cache exists and it hasn't expired
+     *
+     * @param  string $keyName
+     * @return boolean
+     */
+    public function exists($keyName)
+    {
+        return $this->_redis->exists($keyName);
+
+    }
+
+    /**
      * Save cache
      *
      * @param null $keyName
@@ -47,7 +59,7 @@ class CacheRedis extends CacheAbstract
      * @param int $lifetime
      * @return bool
      */
-    public function save($keyName = null, $content = null, $lifetime = 86400)
+    public function save($keyName = null, $content = null, $lifetime = null)
     {
         if (!$keyName) {
             return false;
@@ -72,7 +84,7 @@ class CacheRedis extends CacheAbstract
      * @return bool
      * @see Redis::flushDB()
      */
-    public function clean()
+    public function flush()
     {
         return $this->_redis->flushDB();
     }
