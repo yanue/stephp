@@ -19,8 +19,9 @@ class Dispatcher extends Injectable
     private $_moduleName = 'home'; // 模块
     private $_controllerName = 'index'; // 控制器
     private $_actionName = 'index'; // 方法
-    private $_requestParams = array(); # action 后面的目录结构
+    private $_requestParams = array(); # action 后面的目录结构(key=>val模式，含query部分，mvc部分)
     private $_requestPath = array(); # path部分后面
+    private $_pathParams = array(); # path部分key=>val模式(去除mvc部分)
     private $_urlSuffix = '.html';
     private $_appPath = null;
     private $_apiName = null;
@@ -145,9 +146,9 @@ class Dispatcher extends Injectable
         $queryString = $this->request->getQuery();
         parse_str($queryString, $paramQuery);
         $requestParams = array_merge($paramQuery, $paramMvc, $paramPath);
-
         # 合并所有请求,'?'后面的参数如果有与path部分相同的将被覆盖
         $this->_requestParams = $requestParams;
+        $this->_pathParams = $paramPath;
     }
 
     /**
@@ -218,6 +219,16 @@ class Dispatcher extends Injectable
     public function getParams()
     {
         return $this->_requestParams;
+    }
+
+    /**
+     * 获取请求参数组
+     *
+     * @return array
+     */
+    public function getPathParams()
+    {
+        return $this->_pathParams;
     }
 
     /**

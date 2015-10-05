@@ -57,11 +57,7 @@ abstract class Model extends FluentPDO
                 die("数据库配置错误");
             }
 
-            $db_port = isset($config['port']) ? $config['port'] : '3306';
-            $db_host = $config['host'];
-            $db_name = $config['name'];
-            $db_user = $config['user'];
-            $db_pass = $config['pass'];
+
             $driver = !empty($config['driver']) ? $config['driver'] : "mysql";
 
             $options = array(
@@ -73,6 +69,11 @@ abstract class Model extends FluentPDO
 
             // mysql
             if ($driver == 'mysql') {
+                $db_port = isset($config['port']) ? $config['port'] : '3306';
+                $db_host = $config['host'];
+                $db_name = $config['name'];
+                $db_user = $config['user'];
+                $db_pass = $config['pass'];
                 $dsn = $driver . ':dbname=' . $db_name . ';host=' . $db_host . ';port=' . $db_port;
                 $pdo = new PDO($dsn, $db_user, $db_pass, $options);
                 $pdo->exec('set names \'utf8\'');
@@ -80,9 +81,25 @@ abstract class Model extends FluentPDO
 
             // sqlsrv
             if ($driver == 'sqlsrv') {
-                $dsn = "sqlsrv:server=$db_host;database=$db_name;";
+                $db_port = isset($config['port']) ? $config['port'] : '3306';
+                $db_host = $config['host'];
+                $db_name = $config['name'];
+                $db_user = $config['user'];
+                $db_pass = $config['pass'];
+                $dsn = 'sqlsrv:server=' . $db_host . ';database=' . $db_name . ';';
                 $pdo = new PDO($dsn, $db_user, $db_pass, $options);
             }
+
+            // sqlite
+            if ($driver == 'sqlite3') {
+                $db_file = $config['file'];
+
+                $dsn = "sqlite:" . $db_file;
+                $pdo = new PDO($dsn);
+                // Set errormode to exceptions
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            }
+
             if (!$pdo || !($pdo instanceof PDO)) {
                 die("数据库驱动类型为找到");
             }

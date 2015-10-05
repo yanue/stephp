@@ -18,7 +18,8 @@ class Exception extends \Exception
     private static $isInitErrinfo = false;
 
     // 自定义字符串输出的样式 */
-    public function __toString() {
+    public function __toString()
+    {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
 
@@ -84,10 +85,10 @@ class Exception extends \Exception
      *
      * @param $e
      */
-    public function exception_handler($e)
+    public function exception_handler(\Exception $e)
     {
+
         $error = array();
-        $error['message'] = $e->getMessage();
         $trace = $e->getTrace();
         if ('throw_exception' == $trace[0]['function']) {
             $error['file'] = $trace[0]['file'];
@@ -96,7 +97,11 @@ class Exception extends \Exception
             $error['file'] = $e->getFile();
             $error['line'] = $e->getLine();
         }
-        echo '<pre >[Line ' . $error['line'] . '] ' . $error['file'] . ' <br /> ERR MSG: ' . $error['message'] . '</pre>';
+        echo '<pre>';
+        echo "Uncaught exception: ", $e->getMessage(), "\n";
+        echo '[Line ' . $error['line'] . '] ' . $error['file'] . '';
+        echo '<p style="padding:0 8px;color: #666;font-size: 12px;">' . $e->getTraceAsString() . '</p>';
+        echo '</pre>';
     }
 
     /**

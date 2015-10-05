@@ -126,7 +126,7 @@ final class Uri extends Dispatcher
      */
     public function setUrl($uri = '', $del_arr = array())
     {
-        $ori_params = $this->getParams();
+        $ori_params = $this->getPathParams();
         $paramPath = array();
 
         # 输入参数
@@ -167,14 +167,9 @@ final class Uri extends Dispatcher
 
         $mvcUri = $this->getMvcString();
         $last_param = $params['__last_var'] != '' ? '/' . $params['__last_var'] : '';
-        unset($params['module']);
-        unset($params['controller']);
-        unset($params['action']);
-        unset($params['api']);
         unset($params['__last_var']);
-
         foreach ($params as $k => $v) {
-            if ($k == "__last_var") {
+            if ($k == "__last_var" || !$v) {
                 continue;
             }
             $mvcUri .= '/' . $k . '/' . $v;
