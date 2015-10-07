@@ -1,5 +1,5 @@
 <?php
-# ==== mysql ====
+# ==== database ====
 return array(
     'db.defaultSqlDriver' => 'mysql',
     'mysql' => array(
