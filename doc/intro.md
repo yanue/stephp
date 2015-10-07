@@ -12,4 +12,4 @@ A Simple Tiny Easy PHP mvc Framework
 * 强大缓存处理方式
 * 灵活的配置
 
-- 上一章： [配置文件](config.md)
+- 下一章： [配置文件](config.md)

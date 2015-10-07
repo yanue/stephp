@@ -10,6 +10,7 @@ namespace service;
 
 
 use Library\Core\Plugin;
+use Model\UserModel;
 
 class UserManager extends Plugin
 {
@@ -27,6 +28,7 @@ class UserManager extends Plugin
     {
         print_r($this->uri->getFullUrl());
         print_r($this->db->from('user')->fetch());
+        UserModel::findFirst();
 
     }
 }

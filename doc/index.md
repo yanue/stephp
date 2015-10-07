@@ -8,4 +8,5 @@
 4. [V视图说明](view.md)
 5. [M数据库模型说明](model.md)
 6. [数据库操作CURD](curd.md)
-7. [常见类库](class.md)
+7. [插件式模块业务](service.md)
+8. [常见类库](class.md)

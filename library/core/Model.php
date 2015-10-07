@@ -346,7 +346,7 @@ abstract class Model extends FluentPDO
      * @param string $default
      * @return string
      */
-    public static function getByColumn($where, $column, $default = '')
+    final  public static function getByColumn($where, $column, $default = '')
     {
         // 根据表切换数据库,单独一行
         $table = self::table();
@@ -364,7 +364,7 @@ abstract class Model extends FluentPDO
      * @param null $sort
      * @return array
      */
-    public static function getByColumnArr($where, $column, $index_key = '', $group = null, $sort = null)
+    final public static function getByColumnArr($where, $column, $index_key = '', $group = null, $sort = null)
     {
         // 根据表切换数据库,单独一行
         $table = self::table();
