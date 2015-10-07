@@ -161,7 +161,10 @@ class Application extends Injectable
                 try {
                     $controllerObj->$actionName();
                     $this->di->get('view')->display();
-
+                    //执行action预处理方法
+                    if (method_exists($controllerObj, 'actionAfter')) {
+                        $controllerObj->actionAfter();
+                    }
                 } catch (Exception $e) {
                     Debug::log($e->getFile() . ':' . $e->getMessage());
                     Debug::log('Trace:' . $e->getTraceAsString());
