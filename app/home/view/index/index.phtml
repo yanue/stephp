@@ -6,3 +6,6 @@ foreach ($a as $_a) {
     $this->render('index/row/row');
     ?>
 <?php } ?>
+<?php
+\Library\Util\Pagination::instance()->display();
+?>

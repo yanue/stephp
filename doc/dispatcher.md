@@ -75,3 +75,5 @@ $route['product/(:any)'] = "catalog/product_lookup/$1/$2/$3/$4/$5";        //将
 
 你也可以混合使用通配符与正则表达式.
 
+- 上一章： [配置文件](config.md)
+- 下一章： [控制器](controller.md)

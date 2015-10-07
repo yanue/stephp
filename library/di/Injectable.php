@@ -30,7 +30,7 @@ abstract class Injectable
     protected $response;
 
     /**
-     * @var \Library\Db\FluentPDO
+     * @var \Library\Db\Fluent\FluentPDO
      */
     protected $db;
 

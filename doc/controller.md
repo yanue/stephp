@@ -53,5 +53,33 @@
 	actionBefore 如果Contoller存在actionBefore方法，将会在执行当前action方法之前执行
 	actionAfter 如果Contoller存在actionAfter方法，将会在执行当前action方法之后执行
 	
+### 继承处理
+控制器可以继承控制器，有时需要统一处理一些逻辑，可以通过继承来实现
+
+    <?php
+    namespace App\Home\Controller;
+	// HomeBase.php文件
+    class HomeBase extends Controller {
+    
+           public function __construct()
+           {
+                parent::__construct();
+                // 处理公用逻辑
+           }
+    }
+    ?>
+    
+	<?php
+    namespace App\Home\Controller;
+	// UserController.php文件继承HomeBase
+    class UserController extends HomeBase {
+    
+           public function profileAction()
+           {
+                // 处理自身
+           }
+    }
+    ?>
+	
 - 上一章： [URL分发及路由](dispatcher.md)
 - 下一章： [视图处理](view.md)

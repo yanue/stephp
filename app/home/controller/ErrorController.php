@@ -15,11 +15,11 @@ use Library\Util\Debug;
 
 class Error1Controller extends Controller{
 
-    public function __construct(){
-    }
+
 
     public function indexAction(){
         echo 'You have reached the error page!';
+        $this->uri->setUrl('a=b');
     }
 
 }
