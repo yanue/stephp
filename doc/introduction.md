@@ -19,35 +19,28 @@ A Simple Tiny Easy PHP mvc Framework
 ### --目录结构
     project # 项目根目录
     ├─app   # 应用目录
-    │  └─home           # 模块
-    │     ├─controller # 控制器
-    │     ├─model      # 模型
-    │     └─view       # 试图
+    │  └─default        # 模块
+    │     ├─controllers # 控制器
+    │     ├─models      # 模型
+    │     └─views       # 试图
     │        ├─index    # 对应于IndexController->indexAction.
     │        └─layout.php # layout
     ├─assets        # 该目录可以自定义,默认前端采用seajs模块化开发结构
     │  ├─images     # 图片
-    │  ├─js         # 脚本
-    │  └─css        # 样式
-    ├─cache         # 缓存目录及日志默认
+    │  ├─scripts    # 脚本
+    │  └─styles     # 样式
     ├─config 配置文件
     │  ├─config.php   # 应用配置
-    │  ├─database.php # 数据库配置
     │  └─router.php   # 路由配置
     ├─data      # 数据存放
     ├─library   # 系统类库
-    │  ├─cache  # 缓存处理
     │  ├─core   # 系统初始化核心处理
-    │  ├─di     # 依赖注入
     │  ├─db     # 数据库操作
+    │  ├─func   # 基础公用函数
     │  └─util   # 基础工具类
-    ├─model     # 数据库模型
-    ├─service   # 业务逻辑处理
     ├─.htaccess # 去除url上index.php
     ├─index.php # 入口文件
     └─README.md # 简单说明文档
 
 ### --简单执行流程
 打开url->加载类库->解析url->检查是否经过路由->分陪mvc->执行控制器方法->数据处理->视图输出
-
-
