@@ -63,7 +63,7 @@
 * [黔东南州水利民生工程](http://www.ygsl.gov.cn/)
 * [estt官网](http://estt.com.cn/)
 * [捷明实业官网](http://www.fu5.com.cn/)
-* [爱玩儿网](http://aiwaer.net/)
+* [爱玩儿网](http://aiwaner.net/)
 * [yanue.net](http://yanue.net)
 * ...
 
